@@ -1,105 +1,194 @@
-# Modelo de Datos: Módulo Base de Software de Planificación de Recursos Empresariales (ERP)
+# Modelo Entidad–Relación — Módulo 7: Manufactura y Operaciones
 
-## Entidad: Entity (registro de datos maestros)
+Este documento convierte el diagrama MER a formato tabular Markdown.
 
-Representa el dato maestro central del módulo (p. ej., cliente, proveedor, artículo) con su identidad fiscal, contacto y condiciones comerciales.
+## Leyenda
 
-| Campo | Tipo | Descripción | Restricciones |
+- **PK**: Primary Key / Clave primaria
+- **FK**: Foreign Key / Clave foránea
+- **Ext. Logística**: referencia al módulo 3, Logística e inventario
+- **Ext. RRHH**: referencia al módulo 2, RRHH y planillas
+- **Ext. Compras**: referencia al módulo 6, Adquisición y compras
+
+---
+
+## 1. PRODUCTO
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
 |---|---|---|---|
-| id | string | Identificador interno único del registro de entidad | Obligatorio, generado automáticamente |
-| entity_id | string | Identificador público usado para vincular documentos a esta entidad | Obligatorio, generado automáticamente, único |
-| name | string | Nombre o razón social de la entidad | Obligatorio, no vacío |
-| code | string | Código o clave de negocio que identifica la entidad | Obligatorio, no vacío |
-| taxId | string | Identificación fiscal de la entidad (p. ej., RFC, NIT, CUIT) | Opcional; se almacena recortada cuando se proporciona |
-| email | string | Correo electrónico principal de contacto | Opcional; debe tener formato de correo válido si se proporciona |
-| phone | string | Teléfono de contacto | Opcional |
-| address | string | Dirección fiscal o comercial | Opcional |
-| category | string | Clasificación opcional como tipo, grupo o clase | Opcional |
-| description | string | Descripción corta o notas | Opcional |
-| targetDate | string | Fecha objetivo opcional en formato YYYY-MM-DD; los módulos personalizados definen su significado (p. ej., fecha de vencimiento, fecha de revisión) | Opcional, debe ser una fecha de calendario válida si se proporciona |
-| creditLimit | number | Límite de crédito extendido a la entidad en la moneda configurada | Opcional, debe ser un número no negativo |
-| paymentTerms | string | Condiciones de pago acordadas (p. ej., contado, neto 30) | Opcional |
-| createdAt | string | Marca de tiempo de cuándo se creó la entidad | Obligatorio |
-| updatedAt | string | Marca de tiempo de la última actualización de la entidad | Obligatorio |
+| producto_id | int | PK | |
+| nombre | string | | |
+| tipo | string | | |
 
-## Entidad: Document (registro transaccional)
+## 2. PRODUCTO_MATERIAL
 
-Representa un documento transaccional vinculado a una entidad (p. ej., pedido, factura, contrato), identificado por serie y folio y con desglose económico.
-
-| Campo | Tipo | Descripción | Restricciones |
+| Campo | Tipo de dato | Clave | Referencia / Nota |
 |---|---|---|---|
-| id | string | Identificador único del documento | Obligatorio, generado automáticamente |
-| entity_id | string | Identificador de la entidad a la que pertenece este documento | Obligatorio, debe referenciar el entity_id de una entidad existente |
-| series | string | Serie del documento (p. ej., FAC, A, NV) que agrupa folios consecutivos | Opcional |
-| folio | number | Folio consecutivo que, junto con la serie, forma el número oficial del documento | Obligatorio, debe ser un entero positivo |
-| startDate | string | Fecha de inicio en formato YYYY-MM-DD | Obligatorio, debe ser una fecha de calendario válida |
-| endDate | string | Fecha de fin en formato YYYY-MM-DD | Obligatorio, debe ser una fecha de calendario válida, debe ser igual o posterior a startDate |
-| quantity | number | Cantidad asociada al documento | Opcional, debe ser un entero positivo |
-| subtotal | number | Importe antes de descuentos e impuestos | Opcional, debe ser un número no negativo |
-| discount | number | Descuento aplicado sobre el subtotal | Opcional, debe ser un número no negativo y no puede superar el subtotal |
-| taxAmount | number | Impuesto calculado para el documento | Opcional, debe ser un número no negativo |
-| totalAmount | number | Importe total del documento en la moneda configurada | Opcional, debe ser un número no negativo |
-| currency | string | Código de moneda para los importes del documento (p. ej., MXN, USD, EUR) | Opcional |
-| paymentTerms | string | Condiciones de pago del documento (p. ej., contado, neto 30) | Opcional |
-| notes | string | Notas u observaciones libres del documento | Opcional |
-| status | string | Estado del documento como borrador, pendiente, aprobado o cancelado | Opcional |
-| createdAt | string | Marca de tiempo de cuándo se creó el documento | Obligatorio |
-| updatedAt | string | Marca de tiempo de la última actualización del documento | Obligatorio |
+| prod_mat_id | int | PK | |
+| producto_id | int | FK | PRODUCTO |
+| material_id | int | FK | Ext. Logística |
+| cantidad_por_unidad | decimal | | |
 
-## Entidad: ModuleConfig
+## 3. ETAPA_FABRICACION
 
-Objeto de configuración cargado al arrancar que adapta el módulo base en un módulo específico.
-
-| Campo | Tipo | Descripción | Restricciones |
+| Campo | Tipo de dato | Clave | Referencia / Nota |
 |---|---|---|---|
-| moduleName | string | Nombre visible del módulo adaptado | Obligatorio, no vacío |
-| labels | object | Mapeos de términos como `{ entity: "Cliente", entities: "Clientes", document: "Pedido de Venta", documents: "Pedidos de Venta" }` | Opcional; retrocede a Entidad/Documento |
-| customFields | array | Definiciones de campos por tipo de registro: `{ target: "entity"\|"document", key, label, type: "text"\|"number"\|"date"\|"select", required: boolean, options?: string[] }` | Opcional; las claves NO DEBEN chocar con nombres de campos base |
-| statusLifecycle | object | Estados ordenados y transiciones permitidas para documentos, p. ej., `{ statuses: ["cotización", "pedido", "facturado"], transitions: { cotización: ["pedido"], pedido: ["facturado"], facturado: [] } }` | Opcional |
-| theme | object | Opciones de marca, p. ej., `{ accentColor: "#0f62fe" }`; aplicado como propiedad personalizada de CSS en todo el marco del espacio de trabajo | Opcional; accentColor debe ser un color CSS válido o retrocede al predeterminado |
+| etapa_id | int | PK | |
+| nombre | string | | |
+| tipo | string | | |
+| tiempo_estandar_min | int | | |
 
-## Reglas de ModuleConfig
+## 4. RUTA_PRODUCTO
 
-- La configuración se carga una vez al arrancar y se aplica en todas las pantallas.
-- Cuando la configuración está ausente, se aplican los valores predeterminados integrados: etiquetas Entidad/Documento, sin campos personalizados, estado de texto libre, color de acento predeterminado.
-- Los valores inválidos o conflictivos deben informarse con claridad en lugar de fallar silenciosamente.
-- Las claves de campos personalizados no deben chocar con los nombres de campos base (`id`, `entity_id`, `name`, `code`, `taxId`, `email`, `phone`, `address`, `category`, `description`, `targetDate`, `creditLimit`, `paymentTerms`, `series`, `folio`, `startDate`, `endDate`, `quantity`, `subtotal`, `discount`, `taxAmount`, `totalAmount`, `currency`, `notes`, `status`).
-- Los valores de campos personalizados se persisten junto a los campos base sin cambios de esquema en el almacenamiento.
-- Un ciclo de vida configurado reemplaza la entrada de estado de texto libre; sin uno, el estado permanece como texto libre.
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| ruta_id | int | PK | |
+| producto_id | int | FK | PRODUCTO |
+| etapa_id | int | FK | ETAPA_FABRICACION |
+| secuencia | int | | |
 
-## Reglas de Validación
+## 5. ORDEN_PRODUCCION
 
-### Entidad
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| orden_id | int | PK | |
+| producto_id | int | FK | PRODUCTO |
+| cantidad_plan | decimal | | |
+| estado | string | | |
+| fecha_inicio | date | | |
+| fecha_fin | date | | |
 
-- Una entidad debe incluir un nombre no vacío.
-- Una entidad debe incluir un código no vacío.
-- La identificación fiscal, teléfono, dirección, categoría, descripción y condiciones de pago son opcionales pero deben almacenarse como cadenas recortadas.
-- El correo electrónico es opcional pero, cuando está presente, debe tener formato de correo válido.
-- El límite de crédito es opcional pero, cuando está presente, debe ser un número no negativo.
-- La fecha objetivo es opcional pero, cuando está presente, debe ser una fecha de calendario válida en formato YYYY-MM-DD.
-- Un entity_id debe generarse automáticamente y debe ser único entre todas las entidades.
+## 6. EJECUCION_ETAPA
 
-### Documento
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| ejecucion_id | int | PK | |
+| orden_id | int | FK | ORDEN_PRODUCCION |
+| etapa_id | int | FK | ETAPA_FABRICACION |
+| maquina_id | int | FK | MAQUINA |
+| trabajador_id | int | FK | Ext. RRHH |
+| inicio_real | datetime | | |
+| fin_real | datetime | | |
+| tiempo_uso_min | int | | |
 
-- Un documento debe referenciar una entidad existente mediante entity_id.
-- Un documento debe incluir un folio entero positivo; la serie es opcional y, cuando existe, se combina con el folio para formar el número oficial del documento (p. ej., `FAC-1001`).
-- Un documento debe incluir fechas de inicio y fin válidas; la fecha de fin debe ser igual o posterior a la fecha de inicio.
-- La cantidad es opcional y debe ser un entero positivo.
-- Subtotal, descuento, impuesto e importe total son opcionales y deben ser números no negativos; el descuento no puede superar el subtotal.
-- La aplicación debe normalizar el texto para un comportamiento de búsqueda consistente.
+## 7. RECEPCION_MATERIAL
 
-> Nota: el cálculo automático de totales (p. ej., `total = subtotal - descuento + impuesto`) queda como punto de extensión; el módulo base valida cada importe de forma independiente para evitar sorpresas por redondeo.
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| recepcion_id | int | PK | |
+| orden_id | int | FK | ORDEN_PRODUCCION |
+| material_id | int | FK | Ext. Logística |
+| proveedor_id | int | FK | Ext. Compras |
+| cantidad_recibida | decimal | | |
+| fecha_recepcion | date | | |
 
-## Relaciones
+## 8. MAQUINA
 
-- Cada entidad se almacena independientemente y aparece como una única fila en la lista de entidades.
-- Cada entidad tiene un entity_id usado para conectarse a sus documentos.
-- Cada documento pertenece exactamente a una entidad, vinculada por el entity_id de la entidad.
-- Cuando se elimina una entidad, todos los documentos que referencian su entity_id también se eliminan.
-- Las operaciones de búsqueda se realizan sobre los registros de entidad almacenados, incluyendo identidad fiscal, contacto y condiciones comerciales.
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| maquina_id | int | PK | |
+| codigo | string | | |
+| nombre | string | | |
+| estado | string | | |
+| capacidad_hora | decimal | | |
 
-## Notas de Extensibilidad
+## 9. MANTENIMIENTO_MAQUINA
 
-- Los módulos personalizados pueden añadir campos específicos del dominio a cualquiera de los dos tipos de registro; los campos base anteriores deben mantener sus nombres y semántica para que el almacenamiento, la validación y la integridad referencial permanezcan intactos.
-- El campo `status` es intencionadamente de texto libre a nivel base para que cada módulo personalizado pueda imponer su propio ciclo de vida (p. ej., estados de pedidos, estados de aprobación).
-- La unicidad de folio por serie, las partidas de documento (líneas con producto, cantidad y precio) y la numeración automática son puntos de extensión naturales para módulos que los requieran.
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| mantenimiento_id | int | PK | |
+| maquina_id | int | FK | MAQUINA |
+| tecnico_id | int | FK | Ext. RRHH |
+| tipo | string | | |
+| costo_tecnico | decimal | | |
+| fecha | date | | |
+
+## 10. MANTENIMIENTO_REPUESTO
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| mant_repuesto_id | int | PK | |
+| mantenimiento_id | int | FK | MANTENIMIENTO_MAQUINA |
+| repuesto_id | int | FK | Ext. Logística |
+| cantidad | int | | |
+
+## 11. EQUIPAMIENTO
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| equipamiento_id | int | PK | |
+| nombre | string | | |
+| tipo | string | | |
+
+## 12. ASIGNACION_EQUIPAMIENTO
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| asignacion_id | int | PK | |
+| trabajador_id | int | FK | Ext. RRHH |
+| equipamiento_id | int | FK | EQUIPAMIENTO |
+| fecha_entrega | date | | |
+
+## 13. MATERIAL
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| material_id | int | PK | |
+| nombre | string | | |
+
+## 14. REPUESTO
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| repuesto_id | int | PK | |
+| nombre | string | | |
+
+## 15. PROVEEDOR
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| proveedor_id | int | PK | |
+| razon_social | string | | |
+
+## 16. TRABAJADOR
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| trabajador_id | int | PK | |
+| nombre | string | | |
+
+---
+
+# Relaciones entre entidades
+
+| Entidad A | Cardinalidad | Entidad B | Relación |
+|---|---|---|---|
+| PRODUCTO | 1 → 0..N | PRODUCTO_MATERIAL | se compone de |
+| MATERIAL | 1 → 0..N | PRODUCTO_MATERIAL | es insumo |
+| PRODUCTO | 1 → 0..N | RUTA_PRODUCTO | pasa por |
+| ETAPA_FABRICACION | 1 → 0..N | RUTA_PRODUCTO | forma parte |
+| PRODUCTO | 1 → 0..N | ORDEN_PRODUCCION | se fabrica en |
+| ORDEN_PRODUCCION | 1 → 0..N | EJECUCION_ETAPA | registra |
+| ETAPA_FABRICACION | 1 → 0..N | EJECUCION_ETAPA | se ejecuta |
+| MAQUINA | 0..1 → 0..N | EJECUCION_ETAPA | usa |
+| TRABAJADOR | 0..1 → 0..N | EJECUCION_ETAPA | opera |
+| ORDEN_PRODUCCION | 1 → 0..N | RECEPCION_MATERIAL | recibe insumos |
+| PROVEEDOR | 1 → 0..N | RECEPCION_MATERIAL | entrega |
+| MATERIAL | 1 → 0..N | RECEPCION_MATERIAL | se recibe |
+| MAQUINA | 1 → 0..N | MANTENIMIENTO_MAQUINA | requiere |
+| TRABAJADOR | 0..1 → 0..N | MANTENIMIENTO_MAQUINA | ejecuta |
+| MANTENIMIENTO_MAQUINA | 1 → 0..N | MANTENIMIENTO_REPUESTO | consume |
+| REPUESTO | 1 → 0..N | MANTENIMIENTO_REPUESTO | se usa |
+| TRABAJADOR | 1 → 0..N | ASIGNACION_EQUIPAMIENTO | recibe |
+| EQUIPAMIENTO | 1 → 0..N | ASIGNACION_EQUIPAMIENTO | se asigna |
+
+---
+
+## Módulos representados
+
+| Módulo | Entidades / referencias |
+|---|---|
+| **7. Manufactura y operaciones** | PRODUCTO, PRODUCTO_MATERIAL, ETAPA_FABRICACION, RUTA_PRODUCTO, ORDEN_PRODUCCION, EJECUCION_ETAPA, RECEPCION_MATERIAL, MAQUINA, MANTENIMIENTO_MAQUINA, MANTENIMIENTO_REPUESTO, EQUIPAMIENTO, ASIGNACION_EQUIPAMIENTO |
+| **3. Logística e inventario** | MATERIAL, REPUESTO |
+| **2. RRHH y planillas** | TRABAJADOR |
+| **6. Adquisición y compras** | PROVEEDOR |
