@@ -192,3 +192,6 @@ Este documento convierte el diagrama MER a formato tabular Markdown.
 | **3. Logística e inventario** | MATERIAL, REPUESTO |
 | **2. RRHH y planillas** | TRABAJADOR |
 | **6. Adquisición y compras** | PROVEEDOR |
+
+
+![alt text](image.png)
