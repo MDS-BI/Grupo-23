@@ -59,25 +59,26 @@ Como usuario de negocio, quiero aterrizar en un panel estilo ERP con botones de 
 
 ---
 
-### Historia de Usuario 4 - Gestionar entidades y documentos en una pantalla dedicada (Prioridad: P1)
+### Historia de Usuario 4 - Registrar la recepción de materiales para producción
+ (Prioridad: P2)
 
-Como usuario de negocio, quiero una pantalla dedicada donde pueda añadir, editar y eliminar entidades y sus documentos, para poder gestionar los datos del módulo en un lugar enfocado.
+Como encargado de producción, quiero registrar los materiales recibidos para una orden y el
+proveedor que los entrega, para mantener trazabilidad de los insumos asociados a la fabricación
 
-**Por qué esta prioridad**: Esto preserva el valor central de las capacidades de gestión del módulo, presentado como una única pantalla de gestión accesible desde la barra lateral y las acciones rápidas del panel.
 
-**Prueba Independiente**: Un usuario puede navegar a la pantalla de gestión mediante la barra lateral o una acción rápida, alternar entre la gestión de entidades y documentos, y volver al panel, añadiendo, editando y eliminando con éxito una entidad y un documento.
+**Por qué esta prioridad**: La producción puede funcionar inicialmente con productos, rutas y órdenes, pero registrar la recepción de insumos agrega trazabilidad y conecta Manufactura con Logística/Inventario y Adquisición/Compras.
+Por eso se considera importante, aunque posterior al flujo productivo básico.
+
+
+**Prueba Independiente**: Un usuario puede seleccionar una orden existente, registrar la recepción de un material indicando proveedor, cantidad y fecha, y luego encontrar esa recepción al consultar la orden.
 
 **Escenarios de Aceptación**:
 
-1. **Dado** que el usuario está en la pantalla de gestión, **cuando** mira la navegación, **entonces** la barra lateral del espacio de trabajo ofrece botones de módulo para Entidades, Documentos y Panel con el módulo activo resaltado.
-2. **Dada** la barra lateral visible, **cuando** el usuario activa el botón Entidades, **entonces** se muestra el contenido de gestión de entidades.
-3. **Dada** la barra lateral visible, **cuando** el usuario activa el botón Documentos, **entonces** se muestra el contenido de gestión de documentos.
-4. **Dado** que el usuario está en la pantalla de gestión, **cuando** mira la pantalla, **entonces** la lista de entidades no se muestra.
-5. **Dado** que el usuario está en la pantalla de gestión, **cuando** crea una nueva entidad, **entonces** la entidad se guarda.
-6. **Dada** una entidad existente, **cuando** el usuario edita sus detalles, **entonces** la información actualizada se guarda.
-7. **Dada** una entidad que ya no es relevante, **cuando** el usuario la elimina, **entonces** se elimina junto con sus documentos.
-8. **Dada** una entidad existente, **cuando** el usuario añade, edita o elimina un documento, **entonces** los cambios del documento se guardan y quedan asociados a esa entidad.
-9. **Dado** que el usuario está en la pantalla de gestión, **cuando** activa el botón Panel en la barra lateral, **entonces** vuelve al panel de inicio.
+1. **Dado** que existe una orden de producción, **cuando** llegan materiales para dicha orden, **entonces** el usuario puede crear un registro de recepción asociado a ella.
+2. **Dada** que el usuario registra una recepción, **cuando** selecciona material y proveedor e ingresa cantidad y fecha, **entonces** la recepción queda almacenada con esos datos.
+3. **Dada** que una orden ha recibido materiales en diferentes fechas, **cuando** el usuario consulta la orden, **entonces** puede visualizar todas las recepciones asociadas.
+4. **Dado**  que existe una recepción registrada, **cuando** el usuario consulta sus detalles, **entonces** puede identificar el material, proveedor, cantidad y fecha de recepción.
+5. **Dado** que falta material, proveedor, cantidad o fecha, **cuando**  el usuario intenta guardar una recepción, **entonces** el sistema impide el guardado y muestra el dato faltante.
 
 ---
 
