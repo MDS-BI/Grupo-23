@@ -25,18 +25,20 @@ Como usuario de negocio, quiero crear entradas de entidad con detalles claros pa
 
 ---
 
-### Historia de Usuario 2 - Editar y eliminar entidades (Prioridad: P1)
-Como usuario de negocio, quiero actualizar o eliminar entidades cuando cambien los datos maestros para que los registros se mantengan precisos.
+### Historia de Usuario 2 - Definir el proceso y las etapas de fabricación (Prioridad: P1)
+Como encargado de producción, quiero definir las etapas y el orden que debe seguir cada producto durante su fabricación, para establecer claramente su proceso productivo.
 
-**Por qué esta prioridad**: Mantener los registros actualizados es esencial para la confianza en la herramienta y para soportar las operaciones comerciales diarias.
+**Por qué esta prioridad**: La ruta de fabricación determina cómo se transforma un producto. Sin etapas y una secuencia definida, una orden de producción no puede saber qué pasos debe ejecutar ni en qué orden.
 
-**Prueba Independiente**: Un usuario puede seleccionar una entidad existente, cambiar su información o eliminarla, y la lista refleja el cambio.
+**Prueba Independiente**: Un usuario puede crear varias etapas, asociarlas a un producto mediante una ruta y comprobar que aparecen ordenadas según la secuencia definida.
 
 **Escenarios de Aceptación**:
 
-1. **Dada** una entidad que ya existe en la lista, **cuando** el usuario edita sus detalles, **entonces** la información actualizada se guarda y se muestra en la lista.
-2. **Dada** una entidad que ya no es relevante, **cuando** el usuario la elimina, **entonces** desaparece de la lista y deja de aparecer en los resultados de búsqueda.
-3. **Dadas** cientos de entidades almacenadas, **cuando** el usuario edita o elimina una, **entonces** la lista se actualiza correctamente y sigue siendo ágil.
+1. **Dada** que el usuario necesita definir una nueva etapa,  **cuando** registra nombre, tipo y tiempo estándar, **entonces** la etapa queda disponible para ser utilizada en rutas de productos.
+2. **Dada** que existen un producto y etapas de fabricación, **cuando** el usuario configura una ruta,  **entonces** puede seleccionar las etapas que forman parte del proceso del producto.
+3. **Dadas** que una ruta contiene varias etapas, **cuando** el usuario asigna una secuencia a cada una, **entonces** el sistema conserva ese orden.
+4. **Dada** que un producto posee una ruta definida, **cuando** el usuario consulta el proceso de fabricación, **entonces**  las etapas aparecen ordenadas por su secuencia.
+5. **Dada** que falta un dato obligatorio de una etapa o ruta,  **cuando** el usuario intenta guardar, **entonces** el sistema rechaza el registro y explica qué información falta.
 
 ---
 
