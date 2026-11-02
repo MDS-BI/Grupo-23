@@ -31,17 +31,31 @@ Como encargado de producción, quiero registrar y gestionar los productos junto 
 
 ### Historia de Usuario 2 - Definir el proceso y las etapas de fabricación (Prioridad: P1)
 Como encargado de producción, quiero definir las etapas y el orden que debe seguir cada producto durante su fabricación, para establecer claramente su proceso productivo.
+<<<<<<< HEAD
 **Por qué esta prioridad**: La ruta de fabricación determina cómo se transforma un producto. Sin etapas y una secuencia definida, una orden de producción no puede saber qué pasos debe ejecutar ni en qué orden.
 
+=======
+
+**Por qué esta prioridad**: La ruta de fabricación determina cómo se transforma un producto. Sin etapas y una secuencia definida, una orden de producción no puede saber qué pasos debe ejecutar ni en qué orden.
+
+>>>>>>> 53383bb89e50d180d475b010de2843c6007805bc
 **Prueba Independiente**: Un usuario puede crear varias etapas, asociarlas a un producto mediante una ruta y comprobar que aparecen ordenadas según la secuencia definida.
 
 **Escenarios de Aceptación**:
 
+<<<<<<< HEAD
 1. **Dado** que el usuario necesita definir una nueva etapa, **cuando** registra nombre, tipo y tiempo estándar, **entonces** la etapa queda disponible para ser utilizada en rutas de productos.
 2. **Dado** que existen un producto y etapas de fabricación, **cuando** el usuario configura una ruta, **entonces** puede seleccionar las etapas que forman parte del proceso del producto.
 3. **Dado** que una ruta contiene varias etapas, **cuando** el usuario asigna una secuencia a cada una, **entonces** el sistema conserva ese orden.
 4. **Dado** que un producto posee una ruta definida, **cuando** el usuario consulta el proceso de fabricación, **entonces** las etapas aparecen ordenadas por su secuencia.
 5. **Dado** que falta un dato obligatorio de una etapa o ruta, **cuando** el usuario intenta guardar, **entonces** el sistema rechaza el registro y explica qué información falta.
+=======
+1. **Dada** que el usuario necesita definir una nueva etapa,  **cuando** registra nombre, tipo y tiempo estándar, **entonces** la etapa queda disponible para ser utilizada en rutas de productos.
+2. **Dada** que existen un producto y etapas de fabricación, **cuando** el usuario configura una ruta,  **entonces** puede seleccionar las etapas que forman parte del proceso del producto.
+3. **Dadas** que una ruta contiene varias etapas, **cuando** el usuario asigna una secuencia a cada una, **entonces** el sistema conserva ese orden.
+4. **Dada** que un producto posee una ruta definida, **cuando** el usuario consulta el proceso de fabricación, **entonces**  las etapas aparecen ordenadas por su secuencia.
+5. **Dada** que falta un dato obligatorio de una etapa o ruta,  **cuando** el usuario intenta guardar, **entonces** el sistema rechaza el registro y explica qué información falta.
+>>>>>>> 53383bb89e50d180d475b010de2843c6007805bc
 
 ---
 
@@ -64,21 +78,43 @@ Como encargado de producción, quiero crear órdenes de producción y registrar 
 
 ---
 
+<<<<<<< HEAD
 ### Historia de Usuario 4 - Registrar la recepción de materiales para producción (Prioridad: P1)
 
 Como encargado de producción, quiero registrar los materiales recibidos para una orden y el proveedor que los entrega, para mantener trazabilidad de los insumos asociados a la fabricación.
 
 **Por qué esta prioridad**: La producción puede funcionar inicialmente con productos, rutas y órdenes, pero registrar la recepción de insumos agrega trazabilidad y conecta Manufactura con Logística/Inventario y Adquisición/Compras. Por eso se considera importante, aunque posterior al flujo productivo básico.
 
+=======
+### Historia de Usuario 4 - Registrar la recepción de materiales para producción
+ (Prioridad: P2)
+
+Como encargado de producción, quiero registrar los materiales recibidos para una orden y el
+proveedor que los entrega, para mantener trazabilidad de los insumos asociados a la fabricación
+
+
+**Por qué esta prioridad**: La producción puede funcionar inicialmente con productos, rutas y órdenes, pero registrar la recepción de insumos agrega trazabilidad y conecta Manufactura con Logística/Inventario y Adquisición/Compras.
+Por eso se considera importante, aunque posterior al flujo productivo básico.
+
+
+>>>>>>> 53383bb89e50d180d475b010de2843c6007805bc
 **Prueba Independiente**: Un usuario puede seleccionar una orden existente, registrar la recepción de un material indicando proveedor, cantidad y fecha, y luego encontrar esa recepción al consultar la orden.
 
 **Escenarios de Aceptación**:
 
+<<<<<<< HEAD
 1.  **Dado** que existe una orden de producción, **cuando** llegan materiales para dicha orden, **entonces** el usuario puede crear un registro de recepción asociado a ella.
 2. **Dado** que el usuario registra una recepción, **cuando** selecciona material y proveedor e ingresa cantidad y fecha, **entonces** la recepción queda almacenada con esos datos.
 3. **Dado** que una orden ha recibido materiales en diferentes fechas, **cuando** el usuario consulta la orden, **entonces** puede visualizar todas las recepciones asociadas.
 4. **Dado** que existe una recepción registrada, **cuando** el usuario consulta sus detalles, **entonces** puede identificar el material, proveedor, cantidad y fecha de recepción.
 5. **Dado** que falta material, proveedor, cantidad o fecha, **cuando** el usuario intenta guardar una recepción, **entonces** el sistema impide el guardado y muestra el dato faltante.
+=======
+1. **Dado** que existe una orden de producción, **cuando** llegan materiales para dicha orden, **entonces** el usuario puede crear un registro de recepción asociado a ella.
+2. **Dada** que el usuario registra una recepción, **cuando** selecciona material y proveedor e ingresa cantidad y fecha, **entonces** la recepción queda almacenada con esos datos.
+3. **Dada** que una orden ha recibido materiales en diferentes fechas, **cuando** el usuario consulta la orden, **entonces** puede visualizar todas las recepciones asociadas.
+4. **Dado**  que existe una recepción registrada, **cuando** el usuario consulta sus detalles, **entonces** puede identificar el material, proveedor, cantidad y fecha de recepción.
+5. **Dado** que falta material, proveedor, cantidad o fecha, **cuando**  el usuario intenta guardar una recepción, **entonces** el sistema impide el guardado y muestra el dato faltante.
+>>>>>>> 53383bb89e50d180d475b010de2843c6007805bc
 
 ---
 
