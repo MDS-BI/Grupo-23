@@ -228,7 +228,7 @@
 - [ ] T111 [P] Revisar accesibilidad (etiquetas, orden de foco, mensajes de error) en `src/components/manufactura/`
 - [ ] T112 Verificar integridad referencial y borrado en cascada: producto→ruta, orden→ejecuciones/recepciones, máquina→mantenimientos, mantenimiento→repuestos en `src/modules/manufactura/`
 - [ ] T113 Actualizar `README.md` con el módulo de manufactura y las claves de almacenamiento
-- [ ] T114 Ejecutar la suite completa de pruebas (`npm test`) y la compilación de producción para verificar que no hay regresiones
+- [ ] T114 Ejecutar la suite completa de pruebas (`npm test`), verificar el rendimiento con al menos 500 registros por entidad (< 200 ms) y la compilación de producción para confirmar que no hay regresiones
 
 ---
 
@@ -295,6 +295,79 @@ Con varios desarrolladores:
 1. El equipo completa la Fase 1 en conjunto
 2. Luego se reparte: Desarrollador A → HU1, Desarrollador B → HU2, Desarrollador C → HU3/HU4, Desarrollador D → HU5
 3. Integrar al cerrar cada historia
+
+---
+
+## Trazabilidad Requisitos → Tareas
+
+**Cobertura**: 38/38 requisitos funcionales (FR), 4/4 requisitos de extensibilidad (XR) y 10/10 criterios de éxito (SC) tienen al menos una tarea asociada. Las 76 tareas están cubiertas por al menos un requisito.
+
+### Requisitos Funcionales
+
+| Requisito | Descripción breve | Tareas |
+|---|---|---|
+| FR-001 | Crear producto con nombre y tipo | T012, T014, T015, T017 |
+| FR-002 | Editar producto y persistir cambios | T014, T017, T019 |
+| FR-003 | Eliminar producto y sus materiales en cascada | T014, T112 |
+| FR-004 | Asociar material con cantidad por unidad > 0 | T012, T014, T015, T017 |
+| FR-005 | Editar y eliminar relaciones producto-material | T014, T017 |
+| FR-006 | Consultar composición del producto | T014, T016, T019 |
+| FR-007 | Validar producto y material con retroalimentación por campo | T010, T012, T015, T018 |
+| FR-008 | Crear/editar/eliminar etapas con tiempo estándar > 0 | T032, T035, T037, T039 |
+| FR-009 | Configurar ruta seleccionando etapas | T033, T036, T038, T039 |
+| FR-010 | Asignar secuencia > 0 a cada etapa | T033, T036, T038 |
+| FR-011 | Consultar ruta ordenada por secuencia | T036, T040 |
+| FR-012 | Validar etapa y ruta con mensajes claros | T030, T032, T033, T041 |
+| FR-013 | Crear/editar/eliminar órdenes con cantidad y fechas | T052, T055, T057, T060 |
+| FR-014 | Rechazar orden con fecha fin anterior al inicio | T052, T055, T057, T061 |
+| FR-015 | Registrar ejecuciones asociadas a orden y etapa | T053, T056, T058, T060 |
+| FR-016 | Asociar máquina y trabajador a la ejecución | T053, T056, T058 |
+| FR-017 | Calcular tiempo de uso desde inicio/fin reales | T053, T056, T058 |
+| FR-018 | Consultar etapas ejecutadas y avance de la orden | T059, T062 |
+| FR-019 | Validar obligatorios y fechas de ejecución | T050, T053, T058 |
+| FR-020 | Registrar/editar recepciones con material, proveedor, cantidad y fecha | T072, T074, T075, T077 |
+| FR-021 | Consultar recepciones de una orden | T076, T078 |
+| FR-022 | Validar recepción y señalar campo faltante | T070, T072, T075, T079 |
+| FR-023 | Crear/editar/eliminar máquinas con capacidad > 0 | T090, T093, T098, T101, T105 |
+| FR-024 | Registrar mantenimientos con técnico, costo y fecha | T094, T099, T102, T105 |
+| FR-025 | Asociar repuestos con cantidad > 0 | T091, T095, T099, T102 |
+| FR-026 | Consultar historial de mantenimientos de una máquina | T099, T104 |
+| FR-027 | Registrar equipamiento con nombre y tipo | T091, T096, T100 |
+| FR-028 | Registrar asignación de equipamiento a trabajador | T091, T096, T100, T103, T105 |
+| FR-029 | Consultar asignaciones por trabajador o equipamiento | T100, T105 |
+| FR-030 | Validar mantenimiento y asignación | T094, T096, T106 |
+| FR-031 | Persistir con claves `manufactura:` | T002, T013, T034, T054, T073, T097, T113 |
+| FR-032 | Integridad referencial y borrado en cascada | T112 |
+| FR-033 | Catálogos de referencia de solo lectura | T003, T004 |
+| FR-034 | Registrar navegación del módulo | T001, T113 |
+| FR-035 | Estados vacíos y mensajes accesibles | T018, T020, T041, T042, T063, T080, T106, T107, T111 |
+| FR-036 | Recargar datos al reabrir edición | T019 |
+| FR-037 | Flujo completo producto → ruta → orden → recepción | T110 |
+| FR-038 | Pruebas y compilación sin regresiones | T114 |
+
+### Requisitos de Extensibilidad
+
+| Requisito | Descripción breve | Tareas |
+|---|---|---|
+| XR-001 | Almacenamiento genérico con prefijo `manufactura:` | T002 |
+| XR-002 | Referencias externas desacopladas y sustituibles | T003 |
+| XR-003 | Validadores reutilizables y componibles | T012, T032, T033, T052, T053, T072, T093, T094, T095, T096 |
+| XR-004 | Catálogos locales reemplazables | T003, T004 |
+
+### Criterios de Éxito
+
+| Criterio | Descripción breve | Tareas |
+|---|---|---|
+| SC-001 | Crear producto con material y verlo en < 2 min | T011, T016, T114 |
+| SC-002 | Configurar ruta ordenada en < 5 min | T031, T040, T114 |
+| SC-003 | Crear orden y ejecución en < 5 min | T051, T062, T114 |
+| SC-004 | Registrar recepción y verla en la orden en < 2 min | T071, T078, T114 |
+| SC-005 | Máquina + mantenimiento + asignación en < 5 min | T092, T104, T114 |
+| SC-006 | 90% de usuarios completan tareas sin ayuda | T114 |
+| SC-007 | Validaciones impiden guardar datos faltantes | T010, T030, T050, T070, T090, T114 |
+| SC-008 | 500 registros por entidad con respuesta < 200 ms | T114 |
+| SC-009 | Flujo completo sin regresiones | T110, T114 |
+| SC-010 | Pruebas y compilación exitosas | T114 |
 
 ---
 

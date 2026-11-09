@@ -1,4 +1,4 @@
-# Inicio Rápido: Módulo Base de Software de Planificación de Recursos Empresariales (ERP)
+# Inicio Rápido: Módulo 7 - Manufactura y Operaciones
 
 ## Configuración
 
@@ -8,29 +8,35 @@
 
 ## Flujo de Usuario Principal
 
-1. Aterrice en el panel ERP y use un botón de acción rápida (nueva entidad, nuevo documento, gestión de entidades o buscar registros).
-2. Cree una entidad usando el formulario.
-3. Busque una entidad usando la pantalla de búsqueda.
-4. Edite o elimine una entidad desde el área de gestión.
-5. Cambie entre módulos usando la barra lateral; actualice la página para confirmar que las entidades persisten en el almacenamiento local y que el marco con marca (logotipo, nombre del módulo) permanece consistente.
+1. **Productos y materiales**: cree un producto con nombre y tipo; asóciele uno o más materiales indicando la cantidad por unidad; consulte su composición.
+2. **Etapas y rutas**: registre etapas con nombre, tipo y tiempo estándar; configure la ruta de un producto seleccionando etapas y asignando una secuencia; verifique que la ruta aparece ordenada.
+3. **Órdenes y ejecuciones**: cree una orden con producto, cantidad planificada, estado y fechas; registre la ejecución de una etapa con máquina, trabajador, inicio y fin reales; consulte el avance de la orden.
+4. **Recepción de materiales**: registre una recepción para una orden con material, proveedor, cantidad y fecha; verifique que aparece en el detalle de la orden.
+5. **Máquinas y equipamiento**: registre una máquina, agréguele mantenimientos con técnico, costo y repuestos, y registre la asignación de equipamiento a un trabajador.
+6. Actualice la página para confirmar que los registros persisten en `localStorage` con las claves `manufactura:`.
 
 ## Validación
 
-- Verifique que los campos obligatorios muestran errores de validación.
-- Verifique que un documento exige folio entero positivo y que el descuento no puede superar el subtotal.
-- Verifique que un correo electrónico con formato inválido se rechaza con una explicación.
-- Verifique que los resultados de búsqueda se actualizan a medida que el usuario escribe.
-- Verifique que la lista permanece consistente tras las acciones de edición y eliminación.
-- Verifique que las estadísticas del panel coinciden con el número de registros almacenados.
+- Verifique que los campos obligatorios muestran errores por campo.
+- Verifique que las cantidades, capacidades y tiempos deben ser mayores que cero.
+- Verifique que una orden con fecha de fin anterior a la fecha de inicio se rechaza.
+- Verifique que una ejecución con fin real anterior al inicio real se rechaza.
+- Verifique que una recepción sin material, proveedor, cantidad o fecha no se guarda.
+- Verifique que una ruta conserva el orden definido por secuencia.
+- Verifique que los listados sin registros muestran un estado vacío.
 
-## Extender el Módulo Base
+## Referencias externas
 
-Los módulos ERP personalizados adaptan la base mediante un único archivo de configuración (`src/module-config.js`) en lugar de editar el código central:
+Los materiales, repuestos, trabajadores y proveedores provienen de otros módulos del ERP. En esta iteración se representan con catálogos locales de solo lectura en `src/modules/manufactura/referencias.js`. Para integrarlos con los módulos reales, sustituya ese módulo sin cambiar la lógica de Manufactura.
 
-1. Establezca el nombre del módulo y los mapeos de términos (p. ej., Entidad → Cliente, Documento → Pedido de Venta); cada pantalla se reetiqueta, incluida la barra lateral y el logotipo.
-2. Declare campos personalizados por tipo de registro (texto, número, fecha, selección) — aparecen automáticamente en formularios, listas, validación y búsqueda.
-3. Defina el ciclo de vida de estados de documentos y las transiciones permitidas (p. ej., cotización → pedido → facturado).
-4. Opcionalmente establezca `theme.accentColor` para remarcar los resaltados y controles principales de todo el espacio de trabajo.
-5. Añada reglas de validación específicas del módulo junto a las reglas base donde sea necesario.
+## Datos y persistencia
 
-La generación de identidad, marcas de tiempo, integridad referencial entre entidades y documentos, eliminación en cascada, navegación y búsqueda siguen siendo gestionadas por el módulo base. Sin archivo de configuración, la aplicación se ejecuta con el comportamiento predeterminado Entidad/Documento. Consulte `specs/001-erp-base-module/` para la especificación completa.
+- Los registros se guardan en `localStorage` bajo claves con prefijo `manufactura:` (ver [data-model.md](data-model.md)).
+- Eliminar un producto, una orden, una máquina o un mantenimiento elimina en cascada sus registros dependientes.
+- Consulte [contracts/manufactura-storage.md](contracts/manufactura-storage.md) para la forma de los datos y las operaciones.
+
+## Pruebas
+
+- Ejecute la suite completa con `npm test`.
+- La cobertura incluye pruebas unitarias de validación/persistencia y pruebas de integración por historia de usuario.
+- Consulte [tasks.md](tasks.md) para la trazabilidad entre requisitos y tareas.

@@ -1,8 +1,8 @@
-# Lista de Verificación de Calidad de la Especificación: Módulo Base de Software de Planificación de Recursos Empresariales (ERP)
+# Lista de Verificación de Calidad de la Especificación: Módulo 7 - Manufactura y Operaciones
 
 **Propósito**: Validar la completitud y calidad de la especificación antes de proceder a la planificación
 **Creada**: 2026-07-08
-**Funcionalidad**: [Enlace a spec.md](spec.md)
+**Funcionalidad**: [Enlace a spec.md](../spec.md)
 
 ## Calidad del Contenido
 
@@ -21,6 +21,14 @@
 - [x] Los casos límite están identificados
 - [x] El alcance está claramente delimitado
 - [x] Dependencias y suposiciones identificadas
+
+## Trazabilidad
+
+- [x] Cada requisito funcional (FR) está mapeado a al menos una tarea en [tasks.md](../tasks.md)
+- [x] Cada requisito de extensibilidad (XR) está mapeado a al menos una tarea
+- [x] Cada criterio de éxito (SC) está mapeado a al menos una tarea
+- [x] Cada entidad de [data-model.md](../data-model.md) está asociada a requisitos funcionales
+- [x] No existen requisitos duplicados ni solapados
 
 ## Preparación de la Funcionalidad
 
