@@ -1,0 +1,21 @@
+:root { font-family: system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
+body { margin: 0; }
+.manufactura-app { max-width: 64rem; margin: 0 auto; padding: 1.5rem; }
+.manufactura-app * { box-sizing: border-box; }
+.manufactura-app header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.manufactura-app h1 { margin-bottom: .25rem; }
+.manufactura-app p { line-height: 1.5; }
+.manufactura-app form, .manufactura-app section > div { margin-top: 1.5rem; padding: 1.5rem; background: white; border: 1px solid #cbd5e1; border-radius: .75rem; }
+.manufactura-app form > div + div { margin-top: 1.5rem; }
+.manufactura-app form > div > div { margin-top: 1rem; }
+.manufactura-app label { display: block; margin-bottom: .35rem; }
+.manufactura-app input { width: 100%; padding: .65rem; font: inherit; border: 1px solid #94a3b8; border-radius: .4rem; }
+.manufactura-app button { padding: .65rem 1rem; font: inherit; cursor: pointer; border: 1px solid #cbd5e1; border-radius: .4rem; background: white; }
+.manufactura-app header > button, .manufactura-app button[type="submit"] { background: #0f172a; color: white; }
+.manufactura-app button:focus-visible, .manufactura-app input:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+.manufactura-app form button { margin: .5rem .5rem 0 0; }
+.manufactura-app table { width: 100%; border-collapse: collapse; }
+.manufactura-app th, .manufactura-app td { padding: .75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+.manufactura-app section > div { overflow-x: auto; }
+.manufactura-app [class~="text-red-600"] { color: #b91c1c; }
+@media (max-width: 600px) { .manufactura-app { padding: 1rem; } }

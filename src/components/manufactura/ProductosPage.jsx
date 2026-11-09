@@ -48,4 +48,3 @@ export default function ProductosPage() {
     </section>
   );
 }
-import ProductosPage from './components/manufactura/ProductosPage.jsx';
