@@ -1,21 +1,729 @@
-:root { font-family: system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
-body { margin: 0; }
-.manufactura-app { max-width: 64rem; margin: 0 auto; padding: 1.5rem; }
-.manufactura-app * { box-sizing: border-box; }
-.manufactura-app header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
-.manufactura-app h1 { margin-bottom: .25rem; }
-.manufactura-app p { line-height: 1.5; }
-.manufactura-app form, .manufactura-app section > div { margin-top: 1.5rem; padding: 1.5rem; background: white; border: 1px solid #cbd5e1; border-radius: .75rem; }
-.manufactura-app form > div + div { margin-top: 1.5rem; }
-.manufactura-app form > div > div { margin-top: 1rem; }
-.manufactura-app label { display: block; margin-bottom: .35rem; }
-.manufactura-app input { width: 100%; padding: .65rem; font: inherit; border: 1px solid #94a3b8; border-radius: .4rem; }
-.manufactura-app button { padding: .65rem 1rem; font: inherit; cursor: pointer; border: 1px solid #cbd5e1; border-radius: .4rem; background: white; }
-.manufactura-app header > button, .manufactura-app button[type="submit"] { background: #0f172a; color: white; }
-.manufactura-app button:focus-visible, .manufactura-app input:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
-.manufactura-app form button { margin: .5rem .5rem 0 0; }
-.manufactura-app table { width: 100%; border-collapse: collapse; }
-.manufactura-app th, .manufactura-app td { padding: .75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
-.manufactura-app section > div { overflow-x: auto; }
-.manufactura-app [class~="text-red-600"] { color: #b91c1c; }
-@media (max-width: 600px) { .manufactura-app { padding: 1rem; } }
+:root {
+  font-family: system-ui, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+}
+body {
+  margin: 0;
+}
+.manufactura-app {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.manufactura-app * {
+  box-sizing: border-box;
+}
+.manufactura-app header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.manufactura-app h1 {
+  margin-bottom: 0.25rem;
+}
+.manufactura-app p {
+  line-height: 1.5;
+}
+.manufactura-app form,
+.manufactura-app section > div {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+}
+.manufactura-app form > div + div {
+  margin-top: 1.5rem;
+}
+.manufactura-app form > div > div {
+  margin-top: 1rem;
+}
+.manufactura-app label {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.manufactura-app input {
+  width: 100%;
+  padding: 0.65rem;
+  font: inherit;
+  border: 1px solid #94a3b8;
+  border-radius: 0.4rem;
+}
+.manufactura-app button {
+  padding: 0.65rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.4rem;
+  background: white;
+}
+.manufactura-app header > button,
+.manufactura-app button[type='submit'] {
+  background: #0f172a;
+  color: white;
+}
+.manufactura-app button:focus-visible,
+.manufactura-app input:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+.manufactura-app form button {
+  margin: 0.5rem 0.5rem 0 0;
+}
+.manufactura-app table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.manufactura-app th,
+.manufactura-app td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+.manufactura-app section > div {
+  overflow-x: auto;
+}
+.manufactura-app [class~='text-red-600'] {
+  color: #b91c1c;
+}
+@media (max-width: 600px) {
+  .manufactura-app {
+    padding: 1rem;
+  }
+}
+
+/* Espacio de trabajo compartido por las cinco historias. */
+:root {
+  --ink: #142b36;
+  --muted: #627681;
+  --line: #dbe4e6;
+  --accent: #087f78;
+  --paper: #f4f7f7;
+  background: var(--paper);
+  color: var(--ink);
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.erp-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr);
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: #122d35;
+  color: #dce8e8;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 16px 20px;
+  box-sizing: border-box;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 42px;
+  border: 1px solid #568b88;
+  border-radius: 12px 2px 12px 2px;
+  color: #bceae1;
+  font-size: 24px;
+  font-weight: 750;
+}
+.brand b {
+  display: block;
+  color: white;
+  font-size: 18px;
+  letter-spacing: -0.4px;
+}
+.brand small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+  margin-top: 6px;
+  color: #9eb7bb;
+}
+.nav-label {
+  font-size: 9px;
+  color: #8dabad;
+  letter-spacing: 1.6px;
+  padding: 28px 12px 8px;
+}
+.sidebar nav {
+  display: grid;
+  gap: 7px;
+}
+.sidebar nav button {
+  background: transparent;
+  border: 0;
+  text-align: left;
+  color: #b9ccce;
+  padding: 13px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar nav button > span {
+  width: 18px;
+  color: #79a6a7;
+  font-size: 10px;
+}
+.sidebar nav button:hover {
+  background: #1c3d45;
+  color: white;
+}
+.sidebar nav button[aria-current] {
+  background: #254951;
+  color: white;
+  box-shadow: inset 3px 0 #62c6b5;
+}
+.sidebar-footer {
+  margin-top: auto;
+  font-size: 12px;
+  padding: 25px 12px 0;
+  border-top: 1px solid #2b4850;
+}
+.sidebar-footer small {
+  display: block;
+  color: #88a8ac;
+  margin-top: 6px;
+  font-size: 10px;
+}
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #73cfb0;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.workspace {
+  min-width: 0;
+}
+.topbar {
+  padding: 19px 36px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.topbar b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.storage-chip {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 10px;
+}
+.erp-shell .manufactura-app {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 36px;
+  min-height: calc(100vh - 150px);
+}
+.manufactura-app section > header {
+  margin-bottom: 26px;
+}
+.manufactura-app h1 {
+  font-size: clamp(25px, 2.8vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -1.1px;
+  margin-top: 7px;
+}
+.manufactura-app h2 {
+  font-size: 17px;
+  letter-spacing: -0.35px;
+}
+.manufactura-app h3 {
+  font-size: 15px;
+}
+.manufactura-app header p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.muted,
+.manufactura-app .muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+.eyebrow {
+  display: block;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 1.7px;
+}
+.manufactura-app button {
+  font-size: 12px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--ink);
+  border-color: #d2dfe0;
+}
+.manufactura-app button:hover {
+  border-color: #88b3ad;
+  background: #f0f7f5;
+}
+.manufactura-app button.primary,
+.manufactura-app header > button,
+.manufactura-app button[type='submit'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.manufactura-app button.primary:hover,
+.manufactura-app button[type='submit']:hover {
+  background: #06645f;
+}
+.manufactura-app button.danger,
+.manufactura-app button[class~='text-red-600'] {
+  color: #a12e3b;
+}
+.manufactura-app input,
+.manufactura-app select {
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+  padding: 10px 11px;
+  border: 1px solid #cddbdd;
+  border-radius: 6px;
+  background: white;
+  color: var(--ink);
+}
+.manufactura-app label {
+  font-size: 12px;
+  font-weight: 550;
+  margin-bottom: 7px;
+}
+.manufactura-app .card,
+.manufactura-app .table-wrap {
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 3px 12px #17363a03;
+}
+.manufactura-app .management {
+  padding: 0;
+  border: 0;
+  margin: 22px 0 32px;
+  background: transparent;
+  overflow: visible;
+}
+.manufactura-app .section-heading {
+  margin-bottom: 16px;
+}
+.manufactura-app .section-heading h2 {
+  margin: 0;
+}
+.manufactura-app .table-wrap {
+  padding: 0;
+  overflow-x: auto;
+}
+.manufactura-app th {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  background: #f8fbfb;
+  white-space: nowrap;
+}
+.manufactura-app td {
+  font-size: 12px;
+}
+.manufactura-app td,
+.manufactura-app th {
+  padding: 15px 16px;
+  border-color: #e8eeee;
+}
+.manufactura-app tbody tr:last-child td {
+  border-bottom: 0;
+}
+.row-actions {
+  white-space: nowrap;
+}
+.row-actions button + button {
+  margin-left: 5px;
+}
+.manufactura-app .row-actions button {
+  padding: 6px 8px;
+  font-size: 10px;
+}
+.manufactura-app .empty {
+  text-align: center;
+  padding: 42px 20px;
+  color: var(--muted);
+  background: white;
+  border: 1px dashed #cbd9da;
+  border-radius: 9px;
+}
+.empty > span {
+  font-size: 34px;
+  color: #82aaa6;
+}
+.empty p {
+  margin: 8px 0;
+}
+.empty small {
+  font-size: 11px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.manufactura-app .record-form > .form-grid {
+  margin-top: 20px;
+}
+.field {
+  min-width: 0;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.manufactura-app .notice {
+  background: #eaf5f1;
+  border-left: 3px solid #6eb7a8;
+  padding: 12px 15px;
+  color: #2d6659;
+  font-size: 12px;
+  border-radius: 3px;
+}
+.manufactura-app .error {
+  color: #af2336;
+  font-size: 12px;
+  margin: 6px 0;
+}
+.manufactura-app [aria-invalid='true'] {
+  border-color: #c85261;
+}
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: #edf4f3;
+  color: #3b6963;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.manufactura-app .filter-bar {
+  border: 0;
+  padding: 16px 0;
+  background: transparent;
+  margin: 0;
+  max-width: 700px;
+}
+.subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+.subnav button[aria-current] {
+  background: #e0efeb;
+  border-color: #79b4a9;
+  color: #126a5c;
+}
+.manufactura-app .route-step {
+  display: grid;
+  grid-template-columns: 30px minmax(150px, 1fr) 110px auto;
+  gap: 14px;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+}
+.step-number {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  background: #e0f0eb;
+  color: #247865;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+.route-summary,
+.reference-list,
+.order-summary {
+  padding: 0;
+  list-style: none;
+}
+.route-summary li,
+.reference-list li,
+.order-summary li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+.reference-list small {
+  color: var(--muted);
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 25px 0;
+}
+.summary-grid dt {
+  color: var(--muted);
+  font-size: 10px;
+  margin-bottom: 7px;
+}
+.summary-grid dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.progress {
+  display: grid;
+  gap: 6px;
+  min-width: 120px;
+}
+.progress progress {
+  width: 100%;
+  max-width: 300px;
+  height: 6px;
+  accent-color: var(--accent);
+}
+.progress span {
+  font-size: 10px;
+  color: var(--muted);
+}
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.manufactura-app .reference-grid {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.reference-grid .card {
+  margin: 0;
+}
+.manufactura-app .stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+  margin-bottom: 30px;
+}
+.manufactura-app .stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px;
+  background: white;
+  border-color: var(--line);
+  min-height: 151px;
+}
+.stat-card > span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.stat-card strong {
+  font-size: 36px;
+  font-weight: 550;
+  margin: 8px 0;
+  letter-spacing: -1px;
+}
+.stat-card small {
+  color: #72938e;
+  font-size: 10px;
+}
+.workflow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+.manufactura-app .workflow button {
+  border: 0;
+  border-radius: 6px;
+  background: #f5f8f8;
+  text-align: left;
+  padding: 17px 12px;
+}
+.workflow button span,
+.workflow button b,
+.workflow button small {
+  display: block;
+}
+.workflow button span {
+  color: #478d81;
+  font-size: 10px;
+  margin-bottom: 13px;
+}
+.workflow button b {
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.workflow button small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.order-summary small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 5px;
+}
+.manufactura-app fieldset {
+  margin: 22px 0;
+  border: 1px solid var(--line);
+  padding: 16px;
+  border-radius: 7px;
+}
+.manufactura-app legend {
+  font-size: 12px;
+  padding: 0 8px;
+}
+.workspace-footer {
+  padding: 20px 36px;
+  color: #8a9b9e;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.sr-only,
+.skip-link:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.skip-link:focus {
+  position: fixed;
+  z-index: 10;
+  background: white;
+  padding: 15px;
+}
+@media (max-width: 1100px) {
+  .erp-shell {
+    grid-template-columns: 215px minmax(0, 1fr);
+  }
+  .erp-shell .manufactura-app {
+    padding: 26px;
+  }
+  .manufactura-app .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .workflow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .manufactura-app .route-step {
+    grid-template-columns: 25px 1fr 90px;
+  }
+  .route-step .row-actions {
+    grid-column: 2 / -1;
+  }
+}
+@media (max-width: 760px) {
+  .erp-shell {
+    display: block;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+    padding: 16px;
+  }
+  .brand {
+    margin-bottom: 16px;
+  }
+  .nav-label,
+  .sidebar-footer {
+    display: none;
+  }
+  .sidebar nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 5px;
+  }
+  .sidebar nav button {
+    flex-shrink: 0;
+  }
+  .topbar {
+    padding: 15px 20px;
+  }
+  .erp-shell .manufactura-app {
+    padding: 22px 16px;
+  }
+  .reference-grid {
+    grid-template-columns: 1fr;
+  }
+  .workflow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .workspace-footer {
+    padding: 18px 16px;
+  }
+  .workspace-footer span {
+    display: none;
+  }
+}
+@media (max-width: 420px) {
+  .storage-chip {
+    display: none;
+  }
+  .manufactura-app .stat-grid {
+    gap: 9px;
+  }
+  .manufactura-app .stat-card {
+    padding: 15px;
+  }
+  .manufactura-app .route-step {
+    grid-template-columns: 25px 1fr;
+  }
+  .route-step .field:nth-of-type(2) {
+    grid-column: 2;
+  }
+}

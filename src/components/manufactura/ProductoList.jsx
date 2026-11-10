@@ -1,8 +1,15 @@
-export default function ProductoList({ productos = [], onEliminar }) {
+export default function ProductoList({
+  productos = [],
+  onEliminar,
+  onEditar,
+  onDetalle,
+}) {
   if (productos.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
-        <p className="text-sm font-medium text-slate-700">No hay productos registrados.</p>
+        <p className="text-sm font-medium text-slate-700">
+          No hay productos registrados.
+        </p>
         <p className="mt-1 text-sm text-slate-500">
           Crea tu primer producto para comenzar.
         </p>
@@ -50,8 +57,20 @@ export default function ProductoList({ productos = [], onEliminar }) {
               <td className="px-4 py-3 text-sm font-medium text-slate-900">
                 {producto.nombre}
               </td>
-              <td className="px-4 py-3 text-sm text-slate-600">{producto.tipo}</td>
+              <td className="px-4 py-3 text-sm text-slate-600">
+                {producto.tipo}
+              </td>
               <td className="whitespace-nowrap px-4 py-3 text-right">
+                {onDetalle && (
+                  <button type="button" onClick={() => onDetalle(producto)}>
+                    Ver detalle
+                  </button>
+                )}
+                {onEditar && (
+                  <button type="button" onClick={() => onEditar(producto)}>
+                    Editar
+                  </button>
+                )}
                 {onEliminar && (
                   <button
                     type="button"

@@ -378,3 +378,17 @@ Con varios desarrolladores:
 - Verificar que las pruebas fallen antes de implementar
 - Confirmar después de cada tarea o grupo lógico
 - Evitar tareas vagas y conflictos sobre el mismo archivo
+
+## Implementación React del PDF final (2026-11-10)
+
+Se conserva íntegro el plan anterior. La implementación actual y las decisiones de integración se detallan en [implementacion-historias.md](implementacion-historias.md), con cobertura de los 27 escenarios del PDF final.
+
+- [x] HU1: extender los componentes existentes con edición, composición consultable, selector externo, validación y borrado protegido.
+- [x] HU2: implementar etapas y editor ordenado de rutas con validación de secuencias.
+- [x] HU3: implementar órdenes, inicio/finalización de ejecuciones, cálculo de tiempo y avance.
+- [x] HU4: implementar recepciones, edición, consulta y filtro por orden, integradas en su detalle.
+- [x] HU5: implementar máquinas, historial de mantenimiento/repuestos, equipamiento y asignaciones.
+- [x] Crear navegación, panel, estados vacíos y formularios con mensajes accesibles.
+- [x] Añadir pruebas unitarias y de interfaz conectadas para las cinco historias; conservar las pruebas heredadas.
+- [ ] Sustituir las referencias de muestra por las integraciones reales cuando los módulos externos estén disponibles.
+- [ ] Resolver con el equipo las pruebas de la plantilla antigua cuyos archivos fueron eliminados antes de esta implementación.

@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "test": "vitest"
+    "test": "vitest",
+    "test:manufactura": "vitest run tests/unit/manufactura tests/integration/manufactura"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.2.1",

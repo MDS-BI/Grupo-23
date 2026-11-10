@@ -1,3 +1,22 @@
+# Manufactura y Operaciones — Grupo 23
+
+La aplicación actual utiliza React y Vite e implementa las cinco historias de `Historias_de_Usuario_Modulo_Manufactura_FINAL.pdf`: productos y materiales; etapas y rutas; órdenes y ejecución real; recepción de materiales; máquinas, mantenimiento y equipamiento.
+
+```bash
+npm install
+npm run dev
+npm run test:manufactura
+npm run build
+```
+
+Los datos existentes se conservan en las claves `manufactura:` del navegador. No se sincronizan entre computadores. Los catálogos externos son muestras de solo lectura, con un adaptador sustituible por las integraciones reales. Consulta el alcance, las reglas y la cobertura en [implementacion-historias.md](specs/001-erp-base-module/implementacion-historias.md).
+
+`npm test -- --run` conserva toda la suite. Las pruebas heredadas de Entidades/Documentos siguen referenciando la base antigua eliminada antes de esta implementación (`src/storage.js`, `src/module-config.js`, `src/app.js`); no fueron eliminadas ni desactivadas. El comando `test:manufactura` permite ejecutar las pruebas del módulo actual por separado.
+
+La documentación original de la plantilla se conserva a continuación como referencia histórica.
+
+---
+
 # ERP Software Base Module (Vite + Vanilla JS)
 
 Minimal single-page app serving as an Enterprise Resource Planning (ERP) software base module. It provides the common foundation for building custom ERP modules: master data management (Entities) and linked transactional documents (Documents) with create/edit/delete/search, validation, and browser localStorage persistence — using Vite and vanilla HTML, CSS, and JavaScript.

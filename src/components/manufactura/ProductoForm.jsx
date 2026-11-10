@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import {
+  obtenerReferencias,
+  nombreReferencia,
+} from '../../modules/manufactura/referencias.js';
+import {
   validarProducto,
   validarMaterialProducto,
 } from '../../modules/manufactura/productos.js';
@@ -7,10 +11,21 @@ import {
 const FORMULARIO_VACIO = { nombre: '', tipo: '' };
 const MATERIAL_VACIO = { material_id: '', cantidad_por_unidad: '' };
 
-export default function ProductoForm({ onSubmit, onCancel }) {
-  const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
+export default function ProductoForm({
+  onSubmit,
+  onCancel,
+  producto = null,
+  materialesIniciales = [],
+}) {
+  const [formulario, setFormulario] = useState(
+    producto
+      ? { nombre: producto.nombre, tipo: producto.tipo }
+      : FORMULARIO_VACIO,
+  );
   const [material, setMaterial] = useState(MATERIAL_VACIO);
-  const [materiales, setMateriales] = useState([]);
+  const [materiales, setMateriales] = useState(
+    materialesIniciales.map((r) => ({ ...r })),
+  );
   const [erroresProducto, setErroresProducto] = useState({});
   const [erroresMaterial, setErroresMaterial] = useState({});
 
@@ -28,6 +43,12 @@ export default function ProductoForm({ onSubmit, onCancel }) {
 
   const agregarMaterial = () => {
     const errores = validarMaterialProducto(material);
+    if (
+      materiales.some(
+        (r) => Number(r.material_id) === Number(material.material_id),
+      )
+    )
+      errores.material_id = 'Este material ya está incluido.';
     if (Object.keys(errores).length > 0) {
       setErroresMaterial(errores);
       return;
@@ -45,7 +66,9 @@ export default function ProductoForm({ onSubmit, onCancel }) {
   };
 
   const quitarMaterial = (indice) => {
-    setMateriales((actual) => actual.filter((_, posicion) => posicion !== indice));
+    setMateriales((actual) =>
+      actual.filter((_, posicion) => posicion !== indice),
+    );
   };
 
   const limpiarFormulario = () => {
@@ -58,6 +81,22 @@ export default function ProductoForm({ onSubmit, onCancel }) {
 
   const handleSubmit = (evento) => {
     evento.preventDefault();
+
+    if (material.material_id || material.cantidad_por_unidad) {
+      setErroresMaterial({
+        general: 'Pulsa Agregar para incluir el material antes de guardar.',
+      });
+      return;
+    }
+    const relacionesInvalidas = materiales.some(
+      (r) => Object.keys(validarMaterialProducto(r)).length,
+    );
+    if (relacionesInvalidas) {
+      setErroresMaterial({
+        general: 'Revisa las cantidades: deben ser mayores que 0.',
+      });
+      return;
+    }
 
     const errores = validarProducto(formulario);
     if (Object.keys(errores).length > 0) {
@@ -80,8 +119,20 @@ export default function ProductoForm({ onSubmit, onCancel }) {
       className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
       noValidate
     >
+      {erroresProducto.general && (
+        <p role="alert" className="error">
+          {erroresProducto.general}
+        </p>
+      )}
+      {erroresProducto.materiales && (
+        <p role="alert" className="error">
+          Revisa los materiales y sus cantidades.
+        </p>
+      )}
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Datos del producto</h3>
+        <h3 className="text-base font-semibold text-slate-900">
+          {producto ? 'Editar producto' : 'Datos del producto'}
+        </h3>
 
         <div>
           <label
@@ -96,11 +147,21 @@ export default function ProductoForm({ onSubmit, onCancel }) {
             type="text"
             value={formulario.nombre}
             onChange={handleCambioProducto}
+            aria-invalid={!!erroresProducto.nombre}
+            aria-describedby={
+              erroresProducto.nombre ? 'nombre-error' : undefined
+            }
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
             placeholder="Nombre del producto"
           />
           {erroresProducto.nombre && (
-            <p className="mt-1 text-sm text-red-600">{erroresProducto.nombre}</p>
+            <p
+              id="nombre-error"
+              role="alert"
+              className="mt-1 text-sm text-red-600"
+            >
+              {erroresProducto.nombre}
+            </p>
           )}
         </div>
 
@@ -117,11 +178,19 @@ export default function ProductoForm({ onSubmit, onCancel }) {
             type="text"
             value={formulario.tipo}
             onChange={handleCambioProducto}
+            aria-invalid={!!erroresProducto.tipo}
+            aria-describedby={erroresProducto.tipo ? 'tipo-error' : undefined}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
             placeholder="Tipo del producto"
           />
           {erroresProducto.tipo && (
-            <p className="mt-1 text-sm text-red-600">{erroresProducto.tipo}</p>
+            <p
+              id="tipo-error"
+              role="alert"
+              className="mt-1 text-sm text-red-600"
+            >
+              {erroresProducto.tipo}
+            </p>
           )}
         </div>
       </div>
@@ -140,21 +209,34 @@ export default function ProductoForm({ onSubmit, onCancel }) {
               htmlFor="material_id"
               className="mb-1 block text-sm font-medium text-slate-700"
             >
-              Material (ID)
+              Material
             </label>
-            <input
+            <select
               id="material_id"
               name="material_id"
-              type="number"
-              min="1"
-              step="1"
               value={material.material_id}
               onChange={handleCambioMaterial}
+              aria-invalid={!!erroresMaterial.material_id}
+              aria-describedby={
+                erroresMaterial.material_id ? 'material-error' : undefined
+              }
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-              placeholder="Ej. 1"
-            />
+            >
+              <option value="">Selecciona un material</option>
+              {obtenerReferencias('materiales').map((r) => (
+                <option key={r.material_id} value={r.material_id}>
+                  {r.nombre}
+                </option>
+              ))}
+            </select>
             {erroresMaterial.material_id && (
-              <p className="mt-1 text-sm text-red-600">{erroresMaterial.material_id}</p>
+              <p
+                id="material-error"
+                role="alert"
+                className="mt-1 text-sm text-red-600"
+              >
+                {erroresMaterial.material_id}
+              </p>
             )}
           </div>
 
@@ -173,11 +255,21 @@ export default function ProductoForm({ onSubmit, onCancel }) {
               step="any"
               value={material.cantidad_por_unidad}
               onChange={handleCambioMaterial}
+              aria-invalid={!!erroresMaterial.cantidad_por_unidad}
+              aria-describedby={
+                erroresMaterial.cantidad_por_unidad
+                  ? 'cantidad-error'
+                  : undefined
+              }
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               placeholder="Ej. 2.5"
             />
             {erroresMaterial.cantidad_por_unidad && (
-              <p className="mt-1 text-sm text-red-600">
+              <p
+                id="cantidad-error"
+                role="alert"
+                className="mt-1 text-sm text-red-600"
+              >
                 {erroresMaterial.cantidad_por_unidad}
               </p>
             )}
@@ -192,6 +284,12 @@ export default function ProductoForm({ onSubmit, onCancel }) {
           </button>
         </div>
 
+        {erroresMaterial.general && (
+          <p role="alert" className="error">
+            {erroresMaterial.general}
+          </p>
+        )}
+
         {materiales.length > 0 && (
           <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
             {materiales.map((registro, indice) => (
@@ -200,10 +298,25 @@ export default function ProductoForm({ onSubmit, onCancel }) {
                 className="flex items-center justify-between gap-4 px-4 py-3"
               >
                 <span className="text-sm text-slate-700">
-                  Material <span className="font-mono">{registro.material_id}</span>
+                  {nombreReferencia('materiales', registro.material_id)}
                   <span className="mx-2 text-slate-300">|</span>
                   Cantidad por unidad:{' '}
-                  <span className="font-medium">{registro.cantidad_por_unidad}</span>
+                  <input
+                    aria-label={`Cantidad del material ${indice + 1}`}
+                    type="number"
+                    min="0.001"
+                    step="any"
+                    value={registro.cantidad_por_unidad}
+                    onChange={(e) =>
+                      setMateriales((actual) =>
+                        actual.map((r, i) =>
+                          i === indice
+                            ? { ...r, cantidad_por_unidad: e.target.value }
+                            : r,
+                        ),
+                      )
+                    }
+                  />
                 </span>
                 <button
                   type="button"
@@ -232,7 +345,7 @@ export default function ProductoForm({ onSubmit, onCancel }) {
           type="submit"
           className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
         >
-          Guardar producto
+          {producto ? 'Guardar cambios' : 'Guardar producto'}
         </button>
       </div>
     </form>

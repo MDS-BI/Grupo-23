@@ -3,6 +3,7 @@ import {
   obtenerProductos,
   crearProducto,
   eliminarProducto,
+  actualizarProducto,
 } from '../modules/manufactura/productos.js';
 
 export function useProductos() {
@@ -29,11 +30,21 @@ export function useProductos() {
 
   const eliminar = useCallback(
     (producto_id) => {
-      eliminarProducto(producto_id);
-      recargar();
+      const resultado = eliminarProducto(producto_id);
+      if (!resultado.errores) recargar();
+      return resultado;
     },
     [recargar],
   );
 
-  return { productos, recargar, crear, eliminar };
+  const actualizar = useCallback(
+    (id, datos) => {
+      const resultado = actualizarProducto(id, datos);
+      if (!resultado.errores) recargar();
+      return resultado;
+    },
+    [recargar],
+  );
+
+  return { productos, recargar, crear, actualizar, eliminar };
 }

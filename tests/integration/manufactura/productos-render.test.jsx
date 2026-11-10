@@ -3,7 +3,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from '../../../src/App.jsx';
-import { obtenerProductos, obtenerProductoMaterial } from '../../../src/modules/manufactura/productos.js';
+import {
+  obtenerProductos,
+  obtenerProductoMaterial,
+} from '../../../src/modules/manufactura/productos.js';
 
 let container;
 let root;
@@ -24,7 +27,9 @@ afterEach(async () => {
 });
 
 async function click(text) {
-  const button = [...container.querySelectorAll('button')].find((item) => item.textContent.trim() === text);
+  const button = [...container.querySelectorAll('button')].find(
+    (item) => item.textContent.trim() === text,
+  );
   expect(button, `Botón: ${text}`).toBeTruthy();
   await act(async () => button.click());
 }
@@ -32,8 +37,16 @@ async function click(text) {
 async function input(id, value) {
   const field = container.querySelector(`#${id}`);
   await act(async () => {
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(field, value);
-    field.dispatchEvent(new Event('input', { bubbles: true }));
+    const proto =
+      field.tagName === 'SELECT'
+        ? HTMLSelectElement.prototype
+        : HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(proto, 'value').set.call(field, value);
+    field.dispatchEvent(
+      new Event(field.tagName === 'SELECT' ? 'change' : 'input', {
+        bubbles: true,
+      }),
+    );
   });
 }
 
@@ -61,14 +74,23 @@ describe('Arranque de Manufactura', () => {
     await input('material_id', '1');
     await input('cantidad_por_unidad', '2.5');
     await click('Agregar');
-    expect(container.textContent).toContain('Cantidad por unidad: 2.5');
+    expect(
+      container.querySelector('[aria-label="Cantidad del material 1"]').value,
+    ).toBe('2.5');
     await click('Guardar producto');
-    expect(container.querySelector('tbody').textContent).toContain('Mesa de prueba');
-    expect(obtenerProductoMaterial(obtenerProductos()[0].producto_id)[0].cantidad_por_unidad).toBe(2.5);
+    expect(container.querySelector('tbody').textContent).toContain(
+      'Mesa de prueba',
+    );
+    expect(
+      obtenerProductoMaterial(obtenerProductos()[0].producto_id)[0]
+        .cantidad_por_unidad,
+    ).toBe(2.5);
 
     await act(async () => root.unmount());
     root = createRoot(container);
     await act(async () => root.render(<App />));
-    expect(container.querySelector('tbody').textContent).toContain('Mesa de prueba');
+    expect(container.querySelector('tbody').textContent).toContain(
+      'Mesa de prueba',
+    );
   });
 });

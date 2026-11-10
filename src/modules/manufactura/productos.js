@@ -1,3 +1,6 @@
+import { guardarCambios, listar, fallo } from './almacenamiento.js';
+import { referencia } from './validacion.js';
+
 export const PRODUCTO_STORAGE_KEY = 'manufactura:productos';
 export const PRODUCTO_MATERIAL_STORAGE_KEY = 'manufactura:producto_material';
 
@@ -13,21 +16,21 @@ function leerLista(clave) {
   try {
     const contenido = window.localStorage.getItem(clave);
     const datos = contenido ? JSON.parse(contenido) : [];
-    return Array.isArray(datos) ? datos : [];
+    return Array.isArray(datos)
+      ? datos.filter((dato) => dato && typeof dato === 'object')
+      : [];
   } catch {
     return [];
   }
 }
 
-function guardarLista(clave, lista) {
-  window.localStorage.setItem(clave, JSON.stringify(lista));
-}
-
 function siguienteId(lista, campo) {
-  return lista.reduce((maximo, item) => {
-    const valor = Number(item[campo]);
-    return Number.isFinite(valor) && valor > maximo ? valor : maximo;
-  }, 0) + 1;
+  return (
+    lista.reduce((maximo, item) => {
+      const valor = Number(item[campo]);
+      return Number.isFinite(valor) && valor > maximo ? valor : maximo;
+    }, 0) + 1
+  );
 }
 
 export function obtenerProductos() {
@@ -53,34 +56,59 @@ export function validarProducto({ nombre, tipo }) {
 
 export function validarMaterialProducto({ material_id, cantidad_por_unidad }) {
   const errores = {};
-  const materialVacio = material_id === '' || material_id === null || material_id === undefined;
+  const materialVacio =
+    material_id === '' || material_id === null || material_id === undefined;
   const cantidadVacia =
-    cantidad_por_unidad === '' || cantidad_por_unidad === null || cantidad_por_unidad === undefined;
+    cantidad_por_unidad === '' ||
+    cantidad_por_unidad === null ||
+    cantidad_por_unidad === undefined;
 
   if (materialVacio) {
     errores.material_id = 'El material es obligatorio.';
-  } else if (!Number.isInteger(Number(material_id)) || Number(material_id) <= 0) {
+  } else if (
+    !Number.isInteger(Number(material_id)) ||
+    Number(material_id) <= 0
+  ) {
     errores.material_id = 'El material debe ser un identificador válido.';
   }
 
   if (cantidadVacia) {
     errores.cantidad_por_unidad = 'La cantidad por unidad es obligatoria.';
-  } else if (Number.isNaN(Number(cantidad_por_unidad)) || Number(cantidad_por_unidad) <= 0) {
-    errores.cantidad_por_unidad = 'La cantidad por unidad debe ser mayor que 0.';
+  } else if (
+    !Number.isFinite(Number(cantidad_por_unidad)) ||
+    Number(cantidad_por_unidad) <= 0
+  ) {
+    errores.cantidad_por_unidad =
+      'La cantidad por unidad debe ser mayor que 0.';
   }
 
+  if (!errores.material_id)
+    referencia(
+      errores,
+      { material_id },
+      'material_id',
+      'materiales',
+      'un material',
+    );
   return errores;
 }
 
-export function crearProducto({ nombre, tipo, materiales = [] }) {
+export function crearProducto(
+  { nombre, tipo, materiales = [] },
+  productoId = null,
+) {
   const erroresProducto = validarProducto({ nombre, tipo });
   if (Object.keys(erroresProducto).length > 0) {
     return { producto: null, errores: erroresProducto };
   }
 
   const erroresMateriales = [];
+  const incluidos = new Set();
   materiales.forEach((material, indice) => {
     const errores = validarMaterialProducto(material);
+    if (incluidos.has(Number(material.material_id)))
+      errores.material_id = 'Este material ya está incluido.';
+    incluidos.add(Number(material.material_id));
     if (Object.keys(errores).length > 0) {
       erroresMateriales.push({ indice, errores });
     }
@@ -91,18 +119,31 @@ export function crearProducto({ nombre, tipo, materiales = [] }) {
   }
 
   const productos = leerLista(PRODUCTO_STORAGE_KEY);
+  const previo = productos.find(
+    (p) => Number(p.producto_id) === Number(productoId),
+  );
+  if (productoId != null && !previo) return fallo('El producto ya no existe.');
   const producto = {
-    producto_id: siguienteId(productos, 'producto_id'),
+    ...previo,
+    producto_id: previo?.producto_id ?? siguienteId(productos, 'producto_id'),
     nombre: String(nombre).trim(),
     tipo: String(tipo).trim(),
   };
 
-  const relaciones = leerLista(PRODUCTO_MATERIAL_STORAGE_KEY);
-  let siguienteProdMat = siguienteId(relaciones, 'prod_mat_id');
+  const anteriores = leerLista(PRODUCTO_MATERIAL_STORAGE_KEY);
+  const relaciones = anteriores.filter(
+    (r) => Number(r.producto_id) !== Number(producto.producto_id),
+  );
+  let siguienteProdMat = siguienteId(anteriores, 'prod_mat_id');
 
   materiales.forEach((material) => {
     relaciones.push({
-      prod_mat_id: siguienteProdMat,
+      prod_mat_id:
+        anteriores.find(
+          (r) =>
+            Number(r.producto_id) === Number(producto.producto_id) &&
+            Number(r.material_id) === Number(material.material_id),
+        )?.prod_mat_id ?? siguienteProdMat,
       producto_id: producto.producto_id,
       material_id: Number(material.material_id),
       cantidad_por_unidad: Number(material.cantidad_por_unidad),
@@ -110,22 +151,30 @@ export function crearProducto({ nombre, tipo, materiales = [] }) {
     siguienteProdMat += 1;
   });
 
-  guardarLista(PRODUCTO_STORAGE_KEY, [...productos, producto]);
-  guardarLista(PRODUCTO_MATERIAL_STORAGE_KEY, relaciones);
-
-  return { producto, errores: null };
+  const resultado = guardarCambios({
+    productos: previo
+      ? productos.map((p) =>
+          Number(p.producto_id) === Number(productoId) ? producto : p,
+        )
+      : [...productos, producto],
+    producto_material: relaciones,
+  });
+  return { ...resultado, producto: resultado.errores ? null : producto };
 }
+
+export const actualizarProducto = (id, datos) => crearProducto(datos, id);
 
 export function eliminarProducto(producto_id) {
   const id = Number(producto_id);
-  guardarLista(
-    PRODUCTO_STORAGE_KEY,
-    leerLista(PRODUCTO_STORAGE_KEY).filter((producto) => Number(producto.producto_id) !== id),
-  );
-  guardarLista(
-    PRODUCTO_MATERIAL_STORAGE_KEY,
-    leerLista(PRODUCTO_MATERIAL_STORAGE_KEY).filter(
-      (registro) => Number(registro.producto_id) !== id,
+  if (listar('ordenes').some((o) => Number(o.producto_id) === id))
+    return fallo(
+      'El producto tiene órdenes asociadas. Conserva su historial; no se puede eliminar.',
+    );
+  return guardarCambios({
+    productos: obtenerProductos().filter((p) => Number(p.producto_id) !== id),
+    producto_material: leerLista(PRODUCTO_MATERIAL_STORAGE_KEY).filter(
+      (r) => Number(r.producto_id) !== id,
     ),
-  );
+    rutas: listar('rutas').filter((r) => Number(r.producto_id) !== id),
+  });
 }
