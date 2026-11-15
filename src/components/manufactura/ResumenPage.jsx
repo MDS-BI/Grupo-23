@@ -1,10 +1,19 @@
 import { listar } from '../../modules/manufactura/almacenamiento.js';
+import { calcularAlertasProduccion } from '../../modules/manufactura/alertas.js';
 import { avanceOrden } from '../../modules/manufactura/ordenes.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import { Progreso } from './OrdenesPage.jsx';
+import AlertasProduccion from './AlertasProduccion.jsx';
 export default function ResumenPage({ navegar }) {
   useManufactura();
   const ordenes = listar('ordenes');
+  const maquinas = listar('maquinas');
+  const alertas = calcularAlertasProduccion({
+    ordenes,
+    maquinas,
+    etapas: listar('etapas'),
+    ejecuciones: listar('ejecuciones'),
+  });
   const indicadores = [
     [
       'productos',
@@ -22,7 +31,7 @@ export default function ResumenPage({ navegar }) {
     [
       'recursos',
       'Máquinas disponibles',
-      listar('maquinas').filter((m) => m.estado === 'Disponible').length,
+      maquinas.filter((m) => m.estado === 'Disponible').length,
       'Recursos de planta',
     ],
     [
@@ -57,6 +66,7 @@ export default function ResumenPage({ navegar }) {
           </button>
         ))}
       </div>
+      <AlertasProduccion alertas={alertas} navegar={navegar} />
       <article className="card">
         <h2>Tu flujo de trabajo</h2>
         <p className="muted">

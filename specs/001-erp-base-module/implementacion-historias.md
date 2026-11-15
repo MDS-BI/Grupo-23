@@ -31,6 +31,10 @@ Las prioridades P2 de HU4 y HU5 corresponden al PDF final; no se reescribieron l
 - Un equipo asignado no se elimina hasta quitar la asignación. Se puede editar la orden, pero no cambiar su producto cuando ya tiene movimientos.
 - Una referencia antigua que ya no esté en un catálogo se muestra con su identificador; al guardar una relación nueva o editada debe seleccionarse una referencia válida.
 
+## Alertas de producción
+
+El panel de producción identifica órdenes planificadas o en producción cuya fecha de término ya pasó, máquinas marcadas como fuera de servicio y ejecuciones terminadas que excedieron el tiempo estándar de su etapa. Una orden que vence hoy se considera atrasada a partir del día siguiente según el calendario local del navegador. El panel usa los registros guardados, muestra los minutos reales y estándar de cada ejecución y ofrece accesos a órdenes y máquinas.
+
 ## Verificación reproducible
 
 ```bash
