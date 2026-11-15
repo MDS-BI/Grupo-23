@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import useManufactura from '../../hooks/useManufactura.js';
+import { filtrarMaquinas } from '../../utils/filtrosManufactura.js';
+import BarraFiltros from './BarraFiltros.jsx';
 import {
   obtenerMaquinas,
   guardarMaquina,
@@ -227,6 +229,10 @@ export default function RecursosPage() {
   useManufactura();
   const [pestana, setPestana] = useState('maquinas');
   const [maquina, setMaquina] = useState(null);
+  const [busquedaCodigo, setBusquedaCodigo] = useState('');
+
+  const maquinasFiltradas = filtrarMaquinas(obtenerMaquinas(), busquedaCodigo);
+
   return (
     <section>
       <header className="page-heading">
@@ -257,12 +263,19 @@ export default function RecursosPage() {
       </nav>
       {pestana === 'maquinas' && (
         <>
+          <BarraFiltros
+            placeholderBusqueda="Buscar máquina por código..."
+            valorBusqueda={busquedaCodigo}
+            onChangeBusqueda={setBusquedaCodigo}
+            hayFiltrosActivos={busquedaCodigo.trim() !== ''}
+            onLimpiar={() => setBusquedaCodigo('')}
+          />
           <GestionRegistros
             titulo="Máquinas de planta"
             singular="Máquina"
             nuevoTexto="Nueva máquina"
             idCampo="maquina_id"
-            registros={obtenerMaquinas()}
+            registros={maquinasFiltradas}
             guardar={guardarMaquina}
             eliminar={eliminarMaquina}
             onVer={(r) => setMaquina(r.maquina_id)}

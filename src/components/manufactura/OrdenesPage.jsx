@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import useManufactura from '../../hooks/useManufactura.js';
+import { useFiltros } from '../../hooks/useFiltros.js';
+import { filtrarOrdenes } from '../../utils/filtrosManufactura.js';
+import BarraFiltros from './BarraFiltros.jsx';
 import {
   obtenerOrdenes,
   guardarOrden,
@@ -40,6 +43,7 @@ export function Progreso({ orden }) {
     </div>
   );
 }
+
 function OrdenDetalle({ ordenId, cerrar }) {
   useManufactura();
   const orden = buscar('ordenes', ordenId);
@@ -192,9 +196,28 @@ function OrdenDetalle({ ordenId, cerrar }) {
     </article>
   );
 }
+
 export default function OrdenesPage() {
   useManufactura();
   const [detalle, setDetalle] = useState(null);
+
+  const productos = obtenerProductos();
+  const ordenes = obtenerOrdenes();
+
+  const {
+    filtros,
+    actualizarFiltro,
+    limpiarFiltros,
+    itemsFiltrados: ordenesFiltradas,
+    hayFiltrosActivos,
+  } = useFiltros(ordenes, filtrarOrdenes, {
+    busquedaNumero: '',
+    estado: '',
+    productoId: '',
+    fechaDesde: '',
+    fechaHasta: '',
+  });
+
   return (
     <section>
       <header className="page-heading">
@@ -206,17 +229,29 @@ export default function OrdenesPage() {
           </p>
         </div>
       </header>
-      {!obtenerProductos().length && (
+      {!productos.length && (
         <p className="notice">
           Primero registra un producto y define su ruta de fabricación.
         </p>
       )}
+      <BarraFiltros
+        placeholderBusqueda="Buscar orden por N° (ej: OP-0001 o 1)..."
+        valorBusqueda={filtros.busquedaNumero}
+        onChangeBusqueda={(val) => actualizarFiltro('busquedaNumero', val)}
+        mostrarFiltrosOrden={true}
+        filtros={filtros}
+        onChangeFiltro={actualizarFiltro}
+        onLimpiar={limpiarFiltros}
+        hayFiltrosActivos={hayFiltrosActivos}
+        listaProductos={productos}
+        estadosDisponibles={ESTADOS_ORDEN}
+      />
       <GestionRegistros
         titulo="Órdenes"
         singular="Orden"
         nuevoTexto="Nueva orden"
         idCampo="orden_id"
-        registros={obtenerOrdenes()}
+        registros={ordenesFiltradas}
         guardar={guardarOrden}
         eliminar={eliminarOrden}
         onVer={(r) => setDetalle(r.orden_id)}
@@ -225,7 +260,7 @@ export default function OrdenesPage() {
             name: 'producto_id',
             label: 'Producto',
             type: 'select',
-            options: opciones(obtenerProductos(), 'producto_id'),
+            options: opciones(productos, 'producto_id'),
           },
           {
             name: 'cantidad_plan',

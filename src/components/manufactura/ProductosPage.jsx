@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { filtrarProductos } from '../../utils/filtrosManufactura.js';
+import BarraFiltros from './BarraFiltros.jsx';
 import { useProductos } from '../../hooks/useProductos.js';
 import ProductoList from './ProductoList.jsx';
 import ProductoForm from './ProductoForm.jsx';
@@ -11,6 +13,11 @@ export default function ProductosPage() {
   const [edicion, setEdicion] = useState(null);
   const [detalle, setDetalle] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [busquedaNombre, setBusquedaNombre] = useState('');
+
+  const productosFiltrados = useMemo(() => {
+    return filtrarProductos(productos, busquedaNombre);
+  }, [productos, busquedaNombre]);
 
   const handleCrear = (datos) => {
     const resultado = edicion
@@ -70,9 +77,15 @@ export default function ProductosPage() {
           onCancel={() => setMostrarFormulario(false)}
         />
       )}
-
+<BarraFiltros
+  placeholderBusqueda="Buscar producto por nombre..."
+  valorBusqueda={busquedaNombre}
+  onChangeBusqueda={setBusquedaNombre}
+  hayFiltrosActivos={busquedaNombre.trim() !== ''}
+  onLimpiar={() => setBusquedaNombre('')}
+/>
       <ProductoList
-        productos={productos}
+        productos={productosFiltrados}
         onEliminar={handleEliminar}
         onEditar={(producto) => {
           setEdicion(producto);
