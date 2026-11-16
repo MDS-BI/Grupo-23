@@ -10,7 +10,8 @@ export default function ReferenciasPage() {
           <span className="eyebrow">Integración entre módulos</span>
           <h1>Catálogos de referencia</h1>
           <p>
-            Consulta los registros de Logística, Compras y Recursos Humanos.
+            Consulta los materiales de fabricación y las referencias de los
+            otros módulos.
           </p>
         </div>
       </header>
@@ -22,7 +23,7 @@ export default function ReferenciasPage() {
       )}
       <div className="reference-grid">
         {[
-          ['materiales', 'Materiales', 'Logística e inventario'],
+          ['materiales', 'Materiales', 'Logística y materiales locales'],
           ['repuestos', 'Repuestos', 'Logística e inventario'],
           ['trabajadores', 'Trabajadores', 'Recursos Humanos'],
           ['proveedores', 'Proveedores', 'Adquisición y compras'],
@@ -34,7 +35,12 @@ export default function ReferenciasPage() {
               {obtenerReferencias(tipo).map((r, i) => (
                 <li key={i}>
                   {r.nombre || r.razon_social}
-                  {r.unidad && <small>{r.unidad}</small>}
+                  {r.unidad && (
+                    <small>
+                      {r.unidad}
+                      {r.material_id < 0 ? ' · Material local' : ''}
+                    </small>
+                  )}
                 </li>
               ))}
             </ul>

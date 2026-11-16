@@ -35,7 +35,7 @@ async function click(text) {
 }
 
 async function input(id, value) {
-  const field = container.querySelector(`#${id}`);
+  const field = document.getElementById(id);
   await act(async () => {
     const proto =
       field.tagName === 'SELECT'
@@ -92,5 +92,44 @@ describe('Arranque de Manufactura', () => {
     expect(container.querySelector('tbody').textContent).toContain(
       'Mesa de prueba',
     );
+  });
+
+  it('registra un material nuevo, lo selecciona y lo conserva junto a los ejemplos', async () => {
+    await act(async () => root.render(<App />));
+    await click('Nuevo producto');
+    await input('nombre', 'Computador');
+    await input('tipo', 'Electrónica');
+    await click('Añadir nuevo material');
+    expect(container.querySelector('fieldset').textContent).toContain(
+      '12 clavos',
+    );
+    await click('Guardar material');
+    expect(container.textContent).toContain('Escribe el nombre del material.');
+
+    const nombre = container.querySelector('[name="nombre_material_nuevo"]');
+    await input(nombre.id, 'Memoria RAM de 8 GB');
+    await click('Guardar material');
+    const selector = container.querySelector('#material_id');
+    expect(selector.selectedOptions[0].textContent).toBe(
+      'Memoria RAM de 8 GB (unidad)',
+    );
+    expect(container.querySelector('#nombre').value).toBe('Computador');
+    await input('cantidad_por_unidad', '2');
+    await click('Agregar');
+    await click('Guardar producto');
+    await click('Ver detalle');
+    expect(container.textContent).toContain(
+      'Memoria RAM de 8 GB — 2 por unidad',
+    );
+
+    await act(async () => root.unmount());
+    root = createRoot(container);
+    await act(async () => root.render(<App />));
+    await click('Nuevo producto');
+    const materiales = [
+      ...container.querySelectorAll('#material_id option'),
+    ].map((o) => o.textContent);
+    expect(materiales).toContain('Memoria RAM de 8 GB (unidad)');
+    expect(materiales).toContain('Pintura (litro)');
   });
 });

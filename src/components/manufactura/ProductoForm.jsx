@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   obtenerReferencias,
   nombreReferencia,
@@ -7,6 +7,8 @@ import {
   validarProducto,
   validarMaterialProducto,
 } from '../../modules/manufactura/productos.js';
+import useManufactura from '../../hooks/useManufactura.js';
+import NuevoMaterial from './NuevoMaterial.jsx';
 
 const FORMULARIO_VACIO = { nombre: '', tipo: '' };
 const MATERIAL_VACIO = { material_id: '', cantidad_por_unidad: '' };
@@ -17,6 +19,7 @@ export default function ProductoForm({
   producto = null,
   materialesIniciales = [],
 }) {
+  useManufactura();
   const [formulario, setFormulario] = useState(
     producto
       ? { nombre: producto.nombre, tipo: producto.tipo }
@@ -28,6 +31,30 @@ export default function ProductoForm({
   );
   const [erroresProducto, setErroresProducto] = useState({});
   const [erroresMaterial, setErroresMaterial] = useState({});
+  const [mostrarNuevoMaterial, setMostrarNuevoMaterial] = useState(false);
+  const [avisoMaterial, setAvisoMaterial] = useState('');
+  const cantidadRef = useRef(null);
+  const nuevoMaterialRef = useRef(null);
+  const catalogoMateriales = obtenerReferencias('materiales');
+
+  const materialCreado = (registro) => {
+    setMaterial((actual) => ({
+      ...actual,
+      material_id: String(registro.material_id),
+    }));
+    setErroresMaterial({});
+    setMostrarNuevoMaterial(false);
+    setAvisoMaterial(
+      `${registro.nombre} quedó guardado y seleccionado. Indica la cantidad por unidad y pulsa Agregar.`,
+    );
+    cantidadRef.current?.focus();
+  };
+
+  const cerrarNuevoMaterial = () => {
+    setMostrarNuevoMaterial(false);
+    setErroresMaterial((actual) => ({ ...actual, general: undefined }));
+    nuevoMaterialRef.current?.focus();
+  };
 
   const handleCambioProducto = (evento) => {
     const { name, value } = evento.target;
@@ -38,7 +65,12 @@ export default function ProductoForm({
   const handleCambioMaterial = (evento) => {
     const { name, value } = evento.target;
     setMaterial((actual) => ({ ...actual, [name]: value }));
-    setErroresMaterial((actual) => ({ ...actual, [name]: undefined }));
+    setErroresMaterial((actual) => ({
+      ...actual,
+      [name]: undefined,
+      general: undefined,
+    }));
+    if (name === 'material_id') setAvisoMaterial('');
   };
 
   const agregarMaterial = () => {
@@ -63,6 +95,7 @@ export default function ProductoForm({
     ]);
     setMaterial(MATERIAL_VACIO);
     setErroresMaterial({});
+    setAvisoMaterial('');
   };
 
   const quitarMaterial = (indice) => {
@@ -77,10 +110,19 @@ export default function ProductoForm({
     setMateriales([]);
     setErroresProducto({});
     setErroresMaterial({});
+    setAvisoMaterial('');
   };
 
   const handleSubmit = (evento) => {
     evento.preventDefault();
+
+    if (mostrarNuevoMaterial) {
+      setErroresMaterial({
+        general:
+          'Guarda el nuevo material o cancela su registro antes de guardar el producto.',
+      });
+      return;
+    }
 
     if (material.material_id || material.cantidad_por_unidad) {
       setErroresMaterial({
@@ -223,9 +265,10 @@ export default function ProductoForm({
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
             >
               <option value="">Selecciona un material</option>
-              {obtenerReferencias('materiales').map((r) => (
+              {catalogoMateriales.map((r) => (
                 <option key={r.material_id} value={r.material_id}>
                   {r.nombre}
+                  {r.unidad ? ` (${r.unidad})` : ''}
                 </option>
               ))}
             </select>
@@ -238,6 +281,38 @@ export default function ProductoForm({
                 {erroresMaterial.material_id}
               </p>
             )}
+            <button
+              ref={nuevoMaterialRef}
+              type="button"
+              className="nuevo-material-toggle"
+              aria-expanded={mostrarNuevoMaterial}
+              aria-controls={
+                mostrarNuevoMaterial ? 'nuevo-material' : undefined
+              }
+              onClick={() => {
+                if (mostrarNuevoMaterial) {
+                  cerrarNuevoMaterial();
+                } else {
+                  setAvisoMaterial('');
+                  setMostrarNuevoMaterial(true);
+                }
+              }}
+            >
+              {mostrarNuevoMaterial
+                ? 'Ocultar registro de material'
+                : 'Añadir nuevo material'}
+            </button>
+            {mostrarNuevoMaterial && (
+              <NuevoMaterial
+                onCreado={materialCreado}
+                onCancelar={cerrarNuevoMaterial}
+              />
+            )}
+            {avisoMaterial && (
+              <p role="status" className="notice">
+                {avisoMaterial}
+              </p>
+            )}
           </div>
 
           <div>
@@ -248,6 +323,7 @@ export default function ProductoForm({
               Cantidad por unidad
             </label>
             <input
+              ref={cantidadRef}
               id="cantidad_por_unidad"
               name="cantidad_por_unidad"
               type="number"
@@ -277,6 +353,7 @@ export default function ProductoForm({
 
           <button
             type="button"
+            disabled={mostrarNuevoMaterial}
             onClick={agregarMaterial}
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >

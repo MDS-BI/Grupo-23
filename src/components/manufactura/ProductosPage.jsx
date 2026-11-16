@@ -49,7 +49,7 @@ export default function ProductosPage() {
     <section className="mx-auto w-full max-w-5xl space-y-6 p-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="eyebrow">HU1 · Catálogo de fabricación</span>
+          <span className="eyebrow">Catálogo de fabricación</span>
           <h1 className="text-2xl font-semibold text-slate-900">Productos</h1>
           <p className="mt-1 text-sm text-slate-500">
             Gestiona los productos y los materiales requeridos para fabricarlos.
@@ -97,6 +97,12 @@ export default function ProductosPage() {
             <li><strong>Nombre:</strong> Ingresa el nombre comercial o técnico del artículo (Ej. <em>Taladro Industrial A1</em>).</li>
             <li><strong>Tipo:</strong> Define la categoría o línea de fabricación (Ej. <em>Ensamblaje</em> o <em>Pieza mecanizada</em>).</li>
             <li><strong>Materiales:</strong> Selecciona los insumos requeridos desde el inventario y especifica la cantidad exacta que consume por cada unidad fabricada (Ej. <em>Acero en barra - 2.5 unidades</em>). No olvides hacer clic en <strong>Agregar</strong> antes de guardar.</li>
+            <li>
+              <strong>Si un material falta:</strong> pulsa <strong>Añadir nuevo material</strong>.
+              Por ejemplo, escribe <em>Memoria RAM de 8 GB</em>, usa <em>unidad</em>{' '}
+              como medida y pulsa <strong>Guardar material</strong>. Para un computador
+              que usa dos módulos, indica <strong>2</strong> y pulsa <strong>Agregar</strong>.
+            </li>
           </ul>
         </article>
       )}

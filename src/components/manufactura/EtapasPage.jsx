@@ -31,7 +31,7 @@ export default function EtapasPage() {
     <section>
       <header className="page-heading">
         <div>
-          <span className="eyebrow">HU2 · Proceso productivo</span>
+          <span className="eyebrow">Proceso productivo</span>
           <h1>Etapas y rutas</h1>
           <p>
             Define las actividades y el orden de fabricación de cada producto.
