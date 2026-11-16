@@ -126,8 +126,8 @@ button:disabled {
   position: sticky;
   top: 0;
   height: 100vh;
-  background: #122d35;
-  color: #dce8e8;
+ background: #1b4d47;
+  color: #f0fdfa;
   display: flex;
   flex-direction: column;
   padding: 30px 16px 20px;
