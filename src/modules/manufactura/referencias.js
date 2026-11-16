@@ -36,7 +36,8 @@ export function obtenerReferencias(tipo) {
     });
     return [...externos, ...listar('materiales_locales')];
   }
-  return catalogo;
+  const demo = listar('demo_peluches')[0]?.[tipo];
+  return Array.isArray(demo) ? [...catalogo, ...demo] : catalogo;
 }
 
 const compararNombres = new Intl.Collator('es', { sensitivity: 'base' });

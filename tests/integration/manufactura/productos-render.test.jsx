@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from '../../../src/App.jsx';
@@ -28,7 +28,7 @@ afterEach(async () => {
 
 async function click(text) {
   const button = [...container.querySelectorAll('button')].find(
-    (item) => item.textContent.trim() === text,
+    (item) => (item.getAttribute('aria-label') || item.textContent.trim()) === text,
   );
   expect(button, `Botón: ${text}`).toBeTruthy();
   await act(async () => button.click());
@@ -51,6 +51,41 @@ async function input(id, value) {
 }
 
 describe('Arranque de Manufactura', () => {
+  it('reemplaza los ejemplos previos tras confirmar y muestra sus relaciones en el módulo', async () => {
+    localStorage.setItem('manufactura:productos', JSON.stringify([
+      { producto_id: 1, nombre: 'Mesa anterior', tipo: 'Mueble' },
+    ]));
+    localStorage.setItem('manufactura:materiales_locales', JSON.stringify([
+      { material_id: -1, nombre: 'Clavos anteriores', unidad: 'unidad' },
+    ]));
+    const confirmar = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
+    try {
+      await act(async () => root.render(<App />));
+      await click('Sustituir registros por el ejemplo');
+      expect(container.textContent).toContain('Mesa anterior');
+      await click('Sustituir registros por el ejemplo');
+      expect(container.textContent).not.toContain('Mesa anterior');
+      expect(container.textContent).toContain('Oso Bruno de 30 cm');
+      expect(container.querySelectorAll('tbody tr')).toHaveLength(5);
+
+      await click('Etapas y rutas');
+      await input(container.querySelector('[name="producto_ruta"]').id, '1');
+      expect(container.querySelectorAll('.route-step')).toHaveLength(6);
+      await click('Recepción de materiales');
+      expect(container.textContent).toContain('Textiles Nube Austral');
+      expect(container.textContent).toContain('Felpa marrón de pelo corto');
+      await click('Máquinas y equipamiento');
+      expect(container.textContent).toContain('Rellenadora neumática de fibra');
+      await click('Catálogos de referencia');
+      expect(container.textContent).not.toContain('Clavos anteriores');
+      expect(container.textContent).toContain('Empaques Bosque Azul');
+      await click('Panel de producción');
+      expect(container.textContent).toContain('OP-0005');
+    } finally {
+      confirmar.mockRestore();
+    }
+  });
+
   it('renderiza Productos y permite abrir y cerrar el formulario', async () => {
     await act(async () => root.render(<App />));
     expect(container.querySelector('h1').textContent).toBe('Productos');

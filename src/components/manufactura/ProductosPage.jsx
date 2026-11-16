@@ -6,6 +6,11 @@ import ProductoList from './ProductoList.jsx';
 import ProductoForm from './ProductoForm.jsx';
 import ProductoDetalle from './ProductoDetalle.jsx';
 import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js';
+import {
+  cargarDemoPeluches,
+  demoPeluchesCargada,
+  hayRegistrosManufactura,
+} from '../../modules/manufactura/demo-peluches.js';
 
 export default function ProductosPage() {
   const { productos, crear, actualizar, eliminar } = useProductos();
@@ -13,6 +18,7 @@ export default function ProductosPage() {
   const [edicion, setEdicion] = useState(null);
   const [detalle, setDetalle] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [errorDemo, setErrorDemo] = useState('');
   const [busquedaNombre, setBusquedaNombre] = useState('');
 
   const productosFiltrados = useMemo(() => {
@@ -20,6 +26,24 @@ export default function ProductosPage() {
   }, [productos, busquedaNombre]);
 
   const [mostrarGuia, setMostrarGuia] = useState(false);
+  const hayRegistros = hayRegistrosManufactura();
+
+  const cargarEjemplo = (reemplazar) => {
+    if (
+      reemplazar &&
+      !window.confirm('¿Sustituir todos los registros de Manufactura de este navegador por el ejemplo de peluches?')
+    ) return;
+
+    const resultado = cargarDemoPeluches({ reemplazar });
+    setErrorDemo(resultado.errores?.general || '');
+    if (!resultado.errores) {
+      setDetalle(null);
+      setEdicion(null);
+      setMostrarFormulario(false);
+      setBusquedaNombre('');
+      setMensaje('Fábrica de peluches cargada en este navegador.');
+    }
+  };
 
   const handleCrear = (datos) => {
     const resultado = edicion
@@ -75,6 +99,46 @@ export default function ProductosPage() {
           </button>
         </div>
       </header>
+
+      {!demoPeluchesCargada() && !mostrarFormulario && (
+        <article className="card">
+          <h2>Fábrica de peluches de ejemplo</h2>
+          <p className="muted">
+            Carga cinco productos con sus materiales, proveedores, rutas,
+            órdenes, recepciones y máquinas.
+          </p>
+          {hayRegistros && (
+            <p className="muted" id="alcance-reemplazo-demo">
+              Puedes conservar tus registros o sustituir todos los registros de
+              Manufactura guardados en este navegador por los del ejemplo.
+            </p>
+          )}
+          <div className="row-actions">
+            <button
+              className="primary"
+              type="button"
+              onClick={() => cargarEjemplo(false)}
+            >
+              {hayRegistros
+                ? 'Añadir ejemplo a mis registros'
+                : 'Cargar fábrica de peluches'}
+            </button>
+            {hayRegistros && (
+              <button
+                className="danger"
+                type="button"
+                aria-describedby="alcance-reemplazo-demo"
+                onClick={() => cargarEjemplo(true)}
+              >
+                Sustituir registros por el ejemplo
+              </button>
+            )}
+          </div>
+          {errorDemo && (
+            <p className="error" role="alert">{errorDemo}</p>
+          )}
+        </article>
+      )}
 
       {/* Cuadro de ejemplo y orientación para el usuario */}
       {mostrarGuia && (

@@ -2,6 +2,8 @@ import {
   obtenerReferencias,
   usandoReferenciasDeMuestra,
 } from '../../modules/manufactura/referencias.js';
+import { demoPeluchesCargada } from '../../modules/manufactura/demo-peluches.js';
+
 export default function ReferenciasPage() {
   return (
     <section>
@@ -19,6 +21,11 @@ export default function ReferenciasPage() {
         <p className="notice">
           Estás usando referencias de muestra para probar los flujos. Los
           catálogos reales de los otros módulos aún no están conectados.
+        </p>
+      )}
+      {demoPeluchesCargada() && (
+        <p className="notice">
+          La fábrica de ejemplo usa proveedores y personal ficticios.
         </p>
       )}
       <div className="reference-grid">
