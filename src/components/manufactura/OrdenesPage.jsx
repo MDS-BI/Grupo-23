@@ -222,7 +222,7 @@ export default function OrdenesPage() {
     <section>
       <header className="page-heading">
         <div>
-          <span className="eyebrow">HU3 · Planificación y ejecución</span>
+          <span className="eyebrow">Planificación y ejecución</span>
           <h1>Órdenes de producción</h1>
           <p>
             Planifica la fabricación y registra el avance real de cada etapa.

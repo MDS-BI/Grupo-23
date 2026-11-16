@@ -1,4 +1,6 @@
-// Adaptador de los módulos externos. Las muestras permiten probar el MVP sin crear catálogos propios.
+import { guardarCambios, listar } from './almacenamiento.js';
+
+// Las muestras siguen disponibles hasta conectar los catálogos de los otros módulos.
 const muestras = {
   materiales: [
     { material_id: 1, nombre: 'Tablero de madera', unidad: 'unidad' },
@@ -26,8 +28,55 @@ export function configurarReferencias(adaptador) {
 }
 export function obtenerReferencias(tipo) {
   const lista = proveedor ? proveedor(tipo) : muestras[tipo];
-  return Array.isArray(lista) ? lista.map((r) => ({ ...r })) : [];
+  const catalogo = Array.isArray(lista) ? lista.map((r) => ({ ...r })) : [];
+  if (tipo === 'materiales') {
+    const externos = catalogo.filter(({ material_id }) => {
+      const id = Number(material_id);
+      return Number.isSafeInteger(id) && id > 0;
+    });
+    return [...externos, ...listar('materiales_locales')];
+  }
+  return catalogo;
 }
+
+const compararNombres = new Intl.Collator('es', { sensitivity: 'base' });
+const limpiarTexto = (valor) =>
+  String(valor ?? '')
+    .trim()
+    .replace(/\s+/g, ' ');
+
+export function registrarMaterialLocal(datos) {
+  const nombre = limpiarTexto(datos.nombre);
+  const unidad = limpiarTexto(datos.unidad);
+  const errores = {};
+  if (!nombre) errores.nombre = 'Escribe el nombre del material.';
+  if (!unidad) errores.unidad = 'Escribe una unidad de medida.';
+  if (
+    nombre &&
+    obtenerReferencias('materiales').some(
+      (material) =>
+        compararNombres.compare(limpiarTexto(material.nombre), nombre) === 0,
+    )
+  ) {
+    errores.nombre =
+      'Ya existe un material con ese nombre. Selecciónalo en la lista.';
+  }
+  if (Object.keys(errores).length) return { registro: null, errores };
+
+  const locales = listar('materiales_locales');
+  // Los identificadores locales son negativos para reservar los positivos al catálogo externo.
+  const materialId =
+    locales.reduce((menor, material) => {
+      const id = Number(material.material_id);
+      return Number.isSafeInteger(id) ? Math.min(menor, id) : menor;
+    }, 0) - 1;
+  const registro = { material_id: materialId, nombre, unidad };
+  const resultado = guardarCambios({
+    materiales_locales: [...locales, registro],
+  });
+  return { ...resultado, registro: resultado.errores ? null : registro };
+}
+
 export const usandoReferenciasDeMuestra = () => proveedor === null;
 export const nombreReferencia = (tipo, id) => {
   const campo = {

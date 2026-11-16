@@ -237,7 +237,7 @@ export default function RecursosPage() {
     <section>
       <header className="page-heading">
         <div>
-          <span className="eyebrow">HU5 · Recursos de planta</span>
+          <span className="eyebrow">Recursos de planta</span>
           <h1>Máquinas y equipamiento</h1>
           <p>
             Cuida la disponibilidad de los equipos y la trazabilidad de sus

@@ -10,13 +10,13 @@ import ResumenPage from './components/manufactura/ResumenPage.jsx';
 export default function App() {
   const [pagina, setPagina] = useState('productos');
   const menu = [
-    ['resumen', '00', 'Panel de producción'],
-    ['productos', '01', 'Productos y materiales'],
-    ['etapas', '02', 'Etapas y rutas'],
-    ['ordenes', '03', 'Órdenes de producción'],
-    ['recepciones', '04', 'Recepción de materiales'],
-    ['recursos', '05', 'Máquinas y equipamiento'],
-    ['referencias', '↗', 'Catálogos de referencia'],
+    ['resumen', 'Panel de producción'],
+    ['productos', 'Productos y materiales'],
+    ['etapas', 'Etapas y rutas'],
+    ['ordenes', 'Órdenes de producción'],
+    ['recepciones', 'Recepción de materiales'],
+    ['recursos', 'Máquinas y equipamiento'],
+    ['referencias', 'Catálogos de referencia', '↗'],
   ];
   const paginas = {
     productos: <ProductosPage />,
@@ -42,7 +42,7 @@ export default function App() {
         </div>
         <p className="nav-label">ESPACIO DE TRABAJO</p>
         <nav aria-label="Navegación de Manufactura">
-          {menu.map(([id, numero, label]) => (
+          {menu.map(([id, label, icono]) => (
             <button
               key={id}
               type="button"
@@ -50,8 +50,8 @@ export default function App() {
               aria-current={pagina === id ? 'page' : undefined}
               onClick={() => setPagina(id)}
             >
-              <span aria-hidden="true">{numero}</span>
               {label}
+              {icono && <span aria-hidden="true">{icono}</span>}
             </button>
           ))}
         </nav>

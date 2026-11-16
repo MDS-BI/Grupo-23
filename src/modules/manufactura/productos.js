@@ -66,8 +66,8 @@ export function validarMaterialProducto({ material_id, cantidad_por_unidad }) {
   if (materialVacio) {
     errores.material_id = 'El material es obligatorio.';
   } else if (
-    !Number.isInteger(Number(material_id)) ||
-    Number(material_id) <= 0
+    !Number.isSafeInteger(Number(material_id)) ||
+    Number(material_id) === 0
   ) {
     errores.material_id = 'El material debe ser un identificador válido.';
   }

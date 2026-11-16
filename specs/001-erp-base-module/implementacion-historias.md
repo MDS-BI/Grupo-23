@@ -18,7 +18,8 @@ Las prioridades P2 de HU4 y HU5 corresponden al PDF final; no se reescribieron l
 
 - Se mantienen las 12 claves y los nombres de campos del MER, con prefijo `manufactura:`. No hay migración destructiva ni reinicio de registros existentes.
 - Las escrituras de varias listas guardan sus valores anteriores y los recuperan si una escritura falla. Si una clave contiene JSON dañado se muestra un error antes de sobrescribirla.
-- Las referencias externas se encuentran en `referencias.js`; sus muestras no se guardan en `localStorage` ni tienen formularios de alta. `configurarReferencias(adaptador)` permite suministrar catálogos de Logística, Compras o RRHH sin reescribir los repositorios.
+- Las muestras externas de `referencias.js` siguen siendo de solo lectura. `configurarReferencias(adaptador)` permite suministrar catálogos de Logística, Compras o RRHH sin reescribir los repositorios.
+- Desde el formulario de Productos se puede registrar un material propio con nombre y unidad. Se guarda en `manufactura:materiales_locales` y queda disponible en Productos y Recepciones de ese navegador. Los materiales locales usan identificadores negativos para convivir con los identificadores positivos del catálogo externo.
 - La aplicación es local y no incluye servidor, autenticación ni sincronización entre usuarios. No se afirmó una conexión con módulos externos que todavía no existe.
 
 ## Decisiones para el flujo del PDF

@@ -95,7 +95,7 @@ export default function RecepcionesPage() {
     <section>
       <header className="page-heading">
         <div>
-          <span className="eyebrow">HU4 · Trazabilidad de insumos</span>
+          <span className="eyebrow">Trazabilidad de insumos</span>
           <h1>Recepción de materiales</h1>
           <p>
             Registra las entregas de proveedores y consulta su orden de
