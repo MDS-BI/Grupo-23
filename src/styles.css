@@ -799,3 +799,7 @@ button:disabled {
   color: #ffffff;
   border-color: #dc2626;
 }
+.sidebar a,
+.sidebar button {
+  font-size: 0.96rem;
+}
