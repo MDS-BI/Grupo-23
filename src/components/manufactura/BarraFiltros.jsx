@@ -24,19 +24,29 @@ export default function BarraFiltros({
       {mostrarFiltrosOrden && (
         <>
           <div className="filtro-grupo">
-            <select value={filtros.estado || ''} onChange={(e) => onChangeFiltro('estado', e.target.value)}>
+            <select
+              value={filtros.estado || ''}
+              onChange={(e) => onChangeFiltro('estado', e.target.value)}
+            >
               <option value="">Todos los estados</option>
               {estadosDisponibles.map((est) => (
-                <option key={est} value={est}>{est}</option>
+                <option key={est} value={est}>
+                  {est}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="filtro-grupo">
-            <select value={filtros.productoId || ''} onChange={(e) => onChangeFiltro('productoId', e.target.value)}>
+            <select
+              value={filtros.productoId || ''}
+              onChange={(e) => onChangeFiltro('productoId', e.target.value)}
+            >
               <option value="">Todos los productos</option>
               {listaProductos.map((prod) => (
-                <option key={prod.producto_id} value={prod.producto_id}>{prod.nombre}</option>
+                <option key={prod.producto_id} value={prod.producto_id}>
+                  {prod.nombre}
+                </option>
               ))}
             </select>
           </div>
@@ -44,21 +54,32 @@ export default function BarraFiltros({
           <div className="filtro-grupo filtro-fechas">
             <label>
               Desde:
-              <input type="date" value={filtros.fechaDesde || ''} onChange={(e) => onChangeFiltro('fechaDesde', e.target.value)} />
+              <input
+                type="date"
+                value={filtros.fechaDesde || ''}
+                onChange={(e) => onChangeFiltro('fechaDesde', e.target.value)}
+              />
             </label>
             <label>
               Hasta:
-              <input type="date" value={filtros.fechaHasta || ''} onChange={(e) => onChangeFiltro('fechaHasta', e.target.value)} />
+              <input
+                type="date"
+                value={filtros.fechaHasta || ''}
+                onChange={(e) => onChangeFiltro('fechaHasta', e.target.value)}
+              />
             </label>
           </div>
         </>
       )}
 
-      {hayFiltrosActivos && (
-        <button type="button" className="btn-limpiar-filtros" onClick={onLimpiar}>
-          Limpiar filtros
-        </button>
-      )}
+      <button
+        type="button"
+        className={`btn-limpiar-filtros ${hayFiltrosActivos ? 'activo' : ''}`}
+        onClick={onLimpiar}
+        disabled={!hayFiltrosActivos}
+      >
+        Limpiar filtros
+      </button>
     </div>
   );
 }
