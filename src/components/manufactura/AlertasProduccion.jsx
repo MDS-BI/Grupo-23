@@ -2,10 +2,14 @@ import { formatoFecha } from './Controles.jsx';
 import './alertas-produccion.css';
 
 const codigoOrden = (id) => `OP-${String(id).padStart(4, '0')}`;
+const cantidad = (valor) => Number(valor).toLocaleString('es-CL');
 
 function GrupoAlertas({ titulo, vacio, registros, accion, onVer }) {
   return (
-    <div className="alertas-grupo" data-activo={registros.length > 0}>
+    <div
+      className="alertas-grupo transition-all duration-200"
+      data-activo={registros.length > 0}
+    >
       <h3>
         {titulo}
         <span className="alertas-cantidad">{registros.length}</span>
@@ -69,6 +73,19 @@ export default function AlertasProduccion({ alertas, navegar }) {
           }))}
           accion="Ir a ejecuciones por orden"
           onVer={() => navegar('ordenes')}
+        />
+        <GrupoAlertas
+          titulo="Stock crítico de insumos"
+          vacio="No hay insumos con faltantes para las órdenes abiertas."
+          registros={(alertas.stockCritico || []).map(
+            ({ material_id, nombre, requerido, recibido, faltante }) => ({
+              id: `material-${material_id}`,
+              nombre,
+              detalle: `Faltan ${cantidad(faltante)} · ${cantidad(recibido)}/${cantidad(requerido)} recibidos`,
+            }),
+          )}
+          accion="Ir a recepciones"
+          onVer={() => navegar('recepciones')}
         />
       </div>
     </section>

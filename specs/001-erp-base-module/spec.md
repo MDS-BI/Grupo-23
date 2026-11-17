@@ -105,6 +105,20 @@ Como encargado de planta, quiero gestionar las máquinas, sus mantenimientos y e
 
 ---
 
+### Ampliaciones transversales de interfaz y datos (HU1-HU5)
+
+Como encargado de producción, quiero supervisar alertas, filtrar registros, registrar insumos nuevos y contar con datos de ejemplo, para demostrar y probar el módulo completo sin depender de otros sistemas.
+
+**Escenarios de Aceptación**:
+
+1. **Dado** que existen órdenes abiertas vencidas, máquinas fuera de servicio, ejecuciones que superan el tiempo estándar o insumos con faltantes, **cuando** el usuario abre el panel de producción, **entonces** ve avisos visuales agrupados y puede navegar al área correspondiente.
+2. **Dado** que un material no cubre la cantidad requerida por las órdenes abiertas, **cuando** se calculan las alertas, **entonces** se muestra el faltante comparando lo recibido con lo requerido.
+3. **Dado** que un listado tiene muchos registros, **cuando** el usuario aplica búsqueda o filtros por estado, fecha o categoría, **entonces** la barra reutilizable deja los filtros activos visibles y permite limpiarlos.
+4. **Dado** que un insumo no está en el catálogo, **cuando** el usuario lo registra desde el formulario de productos indicando nombre y unidad, **entonces** queda disponible para la composición del producto y para las recepciones.
+5. **Dado** que el usuario abre la aplicación por primera vez sin registros, **cuando** carga el módulo, **entonces** el dataset de demostración con productos, rutas, órdenes, recepciones y recursos de HU1 a HU5 queda disponible sin borrar datos posteriores.
+
+---
+
 ### Casos Límite
 
 - ¿Qué ocurre cuando un usuario intenta guardar un producto sin nombre o tipo?
@@ -179,6 +193,13 @@ Como encargado de planta, quiero gestionar las máquinas, sus mantenimientos y e
 - **FR-036**: El sistema DEBE recargar los datos persistidos al reabrir un formulario de edición.
 - **FR-037**: El sistema DEBE mantener verificable el flujo completo producto → ruta → orden → recepción.
 - **FR-038**: El sistema DEBE ejecutar pruebas automatizadas y la compilación de producción sin regresiones.
+
+**Ampliaciones transversales (HU1-HU5)**
+
+- **FR-039**: El sistema DEBE mostrar un panel de alertas de producción con avisos visuales de stock crítico, órdenes retrasadas y máquinas fuera de servicio, con accesos a las áreas relacionadas.
+- **FR-040**: El sistema DEBE ofrecer una barra de filtros global reutilizable para filtrar registros por texto, estado, fecha o categoría y permitir limpiar los filtros activos.
+- **FR-041**: El sistema DEBE permitir el alta local de materiales desde el formulario de productos, persistirlos en `manufactura:materiales_locales` y reutilizarlos en composiciones y recepciones.
+- **FR-042**: El sistema DEBE cargar al iniciar, cuando no existan registros, un dataset de demostración que deje operativas las HU1 a HU5 y conservar la carga o el reemplazo manual.
 
 ### Requisitos de Extensibilidad *(obligaciones del módulo)*
 

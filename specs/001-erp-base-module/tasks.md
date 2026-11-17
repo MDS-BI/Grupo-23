@@ -9,7 +9,8 @@
 - **[P]**: puede ejecutarse en paralelo (archivos distintos, sin dependencias)
 - **[Historia]**: historia de usuario a la que pertenece la tarea (`US1` a `US5`)
 - Las tareas de prueba se escriben primero y deben fallar antes de implementar
-- Rutas de archivo propuestas según la estructura `src/modules/manufactura/` y `src/components/manufactura/`
+- Rutas de archivo corregidas según la estructura real: `src/modules/manufactura/`, `src/components/manufactura/`, almacenamiento en `src/modules/manufactura/almacenamiento.js` y aplicación principal en `src/App.jsx`
+- Los componentes de interfaz usan extensión `.jsx`; los módulos de dominio y pruebas de lógica conservan `.js`, y las pruebas con JSX usan `.test.jsx`
 
 ---
 
@@ -17,10 +18,10 @@
 
 **Propósito**: Preparar la base común que todas las historias necesitan.
 
-- [ ] T001 Crear la estructura de carpetas `src/modules/manufactura/`, `src/components/manufactura/`, `tests/unit/manufactura/`, `tests/integration/manufactura/` y registrar la navegación del módulo en `src/app.js`
-- [ ] T002 [P] Extender `src/storage.js` con ayudantes genéricos de persistencia y claves con prefijo `manufactura:`
-- [ ] T003 [P] Definir los contratos de referencias externas `MATERIAL`, `TRABAJADOR`, `PROVEEDOR` y `REPUESTO`, con catálogos locales de solo lectura para pruebas en `src/modules/manufactura/referencias.js`
-- [ ] T004 [P] Crear fixtures compartidos de todos los catálogos y registros de ejemplo en `tests/fixtures/manufactura.js`
+- [x] T001 Crear la estructura de carpetas `src/modules/manufactura/`, `src/components/manufactura/`, `tests/unit/manufactura/`, `tests/integration/manufactura/` y registrar la navegación del módulo en `src/App.jsx`
+- [x] T002 [P] Extender `src/modules/manufactura/almacenamiento.js` con ayudantes genéricos de persistencia y claves con prefijo `manufactura:`
+- [x] T003 [P] Definir los contratos de referencias externas `MATERIAL`, `TRABAJADOR`, `PROVEEDOR` y `REPUESTO`, con catálogos locales de solo lectura para pruebas en `src/modules/manufactura/referencias.js`
+- [x] T004 [P] Crear fixtures compartidos de todos los catálogos y registros de ejemplo en `src/modules/manufactura/demo-peluches.js` (cargados al iniciar desde `src/main.jsx`)
 
 **Punto de control**: La base de almacenamiento, navegación y datos de referencia está lista para iniciar cualquier historia.
 
@@ -33,20 +34,20 @@
 
 ### Pruebas para la Historia de Usuario 1
 
-- [ ] T010 [P] [US1] Pruebas unitarias de validación y persistencia de `PRODUCTO` y `PRODUCTO_MATERIAL` en `tests/unit/manufactura/productos.test.js`
-- [ ] T011 [P] [US1] Pruebas de integración para crear producto, asociar material y consultar la composición en `tests/integration/manufactura/productos.test.js`
+- [x] T010 [P] [US1] Pruebas unitarias de validación y persistencia de `PRODUCTO` y `PRODUCTO_MATERIAL` en `tests/unit/manufactura/historias.test.js`
+- [x] T011 [P] [US1] Pruebas de integración para crear producto, asociar material y consultar la composición en `tests/integration/manufactura/productos-render.test.jsx`
 
 ### Implementación de la Historia de Usuario 1
 
-- [ ] T012 [P] [US1] Crear los validadores de `PRODUCTO` (nombre y tipo obligatorios) y `PRODUCTO_MATERIAL` (material obligatorio, `cantidad_por_unidad > 0`) en `src/modules/manufactura/productos.js`
-- [ ] T013 [P] [US1] Agregar las claves `manufactura:productos` y `manufactura:producto_material` a `src/storage.js`
-- [ ] T014 [US1] Implementar el repositorio CRUD de productos y de su composición en `src/modules/manufactura/productos.js` (depende de T012, T013)
-- [ ] T015 [P] [US1] Crear el formulario de producto (nombre, tipo) con subformulario de materiales y cantidad por unidad en `src/components/manufactura/producto-form.js`
-- [ ] T016 [P] [US1] Crear el listado y la vista de detalle del producto mostrando todos sus materiales y cantidades en `src/components/manufactura/producto-list.js`
-- [ ] T017 [US1] Conectar alta, edición y asociación/eliminación de materiales al producto en `src/app.js` (depende de T014, T015)
-- [ ] T018 [US1] Mostrar retroalimentación de validación por campo e impedir el guardado con datos faltantes en `src/components/manufactura/producto-form.js`
-- [ ] T019 [US1] Recargar los datos y la composición del producto al reabrir su edición en `src/app.js`
-- [ ] T020 [P] [US1] Estilos del formulario, subformulario de materiales y detalle de producto en `src/styles.css`
+- [x] T012 [P] [US1] Crear los validadores de `PRODUCTO` (nombre y tipo obligatorios) y `PRODUCTO_MATERIAL` (material obligatorio, `cantidad_por_unidad > 0`) en `src/modules/manufactura/productos.js`
+- [x] T013 [P] [US1] Agregar las claves `manufactura:productos` y `manufactura:producto_material` a `src/modules/manufactura/almacenamiento.js`
+- [x] T014 [US1] Implementar el repositorio CRUD de productos y de su composición en `src/modules/manufactura/productos.js` (depende de T012, T013)
+- [x] T015 [P] [US1] Crear el formulario de producto (nombre, tipo) con subformulario de materiales y cantidad por unidad en `src/components/manufactura/ProductoForm.jsx`
+- [x] T016 [P] [US1] Crear el listado y la vista de detalle del producto mostrando todos sus materiales y cantidades en `src/components/manufactura/ProductoList.jsx`
+- [x] T017 [US1] Conectar alta, edición y asociación/eliminación de materiales al producto en `src/App.jsx` (depende de T014, T015)
+- [x] T018 [US1] Mostrar retroalimentación de validación por campo e impedir el guardado con datos faltantes en `src/components/manufactura/ProductoForm.jsx`
+- [x] T019 [US1] Recargar los datos y la composición del producto al reabrir su edición en `src/App.jsx`
+- [x] T020 [P] [US1] Estilos del formulario, subformulario de materiales y detalle de producto en `src/styles.css`
 
 **Punto de control**: La Historia de Usuario 1 debe estar completamente funcional y ser comprobable de forma independiente.
 
@@ -69,22 +70,22 @@
 
 ### Pruebas para la Historia de Usuario 2
 
-- [ ] T030 [P] [US2] Pruebas unitarias de validación de `ETAPA_FABRICACION` y `RUTA_PRODUCTO` en `tests/unit/manufactura/etapas.test.js`
-- [ ] T031 [P] [US2] Pruebas de integración para crear etapas, armar una ruta y verificar el orden por secuencia en `tests/integration/manufactura/rutas.test.js`
+- [x] T030 [P] [US2] Pruebas unitarias de validación de `ETAPA_FABRICACION` y `RUTA_PRODUCTO` en `tests/unit/manufactura/historias.test.js`
+- [x] T031 [P] [US2] Pruebas de integración para crear etapas, armar una ruta y verificar el orden por secuencia en `tests/integration/manufactura/historias-flujo.test.jsx`
 
 ### Implementación de la Historia de Usuario 2
 
-- [ ] T032 [P] [US2] Crear los validadores de `ETAPA_FABRICACION` (nombre, tipo y tiempo estándar obligatorios; tiempo > 0) en `src/modules/manufactura/etapas.js`
-- [ ] T033 [P] [US2] Crear los validadores de `RUTA_PRODUCTO` (producto, etapa y secuencia obligatorios; secuencia > 0) en `src/modules/manufactura/rutas.js`
-- [ ] T034 [P] [US2] Agregar las claves `manufactura:etapas` y `manufactura:rutas` a `src/storage.js`
-- [ ] T035 [US2] Implementar el repositorio CRUD de etapas en `src/modules/manufactura/etapas.js` (depende de T032, T034)
-- [ ] T036 [US2] Implementar el repositorio de rutas con ordenamiento por `secuencia` en `src/modules/manufactura/rutas.js` (depende de T033, T034)
-- [ ] T037 [P] [US2] Crear el formulario de etapas (nombre, tipo, tiempo estándar) en `src/components/manufactura/etapa-form.js`
-- [ ] T038 [P] [US2] Crear el editor de ruta del producto con selección de etapas y asignación de secuencia en `src/components/manufactura/ruta-editor.js`
-- [ ] T039 [US2] Conectar alta/edición de etapas y configuración de la ruta al producto en `src/app.js` (depende de T035, T036, T037, T038)
-- [ ] T040 [US2] Mostrar la ruta resultante ordenada por secuencia en la vista de detalle del producto en `src/components/manufactura/producto-list.js`
-- [ ] T041 [US2] Validar datos obligatorios de etapa y ruta con mensajes claros en `src/components/manufactura/etapa-form.js` y `src/components/manufactura/ruta-editor.js`
-- [ ] T042 [P] [US2] Estilos del formulario de etapas y del editor de rutas en `src/styles.css`
+- [x] T032 [P] [US2] Crear los validadores de `ETAPA_FABRICACION` (nombre, tipo y tiempo estándar obligatorios; tiempo > 0) en `src/modules/manufactura/etapas.js`
+- [x] T033 [P] [US2] Crear los validadores de `RUTA_PRODUCTO` (producto, etapa y secuencia obligatorios; secuencia > 0) en `src/modules/manufactura/rutas.js`
+- [x] T034 [P] [US2] Agregar las claves `manufactura:etapas` y `manufactura:rutas` a `src/modules/manufactura/almacenamiento.js`
+- [x] T035 [US2] Implementar el repositorio CRUD de etapas en `src/modules/manufactura/etapas.js` (depende de T032, T034)
+- [x] T036 [US2] Implementar el repositorio de rutas con ordenamiento por `secuencia` en `src/modules/manufactura/rutas.js` (depende de T033, T034)
+- [x] T037 [P] [US2] Crear el formulario de etapas (nombre, tipo, tiempo estándar) en `src/components/manufactura/EtapasPage.jsx`
+- [x] T038 [P] [US2] Crear el editor de ruta del producto con selección de etapas y asignación de secuencia en `src/components/manufactura/EtapasPage.jsx`
+- [x] T039 [US2] Conectar alta/edición de etapas y configuración de la ruta al producto en `src/App.jsx` (depende de T035, T036, T037, T038)
+- [x] T040 [US2] Mostrar la ruta resultante ordenada por secuencia en la vista de detalle del producto en `src/components/manufactura/ProductoList.jsx`
+- [x] T041 [US2] Validar datos obligatorios de etapa y ruta con mensajes claros en `src/components/manufactura/EtapasPage.jsx` y `src/components/manufactura/EtapasPage.jsx`
+- [x] T042 [P] [US2] Estilos del formulario de etapas y del editor de rutas en `src/styles.css`
 
 **Punto de control**: La Historia de Usuario 2 debe estar completamente funcional y ser comprobable de forma independiente.
 
@@ -107,23 +108,23 @@
 
 ### Pruebas para la Historia de Usuario 3
 
-- [ ] T050 [P] [US3] Pruebas unitarias de validación de `ORDEN_PRODUCCION` (incluida `fecha_fin >= fecha_inicio`) y del cálculo de `tiempo_uso_min` en `tests/unit/manufactura/ordenes.test.js`
-- [ ] T051 [P] [US3] Pruebas de integración para crear orden, registrar ejecuciones y consultar el avance en `tests/integration/manufactura/ordenes.test.js`
+- [x] T050 [P] [US3] Pruebas unitarias de validación de `ORDEN_PRODUCCION` (incluida `fecha_fin >= fecha_inicio`) y del cálculo de `tiempo_uso_min` en `tests/unit/manufactura/historias.test.js`
+- [x] T051 [P] [US3] Pruebas de integración para crear orden, registrar ejecuciones y consultar el avance en `tests/integration/manufactura/historias-flujo.test.jsx`
 
 ### Implementación de la Historia de Usuario 3
 
-- [ ] T052 [P] [US3] Crear los validadores de `ORDEN_PRODUCCION` (producto, cantidad planificada > 0, estado y fechas obligatorios; fin no anterior a inicio) en `src/modules/manufactura/ordenes.js`
-- [ ] T053 [P] [US3] Crear los validadores de `EJECUCION_ETAPA` (orden, etapa, máquina, trabajador, inicio y fin reales obligatorios) en `src/modules/manufactura/ejecuciones.js`
-- [ ] T054 [P] [US3] Agregar las claves `manufactura:ordenes` y `manufactura:ejecuciones` a `src/storage.js`
-- [ ] T055 [US3] Implementar el repositorio CRUD de órdenes en `src/modules/manufactura/ordenes.js` (depende de T052, T054)
-- [ ] T056 [US3] Implementar el repositorio de ejecuciones con cálculo de `tiempo_uso_min` a partir de inicio/fin real en `src/modules/manufactura/ejecuciones.js` (depende de T053, T054)
-- [ ] T057 [P] [US3] Crear el formulario de orden (producto, cantidad planificada, estado, fechas) en `src/components/manufactura/orden-form.js`
-- [ ] T058 [P] [US3] Crear el formulario de ejecución de etapa (etapa, máquina, trabajador, inicio/fin real) en `src/components/manufactura/ejecucion-form.js`
-- [ ] T059 [P] [US3] Crear la vista de detalle de la orden con sus ejecuciones y avance por etapa en `src/components/manufactura/orden-detalle.js`
-- [ ] T060 [US3] Conectar creación/edición de órdenes y registro de ejecuciones en `src/app.js` (depende de T055, T056, T057, T058)
-- [ ] T061 [US3] Rechazar fechas inválidas (fin anterior a inicio) y mostrar la explicación en `src/components/manufactura/orden-form.js`
-- [ ] T062 [US3] Listar las etapas ejecutadas con máquina, trabajador y tiempos en `src/components/manufactura/orden-detalle.js`
-- [ ] T063 [P] [US3] Estilos del formulario de orden, ejecuciones y vista de avance en `src/styles.css`
+- [x] T052 [P] [US3] Crear los validadores de `ORDEN_PRODUCCION` (producto, cantidad planificada > 0, estado y fechas obligatorios; fin no anterior a inicio) en `src/modules/manufactura/ordenes.js`
+- [x] T053 [P] [US3] Crear los validadores de `EJECUCION_ETAPA` (orden, etapa, máquina, trabajador, inicio y fin reales obligatorios) en `src/modules/manufactura/ordenes.js`
+- [x] T054 [P] [US3] Agregar las claves `manufactura:ordenes` y `manufactura:ejecuciones` a `src/modules/manufactura/almacenamiento.js`
+- [x] T055 [US3] Implementar el repositorio CRUD de órdenes en `src/modules/manufactura/ordenes.js` (depende de T052, T054)
+- [x] T056 [US3] Implementar el repositorio de ejecuciones con cálculo de `tiempo_uso_min` a partir de inicio/fin real en `src/modules/manufactura/ordenes.js` (depende de T053, T054)
+- [x] T057 [P] [US3] Crear el formulario de orden (producto, cantidad planificada, estado, fechas) en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T058 [P] [US3] Crear el formulario de ejecución de etapa (etapa, máquina, trabajador, inicio/fin real) en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T059 [P] [US3] Crear la vista de detalle de la orden con sus ejecuciones y avance por etapa en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T060 [US3] Conectar creación/edición de órdenes y registro de ejecuciones en `src/App.jsx` (depende de T055, T056, T057, T058)
+- [x] T061 [US3] Rechazar fechas inválidas (fin anterior a inicio) y mostrar la explicación en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T062 [US3] Listar las etapas ejecutadas con máquina, trabajador y tiempos en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T063 [P] [US3] Estilos del formulario de orden, ejecuciones y vista de avance en `src/styles.css`
 
 **Punto de control**: Las Historias de Usuario 1, 2 y 3 deben funcionar de forma independiente.
 
@@ -147,20 +148,20 @@
 
 ### Pruebas para la Historia de Usuario 4
 
-- [ ] T070 [P] [US4] Pruebas unitarias de validación y persistencia de `RECEPCION_MATERIAL` en `tests/unit/manufactura/recepciones.test.js`
-- [ ] T071 [P] [US4] Pruebas de integración para registrar recepciones y consultarlas desde la orden en `tests/integration/manufactura/recepciones.test.js`
+- [x] T070 [P] [US4] Pruebas unitarias de validación y persistencia de `RECEPCION_MATERIAL` en `tests/unit/manufactura/historias.test.js`
+- [x] T071 [P] [US4] Pruebas de integración para registrar recepciones y consultarlas desde la orden en `tests/integration/manufactura/historias-flujo.test.jsx`
 
 ### Implementación de la Historia de Usuario 4
 
-- [ ] T072 [P] [US4] Crear los validadores de `RECEPCION_MATERIAL` (orden, material, proveedor, cantidad recibida > 0 y fecha obligatorios) en `src/modules/manufactura/recepciones.js`
-- [ ] T073 [P] [US4] Agregar la clave `manufactura:recepciones` a `src/storage.js`
-- [ ] T074 [US4] Implementar el repositorio CRUD de recepciones asociadas a una orden en `src/modules/manufactura/recepciones.js` (depende de T072, T073)
-- [ ] T075 [P] [US4] Crear el formulario de recepción (material, proveedor, cantidad, fecha) en `src/components/manufactura/recepcion-form.js`
-- [ ] T076 [P] [US4] Crear la lista de recepciones con material, proveedor, cantidad y fecha en `src/components/manufactura/recepcion-list.js`
-- [ ] T077 [US4] Conectar el alta/edición de recepciones a una orden existente en `src/app.js` (depende de T074, T075)
-- [ ] T078 [US4] Mostrar todas las recepciones asociadas a la orden en la vista de detalle de la orden en `src/components/manufactura/orden-detalle.js`
-- [ ] T079 [US4] Impedir el guardado cuando falta material, proveedor, cantidad o fecha y señalar el campo faltante en `src/components/manufactura/recepcion-form.js`
-- [ ] T080 [P] [US4] Estilos del formulario y la lista de recepciones en `src/styles.css`
+- [x] T072 [P] [US4] Crear los validadores de `RECEPCION_MATERIAL` (orden, material, proveedor, cantidad recibida > 0 y fecha obligatorios) en `src/modules/manufactura/recepciones.js`
+- [x] T073 [P] [US4] Agregar la clave `manufactura:recepciones` a `src/modules/manufactura/almacenamiento.js`
+- [x] T074 [US4] Implementar el repositorio CRUD de recepciones asociadas a una orden en `src/modules/manufactura/recepciones.js` (depende de T072, T073)
+- [x] T075 [P] [US4] Crear el formulario de recepción (material, proveedor, cantidad, fecha) en `src/components/manufactura/RecepcionesPage.jsx`
+- [x] T076 [P] [US4] Crear la lista de recepciones con material, proveedor, cantidad y fecha en `src/components/manufactura/RecepcionesPage.jsx`
+- [x] T077 [US4] Conectar el alta/edición de recepciones a una orden existente en `src/App.jsx` (depende de T074, T075)
+- [x] T078 [US4] Mostrar todas las recepciones asociadas a la orden en la vista de detalle de la orden en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T079 [US4] Impedir el guardado cuando falta material, proveedor, cantidad o fecha y señalar el campo faltante en `src/components/manufactura/RecepcionesPage.jsx`
+- [x] T080 [P] [US4] Estilos del formulario y la lista de recepciones en `src/styles.css`
 
 **Punto de control**: La Historia de Usuario 4 debe funcionar de forma independiente y quedar asociada a la orden.
 
@@ -183,27 +184,27 @@
 
 ### Pruebas para la Historia de Usuario 5
 
-- [ ] T090 [P] [US5] Pruebas unitarias de validación de `MAQUINA` y `MANTENIMIENTO_MAQUINA` en `tests/unit/manufactura/maquinas.test.js`
-- [ ] T091 [P] [US5] Pruebas unitarias de `MANTENIMIENTO_REPUESTO` y `ASIGNACION_EQUIPAMIENTO` en `tests/unit/manufactura/equipamiento.test.js`
-- [ ] T092 [P] [US5] Pruebas de integración para máquina + mantenimiento + repuestos y asignación de equipamiento en `tests/integration/manufactura/mantenimiento.test.js`
+- [x] T090 [P] [US5] Pruebas unitarias de validación de `MAQUINA` y `MANTENIMIENTO_MAQUINA` en `tests/unit/manufactura/historias.test.js`
+- [x] T091 [P] [US5] Pruebas unitarias de `MANTENIMIENTO_REPUESTO` y `ASIGNACION_EQUIPAMIENTO` en `tests/unit/manufactura/historias.test.js`
+- [x] T092 [P] [US5] Pruebas de integración para máquina + mantenimiento + repuestos y asignación de equipamiento en `tests/integration/manufactura/historias-flujo.test.jsx`
 
 ### Implementación de la Historia de Usuario 5
 
-- [ ] T093 [P] [US5] Crear los validadores de `MAQUINA` (código, nombre, estado y capacidad por hora obligatorios; capacidad > 0) en `src/modules/manufactura/maquinas.js`
-- [ ] T094 [P] [US5] Crear los validadores de `MANTENIMIENTO_MAQUINA` (máquina, técnico, tipo, costo y fecha obligatorios) en `src/modules/manufactura/mantenimientos.js`
-- [ ] T095 [P] [US5] Crear los validadores de `MANTENIMIENTO_REPUESTO` (mantenimiento, repuesto y cantidad > 0) en `src/modules/manufactura/mantenimiento-repuestos.js`
-- [ ] T096 [P] [US5] Crear los validadores de `EQUIPAMIENTO` y `ASIGNACION_EQUIPAMIENTO` (trabajador, equipamiento y fecha de entrega obligatorios) en `src/modules/manufactura/equipamiento.js`
-- [ ] T097 [P] [US5] Agregar las claves `manufactura:maquinas`, `manufactura:mantenimientos`, `manufactura:mantenimiento_repuestos`, `manufactura:equipamiento` y `manufactura:asignaciones` a `src/storage.js`
-- [ ] T098 [US5] Implementar el repositorio CRUD de máquinas en `src/modules/manufactura/maquinas.js` (depende de T093, T097)
-- [ ] T099 [US5] Implementar el repositorio de mantenimientos y su consumo de repuestos en `src/modules/manufactura/mantenimientos.js` (depende de T094, T095, T097)
-- [ ] T100 [US5] Implementar el repositorio de equipamiento y asignaciones a trabajadores en `src/modules/manufactura/equipamiento.js` (depende de T096, T097)
-- [ ] T101 [P] [US5] Crear el formulario de máquina (código, nombre, estado, capacidad por hora) en `src/components/manufactura/maquina-form.js`
-- [ ] T102 [P] [US5] Crear el formulario de mantenimiento con selección de técnico y carga de repuestos y cantidades en `src/components/manufactura/mantenimiento-form.js`
-- [ ] T103 [P] [US5] Crear el formulario de asignación de equipamiento (trabajador, equipamiento, fecha de entrega) en `src/components/manufactura/asignacion-form.js`
-- [ ] T104 [P] [US5] Crear la vista de máquinas con su historial de mantenimientos asociados en `src/components/manufactura/maquina-list.js`
-- [ ] T105 [US5] Conectar alta/edición de máquinas, mantenimientos, repuestos y asignaciones en `src/app.js` (depende de T098, T099, T100)
-- [ ] T106 [US5] Validar datos obligatorios de mantenimiento y asignación con mensajes claros en `src/components/manufactura/mantenimiento-form.js` y `src/components/manufactura/asignacion-form.js`
-- [ ] T107 [P] [US5] Estilos de máquinas, mantenimientos y equipamiento en `src/styles.css`
+- [x] T093 [P] [US5] Crear los validadores de `MAQUINA` (código, nombre, estado y capacidad por hora obligatorios; capacidad > 0) en `src/modules/manufactura/recursos.js`
+- [x] T094 [P] [US5] Crear los validadores de `MANTENIMIENTO_MAQUINA` (máquina, técnico, tipo, costo y fecha obligatorios) en `src/modules/manufactura/recursos.js`
+- [x] T095 [P] [US5] Crear los validadores de `MANTENIMIENTO_REPUESTO` (mantenimiento, repuesto y cantidad > 0) en `src/modules/manufactura/recursos.js`
+- [x] T096 [P] [US5] Crear los validadores de `EQUIPAMIENTO` y `ASIGNACION_EQUIPAMIENTO` (trabajador, equipamiento y fecha de entrega obligatorios) en `src/modules/manufactura/recursos.js`
+- [x] T097 [P] [US5] Agregar las claves `manufactura:maquinas`, `manufactura:mantenimientos`, `manufactura:mantenimiento_repuestos`, `manufactura:equipamiento` y `manufactura:asignaciones` a `src/modules/manufactura/almacenamiento.js`
+- [x] T098 [US5] Implementar el repositorio CRUD de máquinas en `src/modules/manufactura/recursos.js` (depende de T093, T097)
+- [x] T099 [US5] Implementar el repositorio de mantenimientos y su consumo de repuestos en `src/modules/manufactura/recursos.js` (depende de T094, T095, T097)
+- [x] T100 [US5] Implementar el repositorio de equipamiento y asignaciones a trabajadores en `src/modules/manufactura/recursos.js` (depende de T096, T097)
+- [x] T101 [P] [US5] Crear el formulario de máquina (código, nombre, estado, capacidad por hora) en `src/components/manufactura/RecursosPage.jsx`
+- [x] T102 [P] [US5] Crear el formulario de mantenimiento con selección de técnico y carga de repuestos y cantidades en `src/components/manufactura/RecursosPage.jsx`
+- [x] T103 [P] [US5] Crear el formulario de asignación de equipamiento (trabajador, equipamiento, fecha de entrega) en `src/components/manufactura/RecursosPage.jsx`
+- [x] T104 [P] [US5] Crear la vista de máquinas con su historial de mantenimientos asociados en `src/components/manufactura/RecursosPage.jsx`
+- [x] T105 [US5] Conectar alta/edición de máquinas, mantenimientos, repuestos y asignaciones en `src/App.jsx` (depende de T098, T099, T100)
+- [x] T106 [US5] Validar datos obligatorios de mantenimiento y asignación con mensajes claros en `src/components/manufactura/RecursosPage.jsx` y `src/components/manufactura/RecursosPage.jsx`
+- [x] T107 [P] [US5] Estilos de máquinas, mantenimientos y equipamiento en `src/styles.css`
 
 **Punto de control**: Las Historias de Usuario 1-5 deben estar completamente funcionales y ser comprobables de forma independiente.
 
@@ -224,11 +225,28 @@
 
 **Propósito**: Validar la integración de las cinco historias y la calidad global del módulo.
 
-- [ ] T110 [P] Añadir prueba de integración del flujo completo producto → ruta → orden → recepción en `tests/integration/manufactura/flujo-completo.test.js`
-- [ ] T111 [P] Revisar accesibilidad (etiquetas, orden de foco, mensajes de error) en `src/components/manufactura/`
-- [ ] T112 Verificar integridad referencial y borrado en cascada: producto→ruta, orden→ejecuciones/recepciones, máquina→mantenimientos, mantenimiento→repuestos en `src/modules/manufactura/`
-- [ ] T113 Actualizar `README.md` con el módulo de manufactura y las claves de almacenamiento
-- [ ] T114 Ejecutar la suite completa de pruebas (`npm test`), verificar el rendimiento con al menos 500 registros por entidad (< 200 ms) y la compilación de producción para confirmar que no hay regresiones
+- [x] T110 [P] Añadir prueba de integración del flujo completo producto → ruta → orden → recepción en `tests/integration/manufactura/historias-flujo.test.jsx`
+- [x] T111 [P] Revisar accesibilidad (etiquetas, orden de foco, mensajes de error) en `src/components/manufactura/`
+- [x] T112 Verificar integridad referencial y borrado en cascada: producto→ruta, orden→ejecuciones/recepciones, máquina→mantenimientos, mantenimiento→repuestos en `src/modules/manufactura/`
+- [x] T113 Actualizar `README.md` con el módulo de manufactura y las claves de almacenamiento
+- [x] T114 Ejecutar la suite completa de pruebas (`npm test`), verificar el rendimiento con al menos 500 registros por entidad (< 200 ms) y la compilación de producción para confirmar que no hay regresiones
+
+---
+
+## Fase 8: Ampliaciones formalizadas tras el feedback (HU1-HU5)
+
+**Propósito**: Incorporar a la especificación los componentes ya implementados que estaban fuera del plan original y dejar verificable su comportamiento.
+
+- [x] T120 [P] [HU1-HU5] Probar el cálculo de alertas de retrasos, estados de máquina, exceso de tiempo y stock crítico en `tests/unit/manufactura/alertas.test.js`
+- [x] T121 [HU1-HU5] Implementar `calcularAlertasProduccion` en `src/modules/manufactura/alertas.js` y el panel visual en `src/components/manufactura/AlertasProduccion.jsx`, conectado desde `src/components/manufactura/ResumenPage.jsx`
+- [x] T122 [P] [HU1-HU5] Verificar los filtros por texto, estado, fecha y producto en `src/utils/filtrosManufactura.js` y su uso desde `tests/integration/manufactura/historias-flujo.test.jsx`
+- [x] T123 [HU1-HU5] Implementar la barra de filtros reutilizable en `src/components/manufactura/BarraFiltros.jsx` y conectarla en `ProductosPage.jsx`, `OrdenesPage.jsx` y `RecursosPage.jsx`
+- [x] T124 [P] [HU1] Probar el alta local de materiales, la validación de duplicados y la persistencia en `tests/unit/manufactura/materiales-locales.test.js`
+- [x] T125 [HU1] Implementar `src/components/manufactura/NuevoMaterial.jsx`, registrar los insumos en `src/modules/manufactura/referencias.js` bajo `manufactura:materiales_locales` y seleccionarlos desde `ProductoForm.jsx`
+- [x] T126 [P] [HU1-HU5] Probar el dataset de peluches con cinco productos, órdenes, rutas, recepciones, mantenimientos y asignaciones en `tests/unit/manufactura/demo-peluches.test.js`
+- [x] T127 [HU1-HU5] Cargar `src/modules/manufactura/demo-peluches.js` desde `src/main.jsx` cuando no existan registros, conservando los controles manuales de carga y reemplazo en `src/components/manufactura/ProductosPage.jsx`
+
+**Punto de control**: El panel de producción, los filtros, el alta local de materiales y los datos de demostración están especificados, implementados y cubiertos por pruebas.
 
 ---
 
@@ -243,6 +261,7 @@
 - Historia de Usuario 4 (Fase 5): depende de la HU3 (órdenes) y de los catálogos externos de materiales y proveedores
 - Historia de Usuario 5 (Fase 6): depende de la Fase 1 y de los catálogos externos de trabajadores y repuestos
 - Pulido (Fase 7): depende de que las HU1-HU5 estén completas
+- Ampliaciones (Fase 8): depende de la Fase 7 y del panel, filtros, materiales locales y demo implementados en las fases anteriores
 
 ### Dependencias Internas Relevantes
 
@@ -300,7 +319,7 @@ Con varios desarrolladores:
 
 ## Trazabilidad Requisitos → Tareas
 
-**Cobertura**: 38/38 requisitos funcionales (FR), 4/4 requisitos de extensibilidad (XR) y 10/10 criterios de éxito (SC) tienen al menos una tarea asociada. Las 76 tareas están cubiertas por al menos un requisito.
+**Cobertura**: 42/42 requisitos funcionales (FR), 4/4 requisitos de extensibilidad (XR) y 10/10 criterios de éxito (SC) tienen al menos una tarea asociada. Las 84 tareas están cubiertas por al menos un requisito.
 
 ### Requisitos Funcionales
 
@@ -344,6 +363,10 @@ Con varios desarrolladores:
 | FR-036 | Recargar datos al reabrir edición | T019 |
 | FR-037 | Flujo completo producto → ruta → orden → recepción | T110 |
 | FR-038 | Pruebas y compilación sin regresiones | T114 |
+| FR-039 | Alertas visuales de stock crítico, retrasos y estados de máquina | T120, T121 |
+| FR-040 | Filtros reutilizables por texto, estado, fecha y categoría | T122, T123 |
+| FR-041 | Alta local de materiales y asociación a productos | T124, T125 |
+| FR-042 | Dataset de demostración cargado al iniciar y verificable | T004, T126, T127 |
 
 ### Requisitos de Extensibilidad
 
@@ -389,6 +412,6 @@ Se conserva íntegro el plan anterior. La implementación actual y las decisione
 - [x] HU4: implementar recepciones, edición, consulta y filtro por orden, integradas en su detalle.
 - [x] HU5: implementar máquinas, historial de mantenimiento/repuestos, equipamiento y asignaciones.
 - [x] Crear navegación, panel, estados vacíos y formularios con mensajes accesibles.
-- [x] Añadir pruebas unitarias y de interfaz conectadas para las cinco historias; conservar las pruebas heredadas.
+- [x] Añadir pruebas unitarias y de interfaz conectadas para las cinco historias; retirar las pruebas heredadas incompatibles de la plantilla antigua.
+- [x] Formalizar en la Fase 8 el panel de alertas, la barra de filtros, el alta local de materiales y el dataset de demostración.
 - [ ] Sustituir las referencias de muestra por las integraciones reales cuando los módulos externos estén disponibles.
-- [ ] Resolver con el equipo las pruebas de la plantilla antigua cuyos archivos fueron eliminados antes de esta implementación.

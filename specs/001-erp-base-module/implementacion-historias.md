@@ -34,7 +34,9 @@ Las prioridades P2 de HU4 y HU5 corresponden al PDF final; no se reescribieron l
 
 ## Alertas de producción
 
-El panel de producción identifica órdenes planificadas o en producción cuya fecha de término ya pasó, máquinas marcadas como fuera de servicio y ejecuciones terminadas que excedieron el tiempo estándar de su etapa. Una orden que vence hoy se considera atrasada a partir del día siguiente según el calendario local del navegador. El panel usa los registros guardados, muestra los minutos reales y estándar de cada ejecución y ofrece accesos a órdenes y máquinas.
+El panel de producción identifica órdenes planificadas o en producción cuya fecha de término ya pasó, máquinas marcadas como fuera de servicio, ejecuciones terminadas que excedieron el tiempo estándar de su etapa e insumos cuyo stock no cubre lo requerido por las órdenes abiertas. Una orden que vence hoy se considera atrasada a partir del día siguiente según el calendario local del navegador. El panel usa los registros guardados, muestra los minutos reales y estándar de cada ejecución, compara lo recibido con lo requerido por material y ofrece accesos a órdenes, máquinas y recepciones.
+
+La barra `BarraFiltros.jsx` se reutiliza en productos, órdenes y recursos para búsqueda por texto, estado, producto, rango de fechas y limpieza de filtros. `NuevoMaterial.jsx` permite crear insumos locales con validación de duplicados y dejarlos seleccionables en productos y recepciones. El dataset `demo-peluches.js` se carga desde `main.jsx` en el primer arranque sin registros, y mantiene los controles manuales de carga y reemplazo en `ProductosPage.jsx`.
 
 ## Verificación reproducible
 
@@ -44,7 +46,7 @@ npm run build
 npm test -- --run
 ```
 
-Las pruebas de Manufactura usan un navegador simulado aislado y limpian únicamente sus propios registros. Comprueban los flujos conectados y la recuperación de datos al volver a montar la aplicación. La prueba global mantiene visibles los fallos heredados por archivos de la plantilla que ya no existen.
+Las pruebas de Manufactura usan un navegador simulado aislado y limpian únicamente sus propios registros. Comprueban los flujos conectados y la recuperación de datos al volver a montar la aplicación. Las pruebas heredadas de la plantilla que importaban `src/storage.js`, `src/module-config.js` y `src/app.js` se retiraron para que la suite completa compile contra la estructura actual.
 
 ## Archivos principales
 

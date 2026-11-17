@@ -185,6 +185,16 @@ button:disabled {
   align-items: center;
   gap: 10px;
 }
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
 .sidebar nav button > span {
   margin-left: auto;
   color: #79a6a7;
@@ -193,11 +203,20 @@ button:disabled {
 .sidebar nav button:hover {
   background: #1c3d45;
   color: white;
+  transform: translateX(2px);
 }
 .sidebar nav button[aria-current] {
-  background: #254951;
+  background: #2c5a61;
   color: white;
-  box-shadow: inset 3px 0 #62c6b5;
+  font-weight: 700;
+  box-shadow: inset 4px 0 #62c6b5;
+}
+.sidebar nav button[aria-current]::after {
+  content: '•';
+  margin-left: 4px;
+  color: #62c6b5;
+  font-size: 18px;
+  line-height: 0;
 }
 .sidebar-footer {
   margin-top: auto;

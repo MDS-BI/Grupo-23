@@ -49,4 +49,43 @@ describe('Alertas del panel de producción', () => {
     expect(ejecucionesExcedidas.map(({ ejecucion, exceso }) => [ejecucion.ejecucion_id, exceso]))
       .toEqual([[2, 20], [1, 1]]);
   });
+
+  it('detecta faltantes de insumos para las órdenes abiertas', () => {
+    const ordenes = [
+      { orden_id: 1, estado: 'En producción', producto_id: 1, cantidad_plan: 10 },
+      { orden_id: 2, estado: 'Finalizada', producto_id: 1, cantidad_plan: 100 },
+    ];
+    const productoMaterial = [
+      { producto_id: 1, material_id: 1, cantidad_por_unidad: 2 },
+      { producto_id: 1, material_id: 2, cantidad_por_unidad: 3 },
+    ];
+    const recepciones = [
+      { material_id: 1, cantidad_recibida: 20 },
+      { material_id: 2, cantidad_recibida: 30 },
+    ];
+    const materiales = [
+      { material_id: 1, nombre: 'Felpa' },
+      { material_id: 2, nombre: 'Relleno' },
+    ];
+    const { stockCritico } = calcularAlertasProduccion(
+      { ...datos, ordenes, productoMaterial, recepciones, materiales },
+      hoy,
+    );
+    expect(stockCritico).toEqual([]);
+
+    recepciones.pop();
+    const { stockCritico: conFaltante } = calcularAlertasProduccion(
+      { ...datos, ordenes, productoMaterial, recepciones, materiales },
+      hoy,
+    );
+    expect(conFaltante).toEqual([
+      {
+        material_id: 2,
+        nombre: 'Relleno',
+        requerido: 30,
+        recibido: 0,
+        faltante: 30,
+      },
+    ]);
+  });
 });

@@ -48,6 +48,9 @@ export default function App() {
               type="button"
               aria-label={label}
               aria-current={pagina === id ? 'page' : undefined}
+              className={`nav-item transition-all duration-200 ${
+                pagina === id ? 'nav-activo' : ''
+              }`}
               onClick={() => setPagina(id)}
             >
               {label}

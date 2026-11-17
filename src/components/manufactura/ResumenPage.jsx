@@ -1,6 +1,7 @@
 import { listar } from '../../modules/manufactura/almacenamiento.js';
 import { calcularAlertasProduccion } from '../../modules/manufactura/alertas.js';
 import { avanceOrden } from '../../modules/manufactura/ordenes.js';
+import { obtenerReferencias } from '../../modules/manufactura/referencias.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import { Progreso } from './OrdenesPage.jsx';
 import AlertasProduccion from './AlertasProduccion.jsx';
@@ -13,6 +14,9 @@ export default function ResumenPage({ navegar }) {
     maquinas,
     etapas: listar('etapas'),
     ejecuciones: listar('ejecuciones'),
+    recepciones: listar('recepciones'),
+    productoMaterial: listar('producto_material'),
+    materiales: obtenerReferencias('materiales'),
   });
   const indicadores = [
     [
@@ -49,14 +53,17 @@ export default function ResumenPage({ navegar }) {
           <h1>Panel de producción</h1>
           <p>Del producto terminado a cada recurso que lo hace posible.</p>
         </div>
-        <button className="primary" onClick={() => navegar('ordenes')}>
+        <button
+          className="primary transition-all duration-200"
+          onClick={() => navegar('ordenes')}
+        >
           Gestionar producción →
         </button>
       </header>
       <div className="stat-grid">
         {indicadores.map(([destino, label, valor, descripcion]) => (
           <button
-            className="stat-card"
+            className="stat-card transition-all duration-200"
             onClick={() => navegar(destino)}
             key={label}
           >
@@ -80,7 +87,11 @@ export default function ResumenPage({ navegar }) {
             ['recepciones', '04', 'Recepciones', 'Traza tus materiales'],
             ['recursos', '05', 'Recursos', 'Mantén la planta lista'],
           ].map(([id, n, label, descripcion]) => (
-            <button key={id} onClick={() => navegar(id)}>
+            <button
+              key={id}
+              className="transition-all duration-200"
+              onClick={() => navegar(id)}
+            >
               <span>{n}</span>
               <b>{label}</b>
               <small>{descripcion}</small>

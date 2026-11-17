@@ -9,9 +9,11 @@ npm run test:manufactura
 npm run build
 ```
 
-Los datos existentes se conservan en las claves `manufactura:` del navegador. No se sincronizan entre computadores. Los catálogos externos son muestras de solo lectura, con un adaptador sustituible por las integraciones reales. Consulta el alcance, las reglas y la cobertura en [implementacion-historias.md](specs/001-erp-base-module/implementacion-historias.md).
+Los datos existentes se conservan en las claves `manufactura:` del navegador. No se sincronizan entre computadores. Los catálogos externos son muestras de solo lectura, con un adaptador sustituible por las integraciones reales. En el primer arranque sin registros se carga automáticamente el dataset de peluches para dejar operativas las HU1-HU5; también puede cargarse o reemplazarse desde Productos. Consulta el alcance, las reglas y la cobertura en [implementacion-historias.md](specs/001-erp-base-module/implementacion-historias.md).
 
-`npm test -- --run` conserva toda la suite. Las pruebas heredadas de Entidades/Documentos siguen referenciando la base antigua eliminada antes de esta implementación (`src/storage.js`, `src/module-config.js`, `src/app.js`); no fueron eliminadas ni desactivadas. El comando `test:manufactura` permite ejecutar las pruebas del módulo actual por separado.
+El panel de producción muestra alertas de órdenes atrasadas, máquinas fuera de servicio, tiempos excedidos y stock crítico. La navegación y las tarjetas usan transiciones suaves y estados activos visibles; los formularios y listados comparten la barra de filtros y utilidades de estilo tipo Tailwind definidas en `src/styles.css`.
+
+`npm test -- --run` ejecuta toda la suite activa. Se retiraron las pruebas heredadas de Entidades/Documentos que importaban la base antigua eliminada (`src/storage.js`, `src/module-config.js`, `src/app.js`). El comando `test:manufactura` permite ejecutar las pruebas del módulo actual por separado.
 
 La documentación original de la plantilla se conserva a continuación como referencia histórica.
 
