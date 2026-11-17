@@ -17,7 +17,7 @@
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f8fbfb;
+  background: #faf7fc;
 }
 
 .alertas-grupo[data-activo='true'] {
@@ -37,8 +37,8 @@
   min-width: 24px;
   padding: 3px 7px;
   border-radius: 20px;
-  background: #e9eeee;
-  color: #38545e;
+  background: var(--lilac-tint);
+  color: var(--accent-hover);
   text-align: center;
   font-size: 11px;
 }

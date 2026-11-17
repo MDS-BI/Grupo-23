@@ -47,11 +47,11 @@ export default function ResumenPage({ navegar }) {
   ];
   return (
     <section>
-      <header className="page-heading">
+      <header className="page-heading page-heading--resumen">
         <div>
           <span className="eyebrow">Grupo 23 · Manufactura y operaciones</span>
           <h1>Panel de producción</h1>
-          <p>Del producto terminado a cada recurso que lo hace posible.</p>
+          <p>Consulta el avance de las órdenes, las recepciones y las alertas de planta.</p>
         </div>
         <button
           className="primary transition-all duration-200"

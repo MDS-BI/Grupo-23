@@ -1,7 +1,9 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
+@font-face {
+  font-family: 'Archivo Black';
+  src: url('./assets/manufactura/ArchivoBlack-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 body {
   margin: 0;
@@ -32,7 +34,7 @@ body {
   margin-top: 1.5rem;
   padding: 1.5rem;
   background: white;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--line);
   border-radius: 0.75rem;
 }
 .manufactura-app form > div + div {
@@ -65,9 +67,9 @@ body {
   background: #0f172a;
   color: white;
 }
-.manufactura-app button:focus-visible,
-.manufactura-app input:focus-visible {
-  outline: 2px solid #2563eb;
+.manufactura-app :is(button, input, select, textarea, a):focus-visible,
+.sidebar button:focus-visible {
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 .manufactura-app form button {
@@ -97,11 +99,18 @@ body {
 
 /* Espacio de trabajo compartido por las cinco historias. */
 :root {
-  --ink: #142b36;
-  --muted: #627681;
-  --line: #dbe4e6;
-  --accent: #087f78;
-  --paper: #f4f7f7;
+  font-family: system-ui, sans-serif;
+  --display: 'Archivo Black', system-ui, sans-serif;
+  --ink: #231c2a;
+  --muted: #655d6b;
+  --line: #e0d8e2;
+  --accent: #603d93;
+  --accent-hover: #4a2b78;
+  --focus: #8251cd;
+  --paper: #f8f5f1;
+  --lavender: #e8d7fa;
+  --lilac-tint: #f5edfc;
+  --night: #201824;
   background: var(--paper);
   color: var(--ink);
 }
@@ -126,11 +135,11 @@ button:disabled {
   position: sticky;
   top: 0;
   height: 100vh;
- background: #1b4d47;
-  color: #f0fdfa;
+  background: var(--night);
+  color: #fff8f3;
   display: flex;
   flex-direction: column;
-  padding: 30px 16px 20px;
+  padding: 30px 18px 22px;
   box-sizing: border-box;
 }
 .brand {
@@ -142,13 +151,12 @@ button:disabled {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 39px;
-  height: 42px;
-  border: 1px solid #568b88;
-  border-radius: 12px 2px 12px 2px;
-  color: #bceae1;
-  font-size: 24px;
-  font-weight: 750;
+  flex: 0 0 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--lavender);
+  color: var(--night);
+  font: 25px/1 var(--display);
 }
 .brand b {
   display: block;
@@ -161,11 +169,11 @@ button:disabled {
   font-size: 9px;
   letter-spacing: 1.4px;
   margin-top: 6px;
-  color: #9eb7bb;
+  color: #d1c1d5;
 }
 .nav-label {
   font-size: 9px;
-  color: #8dabad;
+  color: #c2aeca;
   letter-spacing: 1.6px;
   padding: 28px 12px 8px;
 }
@@ -173,14 +181,17 @@ button:disabled {
   display: grid;
   gap: 7px;
 }
+.sidebar .menu-toggle {
+  display: none;
+}
 .sidebar nav button {
   background: transparent;
   border: 0;
   text-align: left;
-  color: #b9ccce;
+  color: #e6dce9;
   padding: 13px 10px;
-  border-radius: 7px;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -197,36 +208,30 @@ button:disabled {
 }
 .sidebar nav button > span {
   margin-left: auto;
-  color: #79a6a7;
+  color: inherit;
   font-size: 10px;
 }
 .sidebar nav button:hover {
-  background: #1c3d45;
+  background: #392941;
   color: white;
-  transform: translateX(2px);
 }
 .sidebar nav button[aria-current] {
-  background: #2c5a61;
-  color: white;
+  background: var(--lavender);
+  color: var(--night);
   font-weight: 700;
-  box-shadow: inset 4px 0 #62c6b5;
 }
-.sidebar nav button[aria-current]::after {
-  content: '•';
-  margin-left: 4px;
-  color: #62c6b5;
-  font-size: 18px;
-  line-height: 0;
+.sidebar button:focus-visible {
+  outline-color: var(--lavender);
 }
 .sidebar-footer {
   margin-top: auto;
   font-size: 12px;
   padding: 25px 12px 0;
-  border-top: 1px solid #2b4850;
+  border-top: 1px solid #514255;
 }
 .sidebar-footer small {
   display: block;
-  color: #88a8ac;
+  color: #d1c1d5;
   margin-top: 6px;
   font-size: 10px;
 }
@@ -234,7 +239,7 @@ button:disabled {
   display: inline-block;
   width: 6px;
   height: 6px;
-  background: #73cfb0;
+  background: #ffa36f;
   border-radius: 50%;
   margin-right: 8px;
 }
@@ -243,13 +248,13 @@ button:disabled {
 }
 .topbar {
   padding: 19px 36px;
-  background: #fff;
+  background: var(--paper);
   border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   gap: 15px;
   align-items: center;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
 }
 .topbar b {
@@ -259,8 +264,9 @@ button:disabled {
 .storage-chip {
   border: 1px solid var(--line);
   border-radius: 20px;
-  padding: 6px 10px;
-  font-size: 10px;
+  padding: 6px 11px;
+  font-size: 11px;
+  background: #fff;
 }
 .erp-shell .manufactura-app {
   max-width: 1500px;
@@ -272,21 +278,20 @@ button:disabled {
   margin-bottom: 26px;
 }
 .manufactura-app h1 {
-  font-size: clamp(25px, 2.8vw, 34px);
-  line-height: 1.2;
-  letter-spacing: -1.1px;
-  margin-top: 7px;
+  font: clamp(28px, 4vw, 49px)/1.07 var(--display);
+  letter-spacing: -0.055em;
+  margin: 9px 0 0;
 }
 .manufactura-app h2 {
-  font-size: 17px;
-  letter-spacing: -0.35px;
+  font-size: 19px;
+  letter-spacing: -0.03em;
 }
 .manufactura-app h3 {
   font-size: 15px;
 }
 .manufactura-app header p {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
 .muted,
 .manufactura-app .muted {
@@ -302,15 +307,16 @@ button:disabled {
   letter-spacing: 1.7px;
 }
 .manufactura-app button {
-  font-size: 12px;
-  padding: 9px 12px;
-  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 13px;
+  border-radius: 8px;
   color: var(--ink);
-  border-color: #d2dfe0;
+  border-color: var(--line);
 }
 .manufactura-app button:hover {
-  border-color: #88b3ad;
-  background: #f0f7f5;
+  border-color: #bba5d2;
+  background: var(--lilac-tint);
 }
 .manufactura-app button.nuevo-material-toggle {
   background-color: color-mix(in srgb, var(--accent) 50%, transparent);
@@ -326,8 +332,9 @@ button:disabled {
   color: white;
 }
 .manufactura-app button.primary:hover,
+.manufactura-app header > button:hover,
 .manufactura-app button[type='submit']:hover {
-  background: #06645f;
+  background: var(--accent-hover);
 }
 .manufactura-app button.danger,
 .manufactura-app button[class~='text-red-600'] {
@@ -339,8 +346,8 @@ button:disabled {
   min-width: 0;
   font-size: 13px;
   padding: 10px 11px;
-  border: 1px solid #cddbdd;
-  border-radius: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
   background: white;
   color: var(--ink);
 }
@@ -354,9 +361,9 @@ button:disabled {
   padding: 24px;
   margin: 20px 0;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 14px;
   background: white;
-  box-shadow: 0 3px 12px #17363a03;
+  box-shadow: 0 2px 12px #231c2a06;
 }
 .manufactura-app .management {
   padding: 0;
@@ -376,20 +383,23 @@ button:disabled {
   overflow-x: auto;
 }
 .manufactura-app th {
-  font-size: 9px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--muted);
-  background: #f8fbfb;
+  background: #f7f1fa;
   white-space: nowrap;
 }
 .manufactura-app td {
-  font-size: 12px;
+  font-size: 13px;
 }
 .manufactura-app td,
 .manufactura-app th {
   padding: 15px 16px;
-  border-color: #e8eeee;
+  border-color: #eee7ef;
+}
+.manufactura-app tbody tr:hover {
+  background: #fcf9fe;
 }
 .manufactura-app tbody tr:last-child td {
   border-bottom: 0;
@@ -401,20 +411,20 @@ button:disabled {
   margin-left: 5px;
 }
 .manufactura-app .row-actions button {
-  padding: 6px 8px;
-  font-size: 10px;
+  padding: 7px 9px;
+  font-size: 11px;
 }
 .manufactura-app .empty {
   text-align: center;
   padding: 42px 20px;
   color: var(--muted);
   background: white;
-  border: 1px dashed #cbd9da;
-  border-radius: 9px;
+  border: 1px dashed #cdbbd8;
+  border-radius: 14px;
 }
 .empty > span {
   font-size: 34px;
-  color: #82aaa6;
+  color: var(--accent);
 }
 .empty p {
   margin: 8px 0;
@@ -442,10 +452,10 @@ button:disabled {
   margin-top: 22px;
 }
 .manufactura-app .notice {
-  background: #eaf5f1;
-  border-left: 3px solid #6eb7a8;
+  background: var(--lilac-tint);
+  border-left: 3px solid #af90d3;
   padding: 12px 15px;
-  color: #2d6659;
+  color: var(--accent-hover);
   font-size: 12px;
   border-radius: 3px;
 }
@@ -461,9 +471,9 @@ button:disabled {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 20px;
-  background: #edf4f3;
-  color: #3b6963;
-  font-size: 10px;
+  background: var(--lilac-tint);
+  color: var(--accent-hover);
+  font-size: 11px;
   white-space: nowrap;
 }
 .manufactura-app .filter-bar {
@@ -482,9 +492,9 @@ button:disabled {
   padding-bottom: 12px;
 }
 .subnav button[aria-current] {
-  background: #e0efeb;
-  border-color: #79b4a9;
-  color: #126a5c;
+  background: var(--lilac-tint);
+  border-color: #af90d3;
+  color: var(--accent-hover);
 }
 .manufactura-app .route-step {
   display: grid;
@@ -499,8 +509,8 @@ button:disabled {
   height: 26px;
   display: grid;
   place-items: center;
-  background: #e0f0eb;
-  color: #247865;
+  background: var(--lavender);
+  color: var(--accent-hover);
   border-radius: 50%;
   font-size: 11px;
   font-weight: 700;
@@ -586,21 +596,21 @@ button:disabled {
   padding: 22px;
   background: white;
   border-color: var(--line);
-  min-height: 151px;
+  min-height: 146px;
+  border-radius: 14px;
 }
 .stat-card > span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .stat-card strong {
-  font-size: 36px;
-  font-weight: 550;
+  font: 39px/1.1 var(--display);
   margin: 8px 0;
-  letter-spacing: -1px;
+  letter-spacing: -0.05em;
 }
 .stat-card small {
-  color: #72938e;
-  font-size: 10px;
+  color: var(--accent);
+  font-size: 11px;
 }
 .workflow {
   display: grid;
@@ -611,7 +621,7 @@ button:disabled {
 .manufactura-app .workflow button {
   border: 0;
   border-radius: 6px;
-  background: #f5f8f8;
+  background: var(--lilac-tint);
   text-align: left;
   padding: 17px 12px;
 }
@@ -621,7 +631,7 @@ button:disabled {
   display: block;
 }
 .workflow button span {
-  color: #478d81;
+  color: var(--accent);
   font-size: 10px;
   margin-bottom: 13px;
 }
@@ -652,7 +662,7 @@ button:disabled {
 }
 .workspace-footer {
   padding: 20px 36px;
-  color: #8a9b9e;
+  color: var(--muted);
   border-top: 1px solid var(--line);
   font-size: 10px;
   display: flex;
@@ -672,6 +682,113 @@ button:disabled {
   background: white;
   padding: 15px;
 }
+
+.manufactura-app .catalogo-portada {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: stretch;
+  gap: 0;
+  min-height: clamp(320px, 29vw, 440px);
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--night);
+  color: #fff8f3;
+}
+.catalogo-portada-contenido {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  container-type: inline-size;
+  min-width: 0;
+  padding: clamp(24px, 3.5vw, 58px);
+}
+.catalogo-portada .eyebrow {
+  color: #f5b38c;
+  font-size: 11px;
+}
+.catalogo-portada h1 {
+  font-size: clamp(38px, 4.4vw, 72px);
+  font-size: clamp(36px, 20cqi, 72px);
+  margin-top: 13px;
+}
+.manufactura-app .catalogo-portada p {
+  max-width: 31ch;
+  margin: 16px 0 21px;
+  color: #e8dce7;
+  font-size: 15px;
+}
+.catalogo-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.manufactura-app .catalogo-portada button {
+  min-height: 42px;
+  border-color: #846d89;
+  background: transparent;
+  color: #fff8f3;
+}
+.manufactura-app .catalogo-portada button:hover {
+  background: #3d2f43;
+}
+.manufactura-app .catalogo-portada button:focus-visible {
+  outline-color: var(--lavender);
+}
+.manufactura-app .catalogo-portada button.primary {
+  border-color: var(--lavender);
+  background: var(--lavender);
+  color: var(--night);
+}
+.manufactura-app .catalogo-portada button.primary:hover {
+  border-color: #f4e8fc;
+  background: #f4e8fc;
+}
+.catalogo-portada-imagen {
+  position: relative;
+  min-width: 0;
+  background: #d5b4e3;
+}
+.catalogo-portada-imagen img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.manufactura-app .catalogo-listado {
+  margin: 26px 0 12px;
+  align-items: baseline;
+}
+.catalogo-listado h2,
+.catalogo-demo h2,
+.catalogo-guia h2 {
+  margin: 0;
+}
+.catalogo-codigo {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.catalogo-guia ol {
+  padding-left: 1.4rem;
+  margin-bottom: 0;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.catalogo-guia li + li {
+  margin-top: 6px;
+}
+.manufactura-app .page-heading--resumen {
+  padding: clamp(22px, 4vw, 47px);
+  border: 1px solid #ddc9ef;
+  border-radius: 18px;
+  background: var(--lavender);
+}
+.page-heading--resumen p {
+  margin-bottom: 0;
+}
+
 @media (max-width: 1100px) {
   .erp-shell {
     grid-template-columns: 215px minmax(0, 1fr);
@@ -692,6 +809,15 @@ button:disabled {
     grid-column: 2 / -1;
   }
 }
+@media (max-width: 960px) {
+  .manufactura-app .catalogo-portada {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+  .catalogo-portada-imagen {
+    aspect-ratio: 16 / 8;
+  }
+}
 @media (max-width: 760px) {
   .erp-shell {
     display: block;
@@ -701,20 +827,41 @@ button:disabled {
     height: auto;
     padding: 16px;
   }
-  .brand {
-    margin-bottom: 16px;
+  .sidebar-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .sidebar-heading .brand {
+    padding: 0;
+  }
+  .sidebar .menu-toggle {
+    display: block;
+    border: 1px solid #846d89;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .sidebar .menu-toggle[aria-expanded='true'] {
+    border-color: var(--lavender);
+    background: var(--lavender);
+    color: var(--night);
   }
   .nav-label,
   .sidebar-footer {
     display: none;
   }
   .sidebar nav {
-    display: flex;
-    overflow-x: auto;
-    gap: 5px;
+    display: none;
   }
-  .sidebar nav button {
-    flex-shrink: 0;
+  .sidebar nav[data-abierto='true'] {
+    display: grid;
+    margin-top: 14px;
+    gap: 5px;
   }
   .topbar {
     padding: 15px 20px;
@@ -751,28 +898,33 @@ button:disabled {
   .route-step .field:nth-of-type(2) {
     grid-column: 2;
   }
+  .catalogo-portada h1 {
+    font-size: clamp(34px, 17cqi, 48px);
+  }
+  .catalogo-portada-imagen {
+    aspect-ratio: 16 / 9;
+  }
 }
-.barra-filtros {
+.manufactura-app .barra-filtros {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
-  margin-bottom: 1.25rem;
-  padding: 0.75rem;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  margin: 0 0 1.25rem;
+  padding: 0.8rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
 
 .filtro-busqueda {
   flex: 1 1 200px;
+  min-width: 0;
 }
 
 .barra-filtros input,
 .barra-filtros select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
   font-size: 0.9rem;
   width: 100%;
 }
@@ -788,24 +940,24 @@ button:disabled {
   align-items: center;
   gap: 0.35rem;
   font-size: 0.85rem;
-  color: #475569;
+  color: var(--muted);
 }
 
-.barra-filtros button.btn-limpiar-filtros {
+.manufactura-app .barra-filtros button.btn-limpiar-filtros {
   margin-left: auto;
   white-space: nowrap;
   padding: 0.5rem 0.95rem;
-  background-color: #f1f5f9;
-  color: #94a3b8;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  background-color: var(--paper);
+  color: var(--muted);
+  border-color: var(--line);
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: not-allowed;
   transition: all 0.15s ease;
 }
 
-.barra-filtros button.btn-limpiar-filtros.activo {
+.manufactura-app .barra-filtros button.btn-limpiar-filtros.activo {
   background-color: #fee2e2;
   color: #b91c1c;
   border-color: #fca5a5;
@@ -813,12 +965,14 @@ button:disabled {
   box-shadow: 0 1px 3px rgba(185, 28, 28, 0.15);
 }
 
-.barra-filtros button.btn-limpiar-filtros.activo:hover {
+.manufactura-app .barra-filtros button.btn-limpiar-filtros.activo:hover {
   background-color: #ef4444;
   color: #ffffff;
   border-color: #dc2626;
 }
-.sidebar a,
-.sidebar button {
-  font-size: 1rem;
+@media (prefers-reduced-motion: reduce) {
+  .transition-all,
+  .manufactura-app .barra-filtros button.btn-limpiar-filtros {
+    transition: none;
+  }
 }

@@ -5,6 +5,7 @@ import { useProductos } from '../../hooks/useProductos.js';
 import ProductoList from './ProductoList.jsx';
 import ProductoForm from './ProductoForm.jsx';
 import ProductoDetalle from './ProductoDetalle.jsx';
+import portadaPeluches from '../../assets/manufactura/peluches-portada.jpg';
 import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js';
 import {
   cargarDemoPeluches,
@@ -70,38 +71,49 @@ export default function ProductosPage() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-6 p-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <span className="eyebrow">Catálogo de fabricación</span>
-          <h1 className="text-2xl font-semibold text-slate-900">Productos</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Gestiona los productos y los materiales requeridos para fabricarlos.
+    <section>
+      <header className="catalogo-portada">
+        <div className="catalogo-portada-contenido">
+          <span className="eyebrow">Fábrica de peluches</span>
+          <h1>Productos</h1>
+          <p>
+            Gestiona el catálogo de peluches y los materiales de cada modelo.
           </p>
+          <div className="catalogo-acciones">
+            <button
+              type="button"
+              className="primary"
+              aria-expanded={mostrarFormulario}
+              onClick={() => {
+                setEdicion(null);
+                setMostrarFormulario((actual) => !actual);
+              }}
+            >
+              {mostrarFormulario ? 'Cerrar formulario' : 'Nuevo producto'}
+            </button>
+            <button
+              type="button"
+              aria-expanded={mostrarGuia}
+              aria-controls={mostrarGuia ? 'guia-productos' : undefined}
+              onClick={() => setMostrarGuia((actual) => !actual)}
+            >
+              {mostrarGuia ? 'Ocultar guía' : '¿Cómo registrar?'}
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setMostrarGuia((actual) => !actual)}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-          >
-            {mostrarGuia ? 'Ocultar guía' : '💡 ¿Cómo registrar?'}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setEdicion(null);
-              setMostrarFormulario((actual) => !actual);
-            }}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            {mostrarFormulario ? 'Cerrar formulario' : 'Nuevo producto'}
-          </button>
+        <div className="catalogo-portada-imagen">
+          <img
+            src={portadaPeluches}
+            alt="Oso, dinosaurio y ajolote de peluche sobre pedestales de colores"
+            width="1672"
+            height="941"
+            fetchPriority="high"
+          />
         </div>
       </header>
 
       {!demoPeluchesCargada() && !mostrarFormulario && (
-        <article className="card">
+        <article className="card catalogo-demo">
           <h2>Fábrica de peluches de ejemplo</h2>
           <p className="muted">
             Carga cinco productos con sus materiales, proveedores, rutas,
@@ -113,7 +125,7 @@ export default function ProductosPage() {
               Manufactura guardados en este navegador por los del ejemplo.
             </p>
           )}
-          <div className="row-actions">
+          <div className="catalogo-acciones">
             <button
               className="primary"
               type="button"
@@ -140,38 +152,26 @@ export default function ProductosPage() {
         </article>
       )}
 
-      {/* Cuadro de ejemplo y orientación para el usuario */}
       {mostrarGuia && (
-        <article className="rounded-xl border border-blue-200 bg-blue-50/50 p-5 text-sm text-blue-900 shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-blue-950 flex items-center gap-2">
-              📖 Guía rápida: Registro de Productos y Materiales
-            </h3>
-            <button 
-              onClick={() => setMostrarGuia(false)}
-              className="text-blue-700 hover:text-blue-900 text-xs font-semibold"
-            >
-              ✕ Cerrar
-            </button>
-          </div>
-          <p className="text-blue-800">
-            Sigue estos pasos para dar de alta un producto correctamente en el sistema:
-          </p>
-          <ul className="list-disc pl-5 space-y-1 text-blue-800">
-            <li><strong>Nombre:</strong> Ingresa el nombre comercial o técnico del artículo (Ej. <em>Taladro Industrial A1</em>).</li>
-            <li><strong>Tipo:</strong> Define la categoría o línea de fabricación (Ej. <em>Ensamblaje</em> o <em>Pieza mecanizada</em>).</li>
-            <li><strong>Materiales:</strong> Selecciona los insumos requeridos desde el inventario y especifica la cantidad exacta que consume por cada unidad fabricada (Ej. <em>Acero en barra - 2.5 unidades</em>). No olvides hacer clic en <strong>Agregar</strong> antes de guardar.</li>
+        <article className="card catalogo-guia" id="guia-productos">
+          <h2>Cómo registrar un producto</h2>
+          <ol>
+            <li>Escribe el nombre y el tipo. Puedes usar <em>Oso Bruno</em> y <em>Peluche clásico</em>.</li>
             <li>
-              <strong>Si un material falta:</strong> pulsa <strong>Añadir nuevo material</strong>.
-              Por ejemplo, escribe <em>Memoria RAM de 8 GB</em>, usa <em>unidad</em>{' '}
-              como medida y pulsa <strong>Guardar material</strong>. Para un computador
-              que usa dos módulos, indica <strong>2</strong> y pulsa <strong>Agregar</strong>.
+              Selecciona un insumo e indica cuánto se usa por peluche. Por
+              ejemplo, <strong>0,32 metros</strong> de felpa marrón. Pulsa
+              {' '}<strong>Agregar</strong> para incluirlo.
             </li>
-          </ul>
+            <li>
+              Para registrar otro insumo, pulsa <strong>Añadir nuevo material</strong>.
+              Por ejemplo, escribe <em>Fieltro azul</em>, elige <em>metro</em>{' '}
+              como unidad y pulsa <strong>Guardar material</strong>.
+            </li>
+          </ol>
         </article>
       )}
 
-      {mensaje && <p role="status">{mensaje}</p>}
+      {mensaje && <p className="notice" role="status">{mensaje}</p>}
 
       {mostrarFormulario && (
         <ProductoForm
@@ -184,13 +184,20 @@ export default function ProductosPage() {
           onCancel={() => setMostrarFormulario(false)}
         />
       )}
-<BarraFiltros
-  placeholderBusqueda="Buscar producto por nombre..."
-  valorBusqueda={busquedaNombre}
-  onChangeBusqueda={setBusquedaNombre}
-  hayFiltrosActivos={busquedaNombre.trim() !== ''}
-  onLimpiar={() => setBusquedaNombre('')}
-/>
+      <header className="catalogo-listado">
+        <h2>Catálogo</h2>
+        <span className="muted">
+          {productosFiltrados.length}{' '}
+          {productosFiltrados.length === 1 ? 'producto' : 'productos'}
+        </span>
+      </header>
+      <BarraFiltros
+        placeholderBusqueda="Buscar producto por nombre..."
+        valorBusqueda={busquedaNombre}
+        onChangeBusqueda={setBusquedaNombre}
+        hayFiltrosActivos={busquedaNombre.trim() !== ''}
+        onLimpiar={() => setBusquedaNombre('')}
+      />
       <ProductoList
         productos={productosFiltrados}
         onEliminar={handleEliminar}

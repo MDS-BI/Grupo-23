@@ -9,6 +9,7 @@ import ResumenPage from './components/manufactura/ResumenPage.jsx';
 
 export default function App() {
   const [pagina, setPagina] = useState('productos');
+  const [menuAbierto, setMenuAbierto] = useState(false);
   const menu = [
     ['resumen', 'Panel de producción'],
     ['productos', 'Productos y materiales'],
@@ -33,15 +34,30 @@ export default function App() {
         Ir al contenido
       </a>
       <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-mark">M</span>
-          <div>
-            <b>Manufactura</b>
-            <small>ERP BASE · GRUPO 23</small>
+        <div className="sidebar-heading">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true">M</span>
+            <div>
+              <b>Manufactura</b>
+              <small>ERP BASE · GRUPO 23</small>
+            </div>
           </div>
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-expanded={menuAbierto}
+            aria-controls="menu-manufactura"
+            onClick={() => setMenuAbierto((abierto) => !abierto)}
+          >
+            Menú
+          </button>
         </div>
         <p className="nav-label">ESPACIO DE TRABAJO</p>
-        <nav aria-label="Navegación de Manufactura">
+        <nav
+          id="menu-manufactura"
+          aria-label="Navegación de Manufactura"
+          data-abierto={menuAbierto}
+        >
           {menu.map(([id, label, icono]) => (
             <button
               key={id}
@@ -51,7 +67,10 @@ export default function App() {
               className={`nav-item transition-all duration-200 ${
                 pagina === id ? 'nav-activo' : ''
               }`}
-              onClick={() => setPagina(id)}
+              onClick={() => {
+                setPagina(id);
+                setMenuAbierto(false);
+              }}
             >
               {label}
               {icono && <span aria-hidden="true">{icono}</span>}

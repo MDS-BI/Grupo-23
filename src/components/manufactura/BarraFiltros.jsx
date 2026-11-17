@@ -16,6 +16,7 @@ export default function BarraFiltros({
         <input
           type="text"
           placeholder={placeholderBusqueda}
+          aria-label={placeholderBusqueda}
           value={valorBusqueda}
           onChange={(e) => onChangeBusqueda(e.target.value)}
         />
