@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { registrarMaterialLocal } from '../../modules/manufactura/referencias.js';
 import { Campo } from './Controles.jsx';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 
 export default function NuevoMaterial({ onCreado, onCancelar }) {
+  const destino = useEnfoqueAccion();
   const [nombre, setNombre] = useState('');
   const [unidad, setUnidad] = useState('unidad');
   const [errores, setErrores] = useState({});
@@ -17,7 +19,7 @@ export default function NuevoMaterial({ onCreado, onCancelar }) {
   };
 
   return (
-    <fieldset id="nuevo-material">
+    <fieldset ref={destino} id="nuevo-material">
       <legend>Registrar un material para reutilizar</legend>
       <p className="muted">
         Escribe un nombre y una unidad de medida. Por ejemplo,{' '}
@@ -59,6 +61,13 @@ export default function NuevoMaterial({ onCreado, onCancelar }) {
         </p>
       )}
       <div className="actions">
+        <button type="button" onClick={() => {
+          setNombre('');
+          setUnidad('unidad');
+          setErrores({});
+        }}>
+          Deshacer cambios
+        </button>
         <button type="button" onClick={onCancelar}>
           Cancelar nuevo material
         </button>

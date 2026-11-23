@@ -50,6 +50,31 @@ Las entregas nuevas requieren una orden abierta. Para finalizar una orden,
 su producto debe tener una ruta completa y todas las ejecuciones deben estar
 cerradas. Las recepciones anteriores se conservan después del cierre.
 
+## Deshacer y planificar pedidos
+
+**Deshacer cambios** restaura el borrador de un formulario o ruta.
+**Deshacer** revierte el último cambio guardado de la pestaña. Permite recuperar
+eliminaciones válidas junto con sus relaciones, hasta veinte operaciones en
+orden. Está disponible en la barra global y en las acciones de los registros
+afectados. Respeta los perfiles y detecta modificaciones de otras pestañas.
+Las recepciones confirmadas conservan su historial.
+
+Al pulsar **Eliminar**, confirme dentro de la página. Tras confirmar,
+**Deshacer eliminación** aparece en el aviso y en una fila marcada **Eliminado**
+en la tabla. Esa fila permite recuperar el registro aunque salga y vuelva al
+apartado, mientras la eliminación siga siendo el último cambio deshacible.
+
+En **Órdenes de producción**, pulse un modelo en **Pedidos por peluche**.
+El menú muestra el código de cada pedido, el código y nombre del local y su
+cantidad. La demo incluye cinco locales ficticios y cinco pedidos por modelo,
+que suman 64. Los perfiles de Supervisor y Planificación pueden registrar pedidos
+y abrir una orden con **Planificar estos pedidos**.
+
+Cada orden nueva requiere al menos 64 peluches enteros. Las órdenes históricas
+mantienen sus cantidades al editar otros campos. Los pedidos se asignan a la
+orden al guardar y vuelven a quedar pendientes si se deshace esa creación.
+Los botones de apertura desplazan la vista y enfocan el formulario o detalle.
+
 ## Comprobación y trazabilidad
 
 ```bash

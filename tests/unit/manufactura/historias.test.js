@@ -68,7 +68,7 @@ function ordenConRuta() {
   guardarRuta(p.producto_id, [{ etapa_id: e.etapa_id, secuencia: 1 }]);
   const o = guardarOrden({
     producto_id: p.producto_id,
-    cantidad_plan: 10,
+    cantidad_plan: 64,
     estado: 'Planificada',
     fecha_inicio: '2026-11-10',
     fecha_fin: '2026-11-12',

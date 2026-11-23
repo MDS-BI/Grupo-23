@@ -65,6 +65,23 @@ Los materiales, repuestos, trabajadores y proveedores provienen de otros módulo
 - La cobertura incluye pruebas unitarias de validación/persistencia y pruebas de integración por historia de usuario.
 - Consulte [tasks.md](tasks.md) para la trazabilidad entre requisitos y tareas.
 
+## Evaluar deshacer y pedidos
+
+1. Con Supervisor o Planificación, abra **Etapas y rutas** y cree una etapa.
+   El foco debe pasar al formulario.
+2. Edite su nombre, guarde y pulse **Deshacer** en sus acciones. Compruebe que
+   recupera el nombre anterior.
+3. Elimine esa etapa de prueba y pulse **Deshacer** en la barra global.
+   Debe recuperar el registro.
+4. En **Órdenes de producción**, seleccione un peluche y compruebe los códigos,
+   locales y cantidades de sus cinco pedidos de ejemplo.
+5. Pulse **Planificar estos pedidos**, complete las fechas y guarde la orden de
+   64 unidades. Los pedidos deben mostrar su código de orden.
+6. Deshaga la creación. La orden desaparece y los pedidos vuelven a estar
+   pendientes. Intente crear otra orden de 63 para comprobar el error.
+7. En Recepción de materiales, compruebe la restauración del formulario sin
+   guardar. Las entregas confirmadas conservan sus datos.
+
 ## Revisar con Spec Kit
 
 Los comandos de OpenCode están versionados en `.opencode/commands/`.

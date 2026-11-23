@@ -14,6 +14,7 @@ import {
   vacio,
 } from './validacion.js';
 import { obtenerRuta } from './rutas.js';
+export const MINIMO_PRODUCCION = 64;
 
 export const ESTADOS_ORDEN = [
   'Planificada',
@@ -37,6 +38,13 @@ export function validarOrden(d) {
   rango(e, d, 'fecha_inicio', 'fecha_fin');
 
   const anterior = buscar('ordenes', d.orden_id);
+  const cambiaLote = !anterior ||
+    Number(anterior.cantidad_plan) !== Number(d.cantidad_plan) ||
+    Number(anterior.producto_id) !== Number(d.producto_id);
+  if (cambiaLote && (!Number.isInteger(Number(d.cantidad_plan)) ||
+    Number(d.cantidad_plan) < MINIMO_PRODUCCION)) {
+    e.cantidad_plan = `El lote mínimo es de ${MINIMO_PRODUCCION} peluches enteros por producto.`;
+  }
   if (
     anterior &&
     Number(anterior.producto_id) !== Number(d.producto_id) &&
@@ -176,6 +184,9 @@ export function eliminarOrden(id) {
     ),
     recepciones: listar('recepciones').filter(
       (r) => Number(r.orden_id) !== Number(id),
+    ),
+    pedidos: listar('pedidos').map((pedido) =>
+      Number(pedido.orden_id) === Number(id) ? { ...pedido, orden_id: null } : pedido,
     ),
   });
 }

@@ -7,6 +7,7 @@ export const ROLES = {
       'productos', 'producto_material', 'materiales_locales', 'etapas', 'rutas',
       'ordenes', 'ejecuciones', 'recepciones', 'maquinas', 'mantenimientos',
       'mantenimiento_repuestos', 'equipamiento', 'asignaciones', 'demo_peluches',
+      'locales', 'pedidos', 'pedidos_demo',
     ],
     descripcion: 'Supervisa producción, insumos y recursos de planta.',
   },
@@ -14,7 +15,7 @@ export const ROLES = {
     nombre: 'Planificación',
     paginas: ['productos', 'etapas', 'ordenes'],
     inicio: 'productos',
-    tablas: ['productos', 'producto_material', 'materiales_locales', 'etapas', 'rutas', 'ordenes'],
+    tablas: ['productos', 'producto_material', 'materiales_locales', 'etapas', 'rutas', 'ordenes', 'pedidos'],
     descripcion: 'Define productos, rutas y órdenes de fabricación.',
   },
   ensamble: {

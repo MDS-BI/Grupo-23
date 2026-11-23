@@ -293,6 +293,63 @@ button:disabled {
   color: var(--muted);
   font-size: 13px;
 }
+.deshacer-global {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.deshacer-control {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.deshacer-control small {
+  font-size: 12px;
+}
+.manufactura-app .deleted-record {
+  background: var(--lilac-tint);
+}
+.manufactura-app .delete-confirmation h3 {
+  margin-top: 0;
+}
+.record-form,
+.detail-panel,
+.pedidos-detalle,
+.route-editor,
+#nuevo-material,
+.manufactura-app [role='status'] {
+  scroll-margin-top: 24px;
+}
+.pedidos-productos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.manufactura-app .pedidos-productos button[aria-expanded='true'] {
+  color: var(--accent-hover);
+  border-color: var(--accent);
+  background: var(--lavender);
+}
+.pedidos-detalle {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.manufactura-app button.producto-pedidos-enlace {
+  text-align: left;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--accent);
+}
 .erp-shell .manufactura-app {
   max-width: 1500px;
   margin: 0 auto;

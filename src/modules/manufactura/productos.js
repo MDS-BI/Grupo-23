@@ -166,6 +166,9 @@ export const actualizarProducto = (id, datos) => crearProducto(datos, id);
 
 export function eliminarProducto(producto_id) {
   const id = Number(producto_id);
+  if (listar('pedidos').some((pedido) => Number(pedido.producto_id) === id)) {
+    return fallo('El producto tiene pedidos de locales. Conserva su historial.');
+  }
   if (listar('ordenes').some((o) => Number(o.producto_id) === id))
     return fallo(
       'El producto tiene órdenes asociadas. Conserva su historial; no se puede eliminar.',

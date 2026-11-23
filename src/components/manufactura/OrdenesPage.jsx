@@ -11,6 +11,7 @@ import {
   guardarEjecucion,
   avanceOrden,
   ESTADOS_ORDEN,
+  MINIMO_PRODUCCION,
 } from '../../modules/manufactura/ordenes.js';
 import { obtenerProductos } from '../../modules/manufactura/productos.js';
 import { obtenerRuta } from '../../modules/manufactura/rutas.js';
@@ -27,7 +28,10 @@ import {
   formatoFecha,
 } from './Controles.jsx';
 import { RecepcionesGestion } from './RecepcionesPage.jsx';
-import { esEtapaEnsamble, puedeAcceder, rolActual } from '../../modules/manufactura/roles.js';
+import { esEtapaEnsamble, puedeAcceder, puedeModificarTabla, rolActual } from '../../modules/manufactura/roles.js';
+import { crearOrdenDesdePedidos } from '../../modules/manufactura/pedidos-locales.js';
+import PedidosLocales from './PedidosLocales.jsx';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 
 export function Progreso({ orden }) {
   const a = avanceOrden(orden);
@@ -47,6 +51,7 @@ export function Progreso({ orden }) {
 
 function OrdenDetalle({ ordenId, cerrar }) {
   useManufactura();
+  const destino = useEnfoqueAccion(ordenId);
   const orden = buscar('ordenes', ordenId);
   if (!orden) return null;
   const ensamble = rolActual() === 'ensamble';
@@ -93,7 +98,7 @@ function OrdenDetalle({ ordenId, cerrar }) {
     },
   ];
   return (
-    <article className="card detail-panel">
+    <article ref={destino} className="card detail-panel">
       <header>
         <div>
           <span className="eyebrow">Seguimiento de producción</span>
@@ -211,6 +216,8 @@ function OrdenDetalle({ ordenId, cerrar }) {
 export default function OrdenesPage() {
   useManufactura();
   const [detalle, setDetalle] = useState(null);
+  const [productoPedidos, setProductoPedidos] = useState(null);
+  const [solicitudNueva, setSolicitudNueva] = useState(null);
 
   const productos = obtenerProductos();
   const ensamble = rolActual() === 'ensamble';
@@ -243,6 +250,18 @@ export default function OrdenesPage() {
             : 'Planifica la fabricación y registra el avance real de cada etapa.'}</p>
         </div>
       </header>
+      {puedeModificarTabla('ordenes') && (
+        <PedidosLocales
+          productos={productos}
+          productoId={productoPedidos}
+          seleccionarProducto={setProductoPedidos}
+          planificar={(datos) => {
+            setDetalle(null);
+            setProductoPedidos(null);
+            setSolicitudNueva((anterior) => ({ datos, clave: (anterior?.clave || 0) + 1 }));
+          }}
+        />
+      )}
       {!productos.length && (
         <p className="notice">
           Primero registra un producto y define su ruta de fabricación.
@@ -266,7 +285,11 @@ export default function OrdenesPage() {
         nuevoTexto="Nueva orden"
         idCampo="orden_id"
         registros={ordenesFiltradas}
-        guardar={guardarOrden}
+        inicialNuevo={{ cantidad_plan: MINIMO_PRODUCCION, estado: 'Planificada' }}
+        solicitudNueva={solicitudNueva}
+        guardar={(datos, id) => !id && datos.pedido_ids
+          ? crearOrdenDesdePedidos(datos, datos.pedido_ids)
+          : guardarOrden(datos, id)}
         eliminar={eliminarOrden}
         onVer={(r) => setDetalle(r.orden_id)}
         campos={[
@@ -280,7 +303,9 @@ export default function OrdenesPage() {
             name: 'cantidad_plan',
             label: 'Cantidad planificada',
             type: 'number',
-            min: '0.001',
+            min: MINIMO_PRODUCCION,
+            step: '1',
+            help: 'Cada lote nuevo requiere al menos 64 peluches. Las cantidades de órdenes históricas se conservan.',
           },
           {
             name: 'estado',
@@ -300,7 +325,15 @@ export default function OrdenesPage() {
           {
             key: 'producto_id',
             label: 'Producto',
-            render: (r) => buscar('productos', r.producto_id)?.nombre,
+            render: (r) => puedeModificarTabla('ordenes') ? (
+              <button
+                type="button"
+                className="producto-pedidos-enlace"
+                onClick={() => setProductoPedidos(r.producto_id)}
+              >
+                {buscar('productos', r.producto_id)?.nombre}
+              </button>
+            ) : buscar('productos', r.producto_id)?.nombre,
           },
           { key: 'cantidad_plan', label: 'Cantidad' },
           {

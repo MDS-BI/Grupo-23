@@ -67,32 +67,32 @@ export const estaciones = {
 // Las fechas son días relativos al momento de cargar el ejemplo.
 export const lotes = [
   {
-    nombre: 'Oso Bruno de 30 cm', tipo: 'Peluche clásico', cantidad: 40,
+    nombre: 'Oso Bruno de 30 cm', tipo: 'Peluche clásico', cantidad: 64,
     periodo: [-12, -10], estado: 'Finalizada',
     materiales: { felpaOso: 0.32, tela: 0.06, relleno: 0.19, hilo: 12, bordado: 2, ojos: 2, bolsa: 1 },
     tiempos: [48, 62, 92, 70, 31, 35],
   },
   {
-    nombre: 'Dinosaurio Dino de 35 cm', tipo: 'Peluche prehistórico', cantidad: 36,
+    nombre: 'Dinosaurio Dino de 35 cm', tipo: 'Peluche prehistórico', cantidad: 64,
     periodo: [-8, -6], estado: 'Finalizada',
     materiales: { felpaDino: 0.38, fieltro: 0.12, relleno: 0.23, hilo: 15, bordado: 3, bolsa: 1 },
     tiempos: [59, 67, 114, 74, 34, 34],
   },
   {
-    nombre: 'Duende orejón estilo Labubu de 25 cm', tipo: 'Peluche coleccionable', cantidad: 30,
+    nombre: 'Duende orejón estilo Labubu de 25 cm', tipo: 'Peluche coleccionable', cantidad: 64,
     periodo: [-4, -1], estado: 'En producción',
     materiales: { felpaDuende: 0.27, tela: 0.08, relleno: 0.15, hilo: 10, bordado: 5, ojos: 2, bolsa: 1 },
     pendientes: ['bolsa'],
     tiempos: [40, 58, 82],
   },
   {
-    nombre: 'Conejo Nube de 28 cm', tipo: 'Peluche clásico', cantidad: 48,
+    nombre: 'Conejo Nube de 28 cm', tipo: 'Peluche clásico', cantidad: 64,
     periodo: [-2, 2], estado: 'En producción',
     materiales: { felpaConejo: 0.31, tela: 0.1, relleno: 0.17, hilo: 11, bordado: 3, bolsa: 1 },
     tiempos: [51, 69],
   },
   {
-    nombre: 'Ajolote Lila de 32 cm', tipo: 'Peluche de fauna', cantidad: 42,
+    nombre: 'Ajolote Lila de 32 cm', tipo: 'Peluche de fauna', cantidad: 64,
     periodo: [2, 4], estado: 'Planificada',
     materiales: { felpaAjolote: 0.3, fieltro: 0.09, relleno: 0.18, hilo: 13, bordado: 4, bolsa: 1 },
     pendientes: ['hilo', 'bordado', 'bolsa'],

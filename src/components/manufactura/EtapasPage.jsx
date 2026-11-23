@@ -8,6 +8,8 @@ import { obtenerProductos } from '../../modules/manufactura/productos.js';
 import { obtenerRuta, guardarRuta } from '../../modules/manufactura/rutas.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import { Campo, GestionRegistros, opciones } from './Controles.jsx';
+import DeshacerCambios from './DeshacerCambios.jsx';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 
 export default function EtapasPage() {
   useManufactura();
@@ -15,11 +17,12 @@ export default function EtapasPage() {
   const [filas, setFilas] = useState([]);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState('');
+  const destino = useEnfoqueAccion(producto);
+  const rutaGuardada = JSON.stringify(producto ? obtenerRuta(producto) : []);
   useEffect(() => {
-    setFilas(producto ? obtenerRuta(producto) : []);
+    setFilas(JSON.parse(rutaGuardada));
     setErrores({});
-    setMensaje('');
-  }, [producto]);
+  }, [producto, rutaGuardada]);
   const mover = (indice, cambio) => {
     const nuevas = [...filas];
     const destino = indice + cambio;
@@ -80,11 +83,14 @@ export default function EtapasPage() {
             options: opciones(obtenerProductos(), 'producto_id'),
           }}
           value={producto}
-          onChange={setProducto}
+          onChange={(valor) => {
+            setProducto(valor);
+            setMensaje('');
+          }}
         />
         {producto && (
           <>
-            <div className="route-editor">
+            <div ref={destino} className="route-editor">
               {filas.map((r, i) => (
                 <div className="route-step" key={i}>
                   <span className="step-number">{i + 1}</span>
@@ -159,6 +165,17 @@ export default function EtapasPage() {
               </p>
             ))}
             <div className="actions">
+              <button
+                type="button"
+                onClick={() => {
+                  setFilas(obtenerRuta(producto));
+                  setErrores({});
+                  setMensaje('Cambios sin guardar deshechos.');
+                }}
+              >
+                Deshacer cambios
+              </button>
+              <DeshacerCambios tabla="rutas" />
               <button
                 type="button"
                 disabled={!obtenerEtapas().length}

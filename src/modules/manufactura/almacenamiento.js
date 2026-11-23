@@ -13,6 +13,8 @@ export const tablas = {
   mantenimiento_repuestos: 'mant_repuesto_id',
   equipamiento: 'equipamiento_id',
   asignaciones: 'asignacion_id',
+  locales: 'local_id',
+  pedidos: 'pedido_id',
 };
 
 export function listar(tabla) {
@@ -34,11 +36,83 @@ export const siguienteId = (tabla, lista = listar(tabla)) =>
   lista.reduce((max, r) => Math.max(max, Number(r[tablas[tabla]]) || 0), 0) + 1;
 export const fallo = (mensaje) => ({ errores: { general: mensaje } });
 
+let historialEnMemoria = { pasos: [], firma: '' };
+let usarHistorialEnMemoria = false;
+const CLAVE_DESHACER = 'manufactura:deshacer';
+
+function firmaActual() {
+  return JSON.stringify(
+    [...Object.keys(tablas), 'materiales_locales', 'demo_peluches', 'pedidos_demo']
+      .map((tabla) => [tabla, listar(tabla)]),
+  );
+}
+
+function leerHistorial() {
+  if (usarHistorialEnMemoria) return historialEnMemoria;
+  try {
+    const contenido = window.sessionStorage.getItem(CLAVE_DESHACER);
+    if (!contenido) return { pasos: [], firma: '' };
+    const historial = JSON.parse(contenido);
+    if (Array.isArray(historial?.pasos) && typeof historial.firma === 'string' &&
+      historial.pasos.every((paso) => paso && typeof paso.rol === 'string' &&
+        paso.anteriores && paso.posteriores &&
+        Object.values(paso.anteriores).every(Array.isArray) &&
+        Object.values(paso.posteriores).every(Array.isArray))) {
+      return historial;
+    }
+    return { pasos: [], firma: '' };
+  } catch {
+    // El historial puede seguir disponible durante la sesión.
+  }
+  return historialEnMemoria;
+}
+
+function guardarHistorial(historial) {
+  historialEnMemoria = historial;
+  try {
+    window.sessionStorage.setItem(CLAVE_DESHACER, JSON.stringify(historial));
+    usarHistorialEnMemoria = false;
+  } catch {
+    usarHistorialEnMemoria = true;
+    // El guardado de los registros conserva prioridad sobre el historial.
+  }
+}
+
+export function cambioParaDeshacer(tabla, id) {
+  const historial = leerHistorial();
+  const paso = historial.pasos.at(-1);
+  if (!paso || paso.rol !== rolActual() || historial.firma !== firmaActual()) return null;
+  if (!Object.keys(paso.anteriores).every(puedeModificarTabla)) return null;
+  if (tabla && !Object.hasOwn(paso.anteriores, tabla)) return null;
+  if (tabla && id != null) {
+    const campo = tablas[tabla];
+    const anterior = paso.anteriores[tabla].find((r) => Number(r[campo]) === Number(id));
+    const posterior = paso.posteriores[tabla].find((r) => Number(r[campo]) === Number(id));
+    if (JSON.stringify(anterior) === JSON.stringify(posterior)) return null;
+  }
+  return paso;
+}
+
+export function deshacerUltimoCambio(tabla, id) {
+  const paso = cambioParaDeshacer(tabla, id);
+  if (!paso) return fallo('El cambio ya no está disponible para deshacer. Actualiza el listado.');
+  const historial = leerHistorial();
+  const resultado = guardarCambios(paso.anteriores, { registrarHistorial: false });
+  if (resultado.errores) return resultado;
+  guardarHistorial({ pasos: historial.pasos.slice(0, -1), firma: firmaActual() });
+  window.dispatchEvent(new Event('manufactura:cambio'));
+  return { errores: null };
+}
+
 // Guarda juntas las relaciones; si el navegador rechaza una escritura se recuperan los valores previos.
-export function guardarCambios(cambios) {
-  const cargaInicial = cambios.demo_peluches &&
-    !Object.keys(tablas).some((tabla) => listar(tabla).length > 0);
+export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
+  const cargaPedidos = cambios.pedidos_demo && listar('demo_peluches').length > 0 &&
+    !listar('pedidos').length && !listar('locales').length &&
+    Object.keys(cambios).every((tabla) => ['locales', 'pedidos', 'pedidos_demo'].includes(tabla));
+  const cargaInicial = cargaPedidos || (cambios.demo_peluches &&
+    !Object.keys(tablas).some((tabla) => listar(tabla).length > 0));
   const anteriores = new Map();
+  const firmaAnterior = firmaActual();
   try {
     for (const tabla of Object.keys(cambios)) {
       const clave = `manufactura:${tabla}`;
@@ -91,6 +165,30 @@ export function guardarCambios(cambios) {
         `manufactura:${tabla}`,
         JSON.stringify(datos),
       );
+    if (registrarHistorial) {
+      const tablasCambiadas = Object.keys(cambios).filter((tabla) =>
+        JSON.stringify(JSON.parse(anteriores.get(`manufactura:${tabla}`) || '[]')) !==
+        JSON.stringify(cambios[tabla]),
+      );
+      if (tablasCambiadas.length) {
+        const historial = leerHistorial();
+        const pasos = historial.firma === firmaAnterior ? historial.pasos : [];
+        const esHistorialProtegido = tablasCambiadas.some(
+          (tabla) => ['recepciones', 'demo_peluches', 'pedidos_demo'].includes(tabla),
+        );
+        const paso = {
+          rol: rolActual(),
+          anteriores: Object.fromEntries(tablasCambiadas.map((tabla) => [
+            tabla, JSON.parse(anteriores.get(`manufactura:${tabla}`) || '[]'),
+          ])),
+          posteriores: Object.fromEntries(tablasCambiadas.map((tabla) => [tabla, cambios[tabla]])),
+        };
+        guardarHistorial({
+          pasos: esHistorialProtegido ? [] : [...pasos, paso].slice(-20),
+          firma: firmaActual(),
+        });
+      }
+    }
     window.dispatchEvent(new Event('manufactura:cambio'));
     return { errores: null };
   } catch {

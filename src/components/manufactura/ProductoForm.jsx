@@ -9,6 +9,7 @@ import {
 } from '../../modules/manufactura/productos.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import NuevoMaterial from './NuevoMaterial.jsx';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 
 const FORMULARIO_VACIO = { nombre: '', tipo: '' };
 const MATERIAL_VACIO = { material_id: '', cantidad_por_unidad: '' };
@@ -35,6 +36,7 @@ export default function ProductoForm({
   const [avisoMaterial, setAvisoMaterial] = useState('');
   const cantidadRef = useRef(null);
   const nuevoMaterialRef = useRef(null);
+  const destino = useEnfoqueAccion();
   const catalogoMateriales = obtenerReferencias('materiales');
 
   const materialCreado = (registro) => {
@@ -157,6 +159,7 @@ export default function ProductoForm({
 
   return (
     <form
+      ref={destino}
       onSubmit={handleSubmit}
       className="space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
       noValidate
@@ -409,6 +412,20 @@ export default function ProductoForm({
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5">
+        <button
+          type="button"
+          onClick={() => {
+            setFormulario(producto ? { nombre: producto.nombre, tipo: producto.tipo } : FORMULARIO_VACIO);
+            setMateriales(materialesIniciales.map((r) => ({ ...r })));
+            setMaterial(MATERIAL_VACIO);
+            setErroresProducto({});
+            setErroresMaterial({});
+            setAvisoMaterial('');
+            setMostrarNuevoMaterial(false);
+          }}
+        >
+          Deshacer cambios
+        </button>
         {onCancel && (
           <button
             type="button"

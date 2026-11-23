@@ -6,8 +6,10 @@ import {
   hayRegistrosManufactura,
 } from './modules/manufactura/demo-peluches.js';
 import './styles.css';
+import { inicializarPedidosDemo } from './modules/manufactura/pedidos-locales.js';
 
 if (!hayRegistrosManufactura()) cargarDemoPeluches();
+inicializarPedidosDemo();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

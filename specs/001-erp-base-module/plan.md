@@ -153,6 +153,31 @@ activas y mantiene el código, el producto y el estado.
 El selector permite evaluar perspectivas en el MVP local. La autenticación
 de cuentas y los permisos aplicados en un servidor son una ampliación futura.
 
+## Deshacer, navegación y demanda de locales
+
+`almacenamiento.js` conserva en `sessionStorage` hasta veinte transacciones
+reversibles con sus listas anteriores y posteriores. Una firma del estado de
+las tablas permite detectar cambios externos antes de restaurar una transacción.
+Deshacer usa la misma capa de permisos y de escritura con recuperación ante
+fallos. Cada recepción confirmada y cada inicialización de demo empieza un
+historial posterior. Los formularios disponen además de restauración del borrador.
+
+`DeshacerCambios.jsx` ofrece la acción global y por registro. `useEnfoqueAccion.js`
+desplaza y enfoca las secciones recién abiertas, compartido por formularios,
+detalles, rutas y navegación. La interfaz usa los apartados existentes.
+
+`pedidos-locales.js` gestiona locales y pedidos relacionados con productos y
+órdenes. `PedidosLocales.jsx` muestra el menú por peluche y permite iniciar una
+orden con los pedidos pendientes. La creación de la orden y su asignación de
+pedidos se guardan en una sola transacción. Cancelar una orden vuelve a dejar
+sus pedidos disponibles para otra planificación.
+
+El mínimo de una orden nueva es 64. Los registros históricos pueden conservar
+cantidades anteriores al editar otros campos. La demo nueva usa cinco lotes de
+64 unidades, cinco locales ficticios y 25 pedidos, cinco por producto. Sus
+cantidades 16, 12, 10, 14 y 12 suman 64 por modelo. `main.jsx` incorpora estos
+pedidos una sola vez a la demo existente cuando aún no hay locales ni pedidos.
+
 ## Seguimiento de Complejidad
 
 Este plan no introdujo violaciones de la constitución.

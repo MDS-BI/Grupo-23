@@ -27,6 +27,14 @@ La aplicación persiste los registros del módulo de Manufactura y Operaciones e
 | MANTENIMIENTO_REPUESTO | `manufactura:mantenimiento_repuestos` |
 | EQUIPAMIENTO | `manufactura:equipamiento` |
 | ASIGNACION_EQUIPAMIENTO | `manufactura:asignaciones` |
+| LOCAL | `manufactura:locales` |
+| PEDIDO_LOCAL | `manufactura:pedidos` |
+
+LOCAL contiene `local_id`, `codigo` y `nombre`. PEDIDO_LOCAL contiene
+`pedido_id`, `codigo` único, `producto_id`, `local_id`, `cantidad` entera
+positiva y `orden_id` opcional. El enlace a una orden se guarda conjuntamente
+con su creación. No se elimina un producto con pedidos ni un pedido planificado
+en una orden activa. Eliminar una orden permitida deja sus pedidos pendientes.
 
 ## Forma de los datos
 
@@ -171,6 +179,15 @@ datos previos mediante la opción explícita de Productos.
 
 El selector representa roles de demostración en el cliente. La protección
 multiusuario en servidor requiere una integración de autenticación posterior.
+
+## Reversión de transacciones
+
+`manufactura:deshacer` se guarda en `sessionStorage` y conserva veinte
+operaciones de la pestaña. Incluye el rol, las tablas afectadas y sus valores
+anteriores y posteriores. La firma del estado global se compara antes de
+restaurar para evitar sobrescribir cambios de otras pestañas. La reversión
+debe pasar los mismos permisos y protecciones que las escrituras normales.
+Guardar una recepción confirmada o cargar la demo inicia un historial nuevo.
 
 ## Expectativas de extensibilidad
 

@@ -465,3 +465,25 @@ fuera de servicio o en mantenimiento. Se conserva la posibilidad de finalizar
 una ejecución previa con su máquina original usando el identificador recibido
 por la API. Una prueba de regresión cubre ambas operaciones.
 La versión integrada final pasó 45 pruebas y la compilación de producción.
+
+## Fase 10: Deshacer, foco de acciones y pedidos por peluche
+
+- [x] T136 Implementar historial transaccional de veinte operaciones por pestaña,
+  con roles, detección de cambios externos y reversión de relaciones (FR-049).
+- [x] T137 Añadir restauración de borradores y deshacer en acciones de etapas,
+  rutas y registros; conservar recepciones confirmadas (FR-049).
+- [x] T138 Enfocar y desplazar la vista hacia formularios, detalles y páginas
+  mediante un hook compartido, respetando movimiento reducido (FR-050).
+- [x] T139 Validar el lote entero mínimo de 64 y conservar cantidades históricas
+  al editar otros campos; actualizar la demo nueva (FR-051).
+- [x] T140 Relacionar locales y pedidos con productos, mostrar códigos y cantidades
+  y crear órdenes con sus vínculos en una transacción (FR-052/FR-053).
+- [x] T141 Completar las pruebas de interfaz y dominio, revisar el navegador
+  y compilar la versión final.
+
+La versión del 2026-11-23 pasó 57 pruebas en diez archivos y compiló para
+producción. Se verificaron en navegador el menú de locales con códigos y
+cantidades, y el salto con foco al formulario de una orden de 64.
+La revisión de eliminación añade confirmación dentro de la página y
+**Deshacer eliminación** tanto en el aviso como en la fila eliminada. Las
+pruebas cubren cancelación, recuperación al volver al apartado y etapas en uso.

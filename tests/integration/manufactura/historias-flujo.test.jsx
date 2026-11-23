@@ -104,7 +104,7 @@ describe('Historias del PDF en la interfaz', () => {
     await click('Nueva orden');
     await rellenar({
       producto_id: '1',
-      cantidad_plan: '10',
+      cantidad_plan: '64',
       estado: 'Planificada',
       fecha_inicio: '2026-11-10',
       fecha_fin: '2026-11-12',

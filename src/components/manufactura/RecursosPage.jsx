@@ -20,6 +20,7 @@ import {
 } from '../../modules/manufactura/recursos.js';
 import { buscar } from '../../modules/manufactura/almacenamiento.js';
 import { nombreReferencia } from '../../modules/manufactura/referencias.js';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import {
   Campo,
   GestionRegistros,
@@ -31,6 +32,7 @@ import {
 function Mantenimientos({ maquinaId }) {
   useManufactura();
   const [detalle, setDetalle] = useState(null);
+  const destino = useEnfoqueAccion(detalle);
   return (
     <>
       <GestionRegistros
@@ -104,7 +106,7 @@ function Mantenimientos({ maquinaId }) {
         ]}
       />
       {detalle && buscar('mantenimientos', detalle) && (
-        <article className="card">
+        <article ref={destino} className="card">
           <header>
             <h3>Repuestos del mantenimiento #{detalle}</h3>
             <button onClick={() => setDetalle(null)}>Cerrar repuestos</button>
@@ -229,6 +231,7 @@ export default function RecursosPage() {
   useManufactura();
   const [pestana, setPestana] = useState('maquinas');
   const [maquina, setMaquina] = useState(null);
+  const destino = useEnfoqueAccion(maquina);
   const [busquedaCodigo, setBusquedaCodigo] = useState('');
 
   const maquinasFiltradas = filtrarMaquinas(obtenerMaquinas(), busquedaCodigo);
@@ -307,7 +310,7 @@ export default function RecursosPage() {
             ]}
           />
           {maquina && buscar('maquinas', maquina) && (
-            <article className="card">
+            <article ref={destino} className="card">
               <header>
                 <h2>{buscar('maquinas', maquina).nombre}</h2>
                 <button onClick={() => setMaquina(null)}>

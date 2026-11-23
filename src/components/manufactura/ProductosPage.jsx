@@ -7,6 +7,8 @@ import ProductoForm from './ProductoForm.jsx';
 import ProductoDetalle from './ProductoDetalle.jsx';
 import portadaPeluches from '../../assets/manufactura/peluches-portada.jpg';
 import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
+import DeshacerCambios from './DeshacerCambios.jsx';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js';
 import {
   cargarDemoPeluches,
@@ -22,6 +24,7 @@ export default function ProductosPage() {
   const [mensaje, setMensaje] = useState('');
   const [errorDemo, setErrorDemo] = useState('');
   const [busquedaNombre, setBusquedaNombre] = useState('');
+  const confirmacion = useEnfoqueAccion(mensaje);
 
   const productosFiltrados = useMemo(() => {
     return filtrarProductos(productos, busquedaNombre);
@@ -172,7 +175,9 @@ export default function ProductosPage() {
         </article>
       )}
 
-      {mensaje && <p className="notice" role="status">{mensaje}</p>}
+      {mensaje && <p ref={confirmacion} tabIndex={-1} className="notice" role="status">
+        {mensaje} <DeshacerCambios />
+      </p>}
 
       {mostrarFormulario && (
         <ProductoForm
@@ -204,6 +209,7 @@ export default function ProductosPage() {
         onEliminar={handleEliminar}
         onEditar={(producto) => {
           setEdicion(producto);
+          setMensaje('');
           setMostrarFormulario(true);
           setDetalle(null);
         }}

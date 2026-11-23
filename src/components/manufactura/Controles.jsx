@@ -1,7 +1,9 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import useManufactura from '../../hooks/useManufactura.js';
-import { tablas } from '../../modules/manufactura/almacenamiento.js';
+import { cambioParaDeshacer, tablas } from '../../modules/manufactura/almacenamiento.js';
 import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
+import DeshacerCambios from './DeshacerCambios.jsx';
 import {
   obtenerReferencias,
   nombreReferencia,
@@ -179,6 +181,8 @@ export function Formulario({
   const [datos, setDatos] = useState(inicial);
   const [errores, setErrores] = useState({});
   const [repuestoPendiente, setRepuestoPendiente] = useState(false);
+  const [reinicio, setReinicio] = useState(0);
+  const destino = useEnfoqueAccion();
   const cambiar = (name, value) => {
     setDatos((actual) => ({ ...actual, [name]: value }));
     setErrores((actual) => ({ ...actual, [name]: undefined }));
@@ -202,7 +206,7 @@ export function Formulario({
     }
   };
   return (
-    <form className="card record-form" noValidate onSubmit={guardar}>
+    <form ref={destino} className="card record-form" noValidate onSubmit={guardar}>
       <h3>{titulo}</h3>
       {errores.general && (
         <p className="error" role="alert">
@@ -222,6 +226,7 @@ export function Formulario({
       </div>
       {conRepuestos && (
         <RepuestosEditor
+          key={reinicio}
           value={datos.repuestos || []}
           onChange={(value) => cambiar('repuestos', value)}
           onPendiente={setRepuestoPendiente}
@@ -235,6 +240,17 @@ export function Formulario({
           </p>
         ))}
       <div className="actions">
+        <button
+          type="button"
+          onClick={() => {
+            setDatos(inicial);
+            setErrores({});
+            setRepuestoPendiente(false);
+            setReinicio((n) => n + 1);
+          }}
+        >
+          Deshacer cambios
+        </button>
         <button type="button" onClick={onCancelar}>
           Cancelar
         </button>
@@ -263,6 +279,8 @@ export function GestionRegistros({
   textoEditar = 'Editar',
   permitirEditar = true,
   permitirCrear = true,
+  inicialNuevo = {},
+  solicitudNueva,
 }) {
   useManufactura();
   const tabla = Object.keys(tablas).find((nombre) => tablas[nombre] === idCampo);
@@ -270,6 +288,44 @@ export function GestionRegistros({
   const hayAcciones = onVer || (puedeModificar && (permitirEditar || eliminar));
   const [edicion, setEdicion] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [formularioId, setFormularioId] = useState(0);
+  const [pendienteEliminar, setPendienteEliminar] = useState(null);
+  const [eliminado, setEliminado] = useState(null);
+  const confirmacionId = useId();
+  const confirmarEliminacion = useEnfoqueAccion(pendienteEliminar);
+  const cambio = cambioParaDeshacer(tabla);
+  const registrosEliminados = puedeModificar && cambio
+    ? cambio.anteriores[tabla].filter((anterior) =>
+        !cambio.posteriores[tabla].some((posterior) =>
+          Number(posterior[idCampo]) === Number(anterior[idCampo]),
+        ),
+      )
+    : [];
+  const recuperado = eliminado && registros.some((r) =>
+    Number(r[idCampo]) === Number(eliminado[idCampo]),
+  );
+  const mensajeVisible = recuperado
+    ? `Eliminación deshecha. Se recuperó ${singular.toLowerCase()} «${eliminado.nombre || `#${eliminado[idCampo]}`}».`
+    : mensaje;
+  useEffect(() => {
+    if (recuperado) {
+      setMensaje(mensajeVisible);
+      setEliminado(null);
+    }
+  }, [recuperado, mensajeVisible]);
+  const abrirFormulario = (datos) => {
+    setEdicion(datos);
+    setFormularioId((n) => n + 1);
+    setMensaje('');
+    setEliminado(null);
+    setPendienteEliminar(null);
+  };
+  const confirmacion = useEnfoqueAccion(mensajeVisible);
+  useEffect(() => {
+    if (solicitudNueva) {
+      abrirFormulario({ ...solicitudNueva.datos });
+    }
+  }, [solicitudNueva]);
   const guardarDatos = (datos) => {
     const resultado = guardar(datos, edicion?.[idCampo]);
     if (!resultado.errores) {
@@ -279,40 +335,63 @@ export function GestionRegistros({
     return resultado;
   };
   const borrar = (registro) => {
-    if (
-      !window.confirm(
-        `¿Eliminar ${singular.toLowerCase()} #${registro[idCampo]}? Se eliminarán sus registros dependientes cuando corresponda.`,
-      )
-    )
-      return;
     const resultado = eliminar(registro[idCampo]);
-    setMensaje(resultado?.errores?.general || 'Registro eliminado.');
+    setPendienteEliminar(null);
+    setEliminado(resultado?.errores ? null : registro);
+    setMensaje(resultado?.errores?.general ||
+      `Se eliminó ${singular.toLowerCase()} «${registro.nombre || `#${registro[idCampo]}`}». Puedes recuperarlo con Deshacer eliminación.`);
   };
   return (
     <div className="management">
       <header className="section-heading">
         <h2>{titulo}</h2>
+        {tabla !== 'recepciones' && <DeshacerCambios tabla={tabla} />}
         {puedeModificar && permitirCrear && (
           <button
             className="primary"
             type="button"
             onClick={() => {
-              setEdicion({});
-              setMensaje('');
+              abrirFormulario({ ...inicialNuevo });
             }}
           >
             {nuevoTexto || `Nuevo ${singular.toLowerCase()}`}
           </button>
         )}
       </header>
-      {mensaje && (
-        <p role="status" className="notice">
-          {mensaje}
+      {pendienteEliminar && (
+        <div
+          ref={confirmarEliminacion}
+          role="alertdialog"
+          aria-labelledby={confirmacionId}
+          aria-describedby={`${confirmacionId}-detalle`}
+          className="notice delete-confirmation"
+          tabIndex={-1}
+        >
+          <h3 id={confirmacionId}>
+            ¿Eliminar {singular.toLowerCase()} «{pendienteEliminar.nombre || `#${pendienteEliminar[idCampo]}`}»?
+          </h3>
+          <p id={`${confirmacionId}-detalle`}>
+            Se eliminarán sus registros dependientes cuando corresponda. Después podrás usar Deshacer eliminación.
+          </p>
+          <div className="row-actions">
+            <button type="button" onClick={() => setPendienteEliminar(null)}>Cancelar eliminación</button>
+            <button type="button" className="danger" onClick={() => borrar(pendienteEliminar)}>Confirmar eliminación</button>
+          </div>
+        </div>
+      )}
+      {mensajeVisible && (
+        <p ref={confirmacion} tabIndex={-1} role="status" className="notice">
+          {mensajeVisible}
+          {tabla !== 'recepciones' && !recuperado && <> <DeshacerCambios
+            tabla={tabla}
+            registroId={eliminado?.[idCampo]}
+            texto={eliminado ? 'Deshacer eliminación' : 'Deshacer'}
+          /></>}
         </p>
       )}
       {edicion && puedeModificar && permitirCrear && (
         <Formulario
-          key={edicion[idCampo] || 'nuevo'}
+          key={formularioId}
           titulo={`${edicion[idCampo] ? 'Editar' : 'Registrar'} ${singular.toLowerCase()}`}
           campos={campos}
           inicial={edicion}
@@ -321,7 +400,7 @@ export function GestionRegistros({
           conRepuestos={conRepuestos}
         />
       )}
-      {registros.length ? (
+      {registros.length || registrosEliminados.length ? (
         <div className="table-wrap">
           <table>
             <caption className="sr-only">{titulo}</caption>
@@ -352,8 +431,7 @@ export function GestionRegistros({
                       <button
                         type="button"
                         onClick={() => {
-                          setEdicion(preparar(r));
-                          setMensaje('');
+                          abrirFormulario(preparar(r));
                         }}
                       >
                         {textoEditar}
@@ -363,13 +441,32 @@ export function GestionRegistros({
                       <button
                         className="danger"
                         type="button"
-                        onClick={() => borrar(r)}
+                        onClick={() => {
+                          setPendienteEliminar(r);
+                          setMensaje('');
+                          setEliminado(null);
+                        }}
                       >
                         Eliminar
                       </button>
                     )}
+                    {puedeModificar && tabla !== 'recepciones' &&
+                      <DeshacerCambios tabla={tabla} registroId={r[idCampo]} />}
                     </td>
                   )}
+                </tr>
+              ))}
+              {registrosEliminados.map((r) => (
+                <tr key={`eliminado-${r[idCampo]}`} className="deleted-record">
+                  {columnas.map((c, i) => (
+                    <td key={c.key}>
+                      {c.render ? c.render(r) : r[c.key]}
+                      {i === 0 && <> <span className="badge">Eliminado</span></>}
+                    </td>
+                  ))}
+                  {hayAcciones && <td className="row-actions">
+                    <DeshacerCambios tabla={tabla} registroId={r[idCampo]} texto="Deshacer eliminación" />
+                  </td>}
                 </tr>
               ))}
             </tbody>

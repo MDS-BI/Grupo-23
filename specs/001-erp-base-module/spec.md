@@ -235,6 +235,11 @@ Escenarios de aceptación adicionales.
 - **FR-046**: Ensamble DEBE consultar órdenes abiertas y registrar ejecuciones de etapas de tipo Ensamble o Ensamblaje. Las recepciones, los proveedores y las fechas de entrega DEBEN omitirse de esa perspectiva.
 - **FR-047**: El sistema DEBE rechazar modificaciones fuera del perfil antes de escribir registros, y cerrar formularios previos al cambiar el perfil.
 - **FR-048**: El sistema DEBE impedir finalizar órdenes sin ruta, con etapas pendientes o con ejecuciones abiertas. Las órdenes finalizadas o canceladas DEBEN rechazar recepciones nuevas, conservando la consulta de entregas históricas.
+- **FR-049**: El sistema DEBE ofrecer deshacer cambios sin guardar en formularios y rutas, y revertir en orden los últimos veinte cambios guardados de la pestaña, incluidas eliminaciones válidas y sus relaciones. La operación DEBE respetar el rol y rechazarse si otra pestaña cambió los datos. Las recepciones confirmadas conservan su historial y solo ofrecen deshacer en el formulario sin guardar.
+- **FR-050**: Al abrir un formulario, detalle o menú de pedidos, el sistema DEBE llevar la vista a ese apartado y enfocar un control apropiado. La navegación entre páginas DEBE llevar al inicio del contenido y respetar la preferencia de movimiento reducido.
+- **FR-051**: Una orden nueva o un cambio de producto o cantidad DEBE requerir un número entero de al menos 64 peluches. Las órdenes históricas con cantidades inferiores pueden conservar su cantidad al editar otros campos.
+- **FR-052**: Órdenes de producción DEBE ofrecer un menú por modelo de peluche con código de pedido, código y nombre del local, cantidad solicitada y orden asociada. Supervisor y Planificación pueden registrar pedidos y planificar conjuntamente pedidos pendientes del mismo producto cuando sumen al menos 64 unidades.
+- **FR-053**: La creación de una orden desde pedidos DEBE guardar la orden y sus vínculos conjuntamente. Los pedidos ya planificados DEBEN rechazarse si se intenta planificarlos otra vez. Deshacer esa creación DEBE restablecer los pedidos pendientes.
 
 ### Requisitos de Extensibilidad *(obligaciones del módulo)*
 

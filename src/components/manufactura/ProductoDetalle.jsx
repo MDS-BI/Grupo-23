@@ -2,12 +2,14 @@ import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js'
 import { nombreReferencia } from '../../modules/manufactura/referencias.js';
 import { obtenerRuta } from '../../modules/manufactura/rutas.js';
 import { buscar } from '../../modules/manufactura/almacenamiento.js';
+import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 export default function ProductoDetalle({ producto, onCerrar }) {
+  const destino = useEnfoqueAccion(producto?.producto_id);
   if (!producto) return null;
   const materiales = obtenerProductoMaterial(producto.producto_id);
   const ruta = obtenerRuta(producto.producto_id);
   return (
-    <article className="card" aria-label={`Detalle de ${producto.nombre}`}>
+    <article ref={destino} className="card" aria-label={`Detalle de ${producto.nombre}`}>
       <header>
         <h2>{producto.nombre}</h2>
         <button onClick={onCerrar}>Cerrar detalle</button>

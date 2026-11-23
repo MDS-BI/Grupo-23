@@ -8,6 +8,8 @@ import ReferenciasPage from './components/manufactura/ReferenciasPage.jsx';
 import ResumenPage from './components/manufactura/ResumenPage.jsx';
 import useManufactura from './hooks/useManufactura.js';
 import { cambiarRol, puedeAcceder, ROLES, rolActual } from './modules/manufactura/roles.js';
+import DeshacerCambios from './components/manufactura/DeshacerCambios.jsx';
+import useEnfoqueAccion from './hooks/useEnfoqueAccion.js';
 
 export default function App() {
   useManufactura();
@@ -16,6 +18,7 @@ export default function App() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [errorRol, setErrorRol] = useState('');
   const paginaActual = puedeAcceder(pagina) ? pagina : ROLES[rol].inicio;
+  const destinoPagina = useEnfoqueAccion(`${rol}-${paginaActual}`, false);
   const menu = [
     ['resumen', 'Panel de producción'],
     ['productos', 'Productos y materiales'],
@@ -114,9 +117,13 @@ export default function App() {
             </select>
           </div>
         </div>
-        <main id="contenido" className="manufactura-app" key={`${rol}-${paginaActual}`}>
+        <main ref={destinoPagina} tabIndex={-1} id="contenido" className="manufactura-app" key={`${rol}-${paginaActual}`}>
           {errorRol && <p className="error" role="alert">{errorRol}</p>}
           <p className="rol-perspectiva">{ROLES[rol].descripcion}</p>
+          <div className="deshacer-global">
+            <span>Último cambio guardado</span>
+            <DeshacerCambios />
+          </div>
           {paginas[paginaActual]}
         </main>
         <footer className="workspace-footer">
