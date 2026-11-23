@@ -101,9 +101,26 @@ export function validarEjecucion(d) {
     !obtenerRuta(orden.producto_id).some(
       (r) => Number(r.etapa_id) === Number(d.etapa_id),
     )
-  )
+  ) {
     e.etapa_id =
       'La etapa debe formar parte de la ruta del producto de esta orden.';
+  }
+
+  if (!e.maquina_id && !vacio(d.maquina_id)) {
+    const maquina = buscar('maquinas', d.maquina_id);
+    const anterior = d.ejecucion_id ? buscar('ejecuciones', d.ejecucion_id) : null;
+    const cambioMaquina =
+      !anterior || Number(anterior.maquina_id) !== Number(d.maquina_id);
+
+    if (
+      maquina &&
+      cambioMaquina &&
+      ['Fuera de servicio', 'En mantenimiento'].includes(maquina.estado)
+    ) {
+      e.maquina_id = `La máquina "${maquina.nombre}" está ${maquina.estado.toLowerCase()} y no puede asignarse.`;
+    }
+  }
+
   return e;
 }
 

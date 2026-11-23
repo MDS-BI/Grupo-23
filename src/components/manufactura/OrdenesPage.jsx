@@ -65,7 +65,12 @@ function OrdenDetalle({ ordenId, cerrar }) {
       label: 'Máquina',
       type: 'select',
       opcional: true,
-      options: opciones(obtenerMaquinas(), 'maquina_id'),
+      options: opciones(
+        obtenerMaquinas().filter(
+          (m) => !['Fuera de servicio', 'En mantenimiento'].includes(m.estado),
+        ),
+        'maquina_id',
+      ),
     },
     {
       name: 'trabajador_id',
