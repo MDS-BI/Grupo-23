@@ -1,9 +1,17 @@
-import { listar, guardarRegistro, eliminarRegistro } from './almacenamiento.js';
+import {
+  listar,
+  buscar,
+  guardarRegistro,
+  eliminarRegistro,
+  fallo,
+} from './almacenamiento.js';
 import { referencia, numero, fecha } from './validacion.js';
+
 export const obtenerRecepciones = (ordenId) =>
   listar('recepciones').filter(
     (r) => !ordenId || Number(r.orden_id) === Number(ordenId),
   );
+
 export function validarRecepcion(d) {
   const e = {};
   referencia(e, d, 'orden_id', 'ordenes', 'una orden');
@@ -11,10 +19,21 @@ export function validarRecepcion(d) {
   referencia(e, d, 'proveedor_id', 'proveedores', 'un proveedor');
   numero(e, d, 'cantidad_recibida', 'La cantidad recibida');
   fecha(e, d, 'fecha_recepcion', 'una fecha de recepción');
+
+  const orden = buscar('ordenes', d.orden_id);
+  if (orden && ['Finalizada', 'Cancelada'].includes(orden.estado)) {
+    e.orden_id = `No se pueden registrar recepciones en una orden ${orden.estado.toLowerCase()}.`;
+  }
   return e;
 }
-export const guardarRecepcion = (d, id) =>
-  guardarRegistro(
+
+export function guardarRecepcion(d, id) {
+  if (id != null) {
+    return fallo(
+      'Una recepción de materiales ya registrada no se puede editar; si hubo un error, elimínala y regístrala nuevamente.',
+    );
+  }
+  return guardarRegistro(
     'recepciones',
     {
       ...d,
@@ -24,6 +43,7 @@ export const guardarRecepcion = (d, id) =>
       cantidad_recibida: Number(d.cantidad_recibida),
     },
     validarRecepcion,
-    id,
   );
+}
+
 export const eliminarRecepcion = (id) => eliminarRegistro('recepciones', id);

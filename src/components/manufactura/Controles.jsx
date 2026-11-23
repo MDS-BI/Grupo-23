@@ -259,6 +259,7 @@ export function GestionRegistros({
   onVer,
   conRepuestos = false,
   textoEditar = 'Editar',
+  permitirEditar = true,
 }) {
   useManufactura();
   const [edicion, setEdicion] = useState(null);
@@ -338,15 +339,17 @@ export function GestionRegistros({
                         Ver detalle
                       </button>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEdicion(preparar(r));
-                        setMensaje('');
-                      }}
-                    >
-                      {textoEditar}
-                    </button>
+                    {permitirEditar && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEdicion(preparar(r));
+                          setMensaje('');
+                        }}
+                      >
+                        {textoEditar}
+                      </button>
+                    )}
                     {eliminar && (
                       <button
                         className="danger"

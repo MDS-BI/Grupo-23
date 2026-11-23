@@ -16,6 +16,9 @@ import {
 
 export function RecepcionesGestion({ ordenId }) {
   useManufactura();
+  const ordenesActivas = obtenerOrdenes().filter(
+    (o) => !['Finalizada', 'Cancelada'].includes(o.estado),
+  );
   const campos = [
     ...(!ordenId
       ? [
@@ -23,9 +26,9 @@ export function RecepcionesGestion({ ordenId }) {
             name: 'orden_id',
             label: 'Orden de producción',
             type: 'select',
-            options: obtenerOrdenes().map((o) => ({
+            options: ordenesActivas.map((o) => ({
               value: o.orden_id,
-              label: `Orden #${o.orden_id}`,
+              label: `Orden #${o.orden_id} (${o.estado})`,
             })),
           },
         ]
@@ -57,12 +60,10 @@ export function RecepcionesGestion({ ordenId }) {
       singular="Recepción"
       nuevoTexto="Registrar recepción"
       idCampo="recepcion_id"
+      permitirEditar={false}
       registros={obtenerRecepciones(ordenId)}
-      guardar={(d, id) =>
-        guardarRecepcion(
-          { ...d, ...(ordenId ? { orden_id: ordenId } : {}) },
-          id,
-        )
+      guardar={(d) =>
+        guardarRecepcion({ ...d, ...(ordenId ? { orden_id: ordenId } : {}) })
       }
       eliminar={eliminarRecepcion}
       campos={campos}
@@ -88,6 +89,7 @@ export function RecepcionesGestion({ ordenId }) {
     />
   );
 }
+
 export default function RecepcionesPage() {
   useManufactura();
   const [ordenId, setOrdenId] = useState('');
