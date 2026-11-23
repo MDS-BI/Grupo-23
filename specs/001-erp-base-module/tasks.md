@@ -459,3 +459,9 @@ El 2026-11-23 se integraron los commits `55ad22a` y `50395f7` de la rama
 existente `main`. Se resolvieron las coincidencias en controles, página de
 recepciones y repositorio de recepciones. La suite integrada pasó 44 pruebas
 en ocho archivos y la compilación de producción.
+
+La corrección posterior `ce54d39` impide asignaciones nuevas de máquinas
+fuera de servicio o en mantenimiento. Se conserva la posibilidad de finalizar
+una ejecución previa con su máquina original usando el identificador recibido
+por la API. Una prueba de regresión cubre ambas operaciones.
+La versión integrada final pasó 45 pruebas y la compilación de producción.

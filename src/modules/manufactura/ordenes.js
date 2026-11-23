@@ -127,6 +127,7 @@ export function validarEjecucion(d) {
 export function guardarEjecucion(d, id) {
   const datos = {
     ...d,
+    ejecucion_id: id,
     orden_id: Number(d.orden_id),
     etapa_id: Number(d.etapa_id),
     maquina_id: vacio(d.maquina_id) ? null : Number(d.maquina_id),

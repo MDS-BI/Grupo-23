@@ -281,6 +281,29 @@ describe('HU3 órdenes y ejecución real', () => {
       }).errores.etapa_id,
     ).toBeTruthy();
   });
+  it('rechaza asignaciones nuevas de máquinas detenidas y permite cerrar su ejecución histórica', () => {
+    const { o, e } = ordenConRuta();
+    const m = maquina();
+    const datos = {
+      orden_id: o.orden_id,
+      etapa_id: e.etapa_id,
+      maquina_id: m.maquina_id,
+      inicio_real: '2026-11-10T09:00',
+    };
+    const ejecucion = guardarEjecucion(datos).registro;
+    guardarMaquina({ ...m, estado: 'En mantenimiento' }, m.maquina_id);
+    expect(guardarEjecucion(datos).errores.maquina_id).toBeTruthy();
+    expect(guardarEjecucion({
+      ...datos, ejecucion_id: ejecucion.ejecucion_id,
+    }).errores.maquina_id).toBeTruthy();
+    expect(guardarEjecucion({
+      ...datos, fin_real: '2026-11-10T09:30',
+    }, ejecucion.ejecucion_id).errores).toBeNull();
+    guardarMaquina({ ...m, estado: 'Fuera de servicio' }, m.maquina_id);
+    expect(guardarEjecucion(datos).errores.maquina_id).toBeTruthy();
+    expect(obtenerEjecuciones(o.orden_id)).toHaveLength(1);
+  });
+
   it('conserva la orden y sus movimientos cuando ya tiene una recepción', () => {
     const { o, e } = ordenConRuta();
     guardarEjecucion({
