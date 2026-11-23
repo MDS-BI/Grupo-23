@@ -7,6 +7,7 @@ import {
 import { obtenerReferencias } from './referencias.js';
 import { estaciones, insumos, lotes, proveedores } from './peluches-ejemplo.js';
 
+export const FECHA_BASE_DEMO = '2026-11-16';
 export const demoPeluchesCargada = () => listar('demo_peluches').length > 0;
 export const hayRegistrosManufactura = () =>
   [...Object.keys(tablas), 'materiales_locales'].some((tabla) => listar(tabla).length > 0);
@@ -33,7 +34,10 @@ function horaLocal(fecha, minutos) {
   return `${fecha}T${hora}`;
 }
 
-export function cargarDemoPeluches({ reemplazar = false, hoy = new Date() } = {}) {
+export function cargarDemoPeluches({
+  reemplazar = false,
+  hoy = new Date(`${FECHA_BASE_DEMO}T12:00:00`),
+} = {}) {
   if (demoPeluchesCargada()) return { errores: null, cargada: false };
 
   const cambios = Object.fromEntries(

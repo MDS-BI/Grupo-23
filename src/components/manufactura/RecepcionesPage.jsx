@@ -4,9 +4,9 @@ import { obtenerOrdenes } from '../../modules/manufactura/ordenes.js';
 import {
   obtenerRecepciones,
   guardarRecepcion,
-  eliminarRecepcion,
 } from '../../modules/manufactura/recepciones.js';
-import { nombreReferencia } from '../../modules/manufactura/referencias.js';
+import { nombreReferencia, obtenerReferencias } from '../../modules/manufactura/referencias.js';
+import { buscar } from '../../modules/manufactura/almacenamiento.js';
 import {
   Campo,
   GestionRegistros,
@@ -28,7 +28,7 @@ export function RecepcionesGestion({ ordenId }) {
             type: 'select',
             options: ordenesActivas.map((o) => ({
               value: o.orden_id,
-              label: `Orden #${o.orden_id} (${o.estado})`,
+              label: `OP-${String(o.orden_id).padStart(4, '0')} · ${buscar('productos', o.producto_id)?.nombre || 'Producto'} (${o.estado})`,
             })),
           },
         ]
@@ -61,14 +61,21 @@ export function RecepcionesGestion({ ordenId }) {
       nuevoTexto="Registrar recepción"
       idCampo="recepcion_id"
       permitirEditar={false}
+      permitirCrear={!ordenId || ordenesActivas.some((o) => Number(o.orden_id) === Number(ordenId))}
       registros={obtenerRecepciones(ordenId)}
       guardar={(d) =>
         guardarRecepcion({ ...d, ...(ordenId ? { orden_id: ordenId } : {}) })
       }
-      eliminar={eliminarRecepcion}
       campos={campos}
       columnas={[
-        { key: 'orden_id', label: 'Orden', render: (r) => `#${r.orden_id}` },
+        {
+          key: 'orden_id',
+          label: 'Orden y producto',
+          render: (r) => {
+            const orden = buscar('ordenes', r.orden_id);
+            return `OP-${String(r.orden_id).padStart(4, '0')} · ${buscar('productos', orden?.producto_id)?.nombre || 'Producto'}`;
+          },
+        },
         {
           key: 'material_id',
           label: 'Material',
@@ -79,7 +86,11 @@ export function RecepcionesGestion({ ordenId }) {
           label: 'Proveedor',
           render: (r) => nombreReferencia('proveedores', r.proveedor_id),
         },
-        { key: 'cantidad_recibida', label: 'Cantidad' },
+        {
+          key: 'cantidad_recibida',
+          label: 'Cantidad',
+          render: (r) => `${r.cantidad_recibida} ${obtenerReferencias('materiales').find((m) => Number(m.material_id) === Number(r.material_id))?.unidad || ''}`,
+        },
         {
           key: 'fecha_recepcion',
           label: 'Fecha',
@@ -105,6 +116,10 @@ export default function RecepcionesPage() {
           </p>
         </div>
       </header>
+      <p className="notice">
+        Cada recepción se registra una vez. Su orden, material, proveedor,
+        cantidad y fecha quedan conservados en el historial.
+      </p>
       <div className="filter-bar">
         <Campo
           campo={{
@@ -115,7 +130,7 @@ export default function RecepcionesPage() {
             opcional: true,
             options: obtenerOrdenes().map((o) => ({
               value: o.orden_id,
-              label: `Orden #${o.orden_id}`,
+              label: `OP-${String(o.orden_id).padStart(4, '0')} · ${buscar('productos', o.producto_id)?.nombre || 'Producto'}`,
             })),
           }}
           value={ordenId}

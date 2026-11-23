@@ -281,7 +281,7 @@ describe('HU3 órdenes y ejecución real', () => {
       }).errores.etapa_id,
     ).toBeTruthy();
   });
-  it('impide cambiar el producto de una orden con movimientos y elimina sus dependientes al borrar la orden', () => {
+  it('conserva la orden y sus movimientos cuando ya tiene una recepción', () => {
     const { o, e } = ordenConRuta();
     guardarEjecucion({
       orden_id: o.orden_id,
@@ -300,14 +300,14 @@ describe('HU3 órdenes y ejecución real', () => {
       guardarOrden({ ...o, producto_id: otro.producto_id }, o.orden_id).errores
         .producto_id,
     ).toBeTruthy();
-    eliminarOrden(o.orden_id);
-    expect(obtenerEjecuciones(o.orden_id)).toEqual([]);
-    expect(obtenerRecepciones(o.orden_id)).toEqual([]);
+    expect(eliminarOrden(o.orden_id).errores.general).toContain('recepciones');
+    expect(obtenerEjecuciones(o.orden_id)).toHaveLength(1);
+    expect(obtenerRecepciones(o.orden_id)).toHaveLength(1);
   });
 });
 
 describe('HU4 recepciones', () => {
-  it('registra varias fechas y proveedores, filtra por orden y edita una recepción', () => {
+  it('registra varias fechas y proveedores y rechaza la edición de una recepción', () => {
     const { o } = ordenConRuta();
     const r = guardarRecepcion({
       orden_id: o.orden_id,
@@ -323,12 +323,13 @@ describe('HU4 recepciones', () => {
       cantidad_recibida: 15,
       fecha_recepcion: '2026-11-11',
     });
-    guardarRecepcion(
+    const edicion = guardarRecepcion(
       { ...r.registro, cantidad_recibida: 12 },
       r.registro.recepcion_id,
     );
+    expect(edicion.errores.general).toContain('no se puede editar');
     expect(obtenerRecepciones(o.orden_id)).toHaveLength(2);
-    expect(obtenerRecepciones(o.orden_id)[0].cantidad_recibida).toBe(12);
+    expect(obtenerRecepciones(o.orden_id)[0].cantidad_recibida).toBe(10);
     expect(obtenerRecepciones(999)).toEqual([]);
   });
   it('rechaza campos vacíos y referencias inexistentes sin persistir', () => {

@@ -2,20 +2,81 @@
 
 La aplicación actual utiliza React y Vite e implementa las cinco historias de `Historias_de_Usuario_Modulo_Manufactura_FINAL.pdf`: productos y materiales; etapas y rutas; órdenes y ejecución real; recepción de materiales; máquinas, mantenimiento y equipamiento.
 
+## Ejecución reproducible
+
+Use Node.js 24.19.0 y npm 11.17.0. La versión de Node está en `.nvmrc` y las
+dependencias exactas en `package-lock.json`. Desde la carpeta del repositorio
+ejecute lo siguiente.
+
 ```bash
-npm install
+npm ci
 npm run dev
-npm run test:manufactura
+```
+
+Abra la dirección que muestre Vite, normalmente `http://localhost:5173/`.
+Con la misma revisión del repositorio y un perfil nuevo de navegador, se cargan
+los mismos cinco peluches, seis etapas, cinco rutas, cinco órdenes, 28 recepciones
+y cinco máquinas. El dataset usa como fecha base el 16 de noviembre de 2026.
+Las alertas de vencimiento usan la fecha actual del navegador.
+
+Los datos existentes se conservan en las claves `manufactura:` del navegador.
+Cada navegador tiene su propia copia. Para comparar el estado inicial use un
+perfil nuevo. La imagen y la fuente están incluidas en `src/assets/manufactura/`.
+Los catálogos externos se representan con muestras y un adaptador sustituible.
+
+## Vistas por rol
+
+El selector **Rol de demostración** permite probar los perfiles del MVP local.
+El primer arranque usa Supervisor y el perfil elegido se conserva al recargar.
+
+| Rol | Funciones |
+|---|---|
+| Supervisor | Supervisa todas las áreas y prepara los datos de ejemplo |
+| Planificación | Gestiona productos, materiales, rutas y órdenes; consulta ejecuciones |
+| Ensamble | Consulta órdenes abiertas y registra sus etapas de ensamblaje |
+| Bodega | Registra recepciones y consulta el historial de entregas |
+| Mantenimiento | Gestiona máquinas, mantenimientos, repuestos y equipamiento |
+
+Las operaciones de persistencia también comprueban el perfil. Ensamble ve sus
+etapas y Bodega ve las entregas. Los perfiles son una simulación de interfaz en
+el navegador. Un despliegue multiusuario requiere cuentas y autorización en un
+servidor, dentro de una ampliación del alcance.
+
+Las recepciones son registros históricos de alta y consulta. Después de guardar,
+la edición y la eliminación se rechazan, incluso al borrar la orden asociada.
+Una entrega posterior se registra como otra recepción.
+
+Las entregas nuevas requieren una orden abierta. Para finalizar una orden,
+su producto debe tener una ruta completa y todas las ejecuciones deben estar
+cerradas. Las recepciones anteriores se conservan después del cierre.
+
+## Comprobación y trazabilidad
+
+```bash
+npm test -- --run
 npm run build
 ```
 
-Los datos existentes se conservan en las claves `manufactura:` del navegador. No se sincronizan entre computadores. Los catálogos externos son muestras de solo lectura, con un adaptador sustituible por las integraciones reales. En el primer arranque sin registros se carga automáticamente el dataset de peluches para dejar operativas las HU1-HU5; también puede cargarse o reemplazarse desde Productos. Consulta el alcance, las reglas y la cobertura en [implementacion-historias.md](specs/001-erp-base-module/implementacion-historias.md).
+`npm run test:manufactura` ejecuta las pruebas del módulo. Se cubren los flujos
+de HU1-HU5, las diferencias entre perfiles, las operaciones rechazadas, la
+conservación de recepciones y el dataset independiente del reloj.
 
-El panel de producción muestra alertas de órdenes atrasadas, máquinas fuera de servicio, tiempos excedidos y stock crítico. La navegación y las tarjetas usan transiciones suaves y estados activos visibles; los formularios y listados comparten la barra de filtros y utilidades de estilo tipo Tailwind definidas en `src/styles.css`.
+La guía de evaluación está en [quickstart.md](specs/001-erp-base-module/quickstart.md).
+Las reglas están en [spec.md](specs/001-erp-base-module/spec.md), las decisiones
+técnicas en [plan.md](specs/001-erp-base-module/plan.md) y su trazabilidad en
+[tasks.md](specs/001-erp-base-module/tasks.md).
 
-`npm test -- --run` ejecuta toda la suite activa. Se retiraron las pruebas heredadas de Entidades/Documentos que importaban la base antigua eliminada (`src/storage.js`, `src/module-config.js`, `src/app.js`). El comando `test:manufactura` permite ejecutar las pruebas del módulo actual por separado.
+El desarrollo utiliza apoyo de OpenCode y Codex para redactar especificaciones,
+implementar las historias y proponer correcciones. Las decisiones de la revisión
+del 23 de noviembre de 2026 se registran en spec, plan y tasks. Las pruebas
+automatizadas validan los perfiles y las reglas. La revisión de escritorio y
+móvil se documenta según lo efectivamente comprobado.
 
-La documentación original de la plantilla se conserva a continuación como referencia histórica.
+<details>
+<summary>Documentación histórica de la plantilla original</summary>
+
+Esta sección describe el ERP base anterior. Las instrucciones vigentes para
+Manufactura están arriba y en la guía de evaluación.
 
 ---
 
@@ -85,3 +146,5 @@ If the configuration is invalid (unknown types, bad keys, transitions referencin
 - Data is persisted to `localStorage` under the keys `erp_base_module:entities` and `erp_base_module:documents`.
 - Deleting an entity also deletes its documents (cascade).
 - This project intentionally uses vanilla HTML, CSS, and JavaScript for simplicity.
+
+</details>

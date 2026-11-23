@@ -136,7 +136,7 @@ Cada repositorio expone, como mínimo:
 Operaciones de cascada:
 
 - `eliminarProducto(producto_id)`: elimina el PRODUCTO, sus PRODUCTO_MATERIAL y sus RUTA_PRODUCTO.
-- `eliminarOrden(orden_id)`: elimina la ORDEN_PRODUCCION, sus EJECUCION_ETAPA y sus RECEPCION_MATERIAL.
+- `eliminarOrden(orden_id)`: rechaza la operación si la orden tiene recepciones. Para una orden sin recepciones elimina la orden y sus ejecuciones.
 - `eliminarMaquina(maquina_id)`: elimina la MAQUINA y sus MANTENIMIENTO_MAQUINA, junto con los MANTENIMIENTO_REPUESTO de cada mantenimiento.
 - `eliminarMantenimiento(mantenimiento_id)`: elimina el mantenimiento y sus MANTENIMIENTO_REPUESTO.
 
@@ -150,6 +150,27 @@ Operaciones de cascada:
 - `costo_tecnico` no puede ser negativo.
 - Toda FK debe referenciar un registro existente; las referencias externas deben existir en su catálogo de solo lectura.
 - Las operaciones deben preservar el orden actual de las listas y devolver errores por campo cuando la validación falla.
+
+## Recepciones y perfiles
+
+`guardarRecepcion(datos)` crea una entrega. Si se pasa un identificador de
+edición, la operación se rechaza. `eliminarRecepcion` devuelve un error. La capa
+genérica también comprueba que cada recepción existente permanezca íntegra en
+cualquier escritura posterior.
+
+Las entregas nuevas requieren una orden abierta. Las recepciones previas de
+órdenes finalizadas o canceladas siguen siendo registros históricos válidos.
+Finalizar una orden requiere ruta completa y todas sus ejecuciones cerradas.
+
+`manufactura:rol` contiene el identificador del perfil seleccionado. Los
+perfiles válidos y sus tablas modificables están en `roles.js`. La capa de
+persistencia devuelve un error para tablas fuera de su alcance. Ensamble puede
+modificar ejecuciones de sus etapas en órdenes abiertas. El cargador de la demo
+puede inicializar un almacén vacío, y Supervisor puede cargar el ejemplo sobre
+datos previos mediante la opción explícita de Productos.
+
+El selector representa roles de demostración en el cliente. La protección
+multiusuario en servidor requiere una integración de autenticación posterior.
 
 ## Expectativas de extensibilidad
 

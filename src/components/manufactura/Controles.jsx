@@ -1,5 +1,7 @@
 import { useId, useState } from 'react';
 import useManufactura from '../../hooks/useManufactura.js';
+import { tablas } from '../../modules/manufactura/almacenamiento.js';
+import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
 import {
   obtenerReferencias,
   nombreReferencia,
@@ -260,8 +262,12 @@ export function GestionRegistros({
   conRepuestos = false,
   textoEditar = 'Editar',
   permitirEditar = true,
+  permitirCrear = true,
 }) {
   useManufactura();
+  const tabla = Object.keys(tablas).find((nombre) => tablas[nombre] === idCampo);
+  const puedeModificar = puedeModificarTabla(tabla);
+  const hayAcciones = onVer || (puedeModificar && (permitirEditar || eliminar));
   const [edicion, setEdicion] = useState(null);
   const [mensaje, setMensaje] = useState('');
   const guardarDatos = (datos) => {
@@ -286,23 +292,25 @@ export function GestionRegistros({
     <div className="management">
       <header className="section-heading">
         <h2>{titulo}</h2>
-        <button
-          className="primary"
-          type="button"
-          onClick={() => {
-            setEdicion({});
-            setMensaje('');
-          }}
-        >
-          {nuevoTexto || `Nuevo ${singular.toLowerCase()}`}
-        </button>
+        {puedeModificar && permitirCrear && (
+          <button
+            className="primary"
+            type="button"
+            onClick={() => {
+              setEdicion({});
+              setMensaje('');
+            }}
+          >
+            {nuevoTexto || `Nuevo ${singular.toLowerCase()}`}
+          </button>
+        )}
       </header>
       {mensaje && (
         <p role="status" className="notice">
           {mensaje}
         </p>
       )}
-      {edicion && (
+      {edicion && puedeModificar && permitirCrear && (
         <Formulario
           key={edicion[idCampo] || 'nuevo'}
           titulo={`${edicion[idCampo] ? 'Editar' : 'Registrar'} ${singular.toLowerCase()}`}
@@ -324,7 +332,7 @@ export function GestionRegistros({
                     {c.label}
                   </th>
                 ))}
-                <th scope="col">Acciones</th>
+                {hayAcciones && <th scope="col">Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -333,13 +341,14 @@ export function GestionRegistros({
                   {columnas.map((c) => (
                     <td key={c.key}>{c.render ? c.render(r) : r[c.key]}</td>
                   ))}
-                  <td className="row-actions">
+                  {hayAcciones && (
+                    <td className="row-actions">
                     {onVer && (
                       <button type="button" onClick={() => onVer(r)}>
                         Ver detalle
                       </button>
                     )}
-                    {permitirEditar && (
+                    {permitirEditar && puedeModificar && (
                       <button
                         type="button"
                         onClick={() => {
@@ -350,7 +359,7 @@ export function GestionRegistros({
                         {textoEditar}
                       </button>
                     )}
-                    {eliminar && (
+                    {eliminar && puedeModificar && (
                       <button
                         className="danger"
                         type="button"
@@ -359,7 +368,8 @@ export function GestionRegistros({
                         Eliminar
                       </button>
                     )}
-                  </td>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -369,7 +379,7 @@ export function GestionRegistros({
         <div className="empty">
           <span aria-hidden="true">◇</span>
           <p>{vacio || `No hay registros de ${titulo.toLowerCase()}.`}</p>
-          <small>Comienza con el botón de registro.</small>
+          {puedeModificar && permitirCrear && <small>Comienza con el botón de registro.</small>}
         </div>
       )}
     </div>

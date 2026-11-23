@@ -1,3 +1,5 @@
+import { esEtapaEnsamble, puedeModificarTabla, rolActual } from './roles.js';
+
 export const tablas = {
   productos: 'producto_id',
   producto_material: 'prod_mat_id',
@@ -34,6 +36,8 @@ export const fallo = (mensaje) => ({ errores: { general: mensaje } });
 
 // Guarda juntas las relaciones; si el navegador rechaza una escritura se recuperan los valores previos.
 export function guardarCambios(cambios) {
+  const cargaInicial = cambios.demo_peluches &&
+    !Object.keys(tablas).some((tabla) => listar(tabla).length > 0);
   const anteriores = new Map();
   try {
     for (const tabla of Object.keys(cambios)) {
@@ -54,6 +58,33 @@ export function guardarCambios(cambios) {
           );
       }
       anteriores.set(clave, anterior);
+      const registros = anterior === null ? [] : JSON.parse(anterior);
+      if (JSON.stringify(registros) === JSON.stringify(cambios[tabla])) continue;
+      if (!cargaInicial && !puedeModificarTabla(tabla)) {
+        return fallo('Tu rol no permite modificar estos registros.');
+      }
+      if (tabla === 'recepciones' && !cambios.demo_peluches) {
+        const nuevas = new Set(cambios[tabla].map((registro) => JSON.stringify(registro)));
+        const originalesConservados = registros.every((registro) =>
+          nuevas.has(JSON.stringify(registro)),
+        );
+        if (!originalesConservados) {
+          return fallo('Las recepciones registradas se conservan como historial y no se pueden editar ni eliminar.');
+        }
+      }
+      if (!cargaInicial && tabla === 'ejecuciones' && rolActual() === 'ensamble') {
+        const previos = new Set(registros.map((registro) => JSON.stringify(registro)));
+        const nuevos = new Set(cambios[tabla].map((registro) => JSON.stringify(registro)));
+        const modificados = [...registros, ...cambios[tabla]].filter((registro) =>
+          !previos.has(JSON.stringify(registro)) || !nuevos.has(JSON.stringify(registro)),
+        );
+        if (modificados.some((registro) =>
+          !esEtapaEnsamble(buscar('etapas', registro.etapa_id)) ||
+          !['Planificada', 'En producción'].includes(buscar('ordenes', registro.orden_id)?.estado),
+        )) {
+          return fallo('Ensamble solo puede registrar ejecuciones de sus etapas en órdenes abiertas.');
+        }
+      }
     }
     for (const [tabla, datos] of Object.entries(cambios))
       window.localStorage.setItem(

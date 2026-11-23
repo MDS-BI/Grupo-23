@@ -1,8 +1,8 @@
 # Especificación de la Funcionalidad: Módulo 7 - Manufactura y Operaciones
 
-**Rama de la funcionalidad**: 001-erp-base-module  
+**Rama de trabajo**: main; carpeta de especificación 001-erp-base-module
 **Creada**: 2026-07-08  
-**Estado**: Borrador  
+**Estado**: MVP en revisión; actualización de roles y reproducibilidad del 2026-11-23
 **Entrada**: Descripción del usuario: "Construir el módulo de Manufactura y Operaciones de un ERP: gestión de productos y sus materiales, definición de etapas y rutas de fabricación, creación y control de órdenes de producción con ejecución real de etapas, registro de recepción de materiales y gestión de máquinas, mantenimientos y equipamiento, con capacidades de crear/editar/eliminar/consultar."
 
 ## Propósito
@@ -119,6 +119,35 @@ Como encargado de producción, quiero supervisar alertas, filtrar registros, reg
 
 ---
 
+### Vistas por rol
+
+El MVP permite seleccionar Supervisor, Planificación, Ensamble, Bodega o
+Mantenimiento. Se trata de perfiles de demostración locales. La autenticación
+de cuentas y la autorización en servidor corresponden a una ampliación del alcance.
+
+| Rol | Perspectiva y acciones |
+|---|---|
+| Supervisor | Acceso a todas las áreas y gestión de la demo |
+| Planificación | Alta, edición y baja de productos, composición, etapas, rutas y órdenes; consulta de ejecuciones |
+| Ensamble | Órdenes abiertas, ruta de ensamblaje e inicio/finalización de sus ejecuciones |
+| Bodega | Alta y consulta de recepciones por orden |
+| Mantenimiento | Gestión de máquinas, mantenimiento, repuestos, equipamiento y asignaciones |
+
+Escenarios de aceptación adicionales.
+
+1. Al seleccionar Ensamble, solo se ofrece la navegación a órdenes. Sus detalles
+   muestran etapas de tipo Ensamble o Ensamblaje y permiten registrar sus
+   ejecuciones. Se omiten proveedores, recepciones y fechas de entrega.
+2. Al seleccionar Planificación se pueden gestionar órdenes y consultar su
+   ejecución. Al seleccionar Bodega se puede registrar una entrega y consultar
+   las anteriores.
+3. Una operación fuera del perfil se rechaza en la capa de persistencia. Cambiar
+   de perfil cierra el formulario anterior y carga una página permitida.
+4. Una recepción guardada conserva todos sus campos. Intentar editarla,
+   eliminarla o borrar su orden asociada produce un error y conserva el historial.
+5. Dos instalaciones de la misma revisión con el entorno documentado y
+   navegadores sin registros generan el mismo dataset inicial.
+
 ### Casos Límite
 
 - ¿Qué ocurre cuando un usuario intenta guardar un producto sin nombre o tipo?
@@ -168,7 +197,7 @@ Como encargado de producción, quiero supervisar alertas, filtrar registros, reg
 
 **Recepción de materiales (HU4)**
 
-- **FR-020**: El sistema DEBE permitir registrar y editar recepciones de material asociadas a una orden con material, proveedor, cantidad recibida mayor que cero y fecha.
+- **FR-020**: El sistema DEBE permitir registrar recepciones de material asociadas a una orden con material, proveedor, cantidad recibida mayor que cero y fecha. Cada registro guardado DEBE conservarse como historial de solo consulta. Su edición y eliminación, incluida la eliminación por cascada desde la orden, DEBEN rechazarse.
 - **FR-021**: El sistema DEBE mostrar todas las recepciones de una orden con material, proveedor, cantidad y fecha.
 - **FR-022**: El sistema DEBE validar los campos obligatorios de una recepción y señalar el campo faltante.
 
@@ -200,6 +229,12 @@ Como encargado de producción, quiero supervisar alertas, filtrar registros, reg
 - **FR-040**: El sistema DEBE ofrecer una barra de filtros global reutilizable para filtrar registros por texto, estado, fecha o categoría y permitir limpiar los filtros activos.
 - **FR-041**: El sistema DEBE permitir el alta local de materiales desde el formulario de productos, persistirlos en `manufactura:materiales_locales` y reutilizarlos en composiciones y recepciones.
 - **FR-042**: El sistema DEBE cargar al iniciar, cuando no existan registros, un dataset de demostración que deje operativas las HU1 a HU5 y conservar la carga o el reemplazo manual.
+- **FR-043**: Al instalar la misma revisión con el entorno documentado y abrir un perfil de navegador sin registros, el sistema DEBE presentar los mismos productos, composiciones, rutas, órdenes, recepciones y recursos iniciales. Las fechas de esos registros DEBEN ser deterministas.
+- **FR-044**: El repositorio DEBE contener los pasos de instalación, versiones del entorno, dependencias resueltas, recursos visuales y trazabilidad entre especificación, plan, tareas y pruebas. La reproducción DEBE poder verificarse con una instalación limpia, la suite automatizada y la compilación.
+- **FR-045**: El sistema DEBE ofrecer los cinco perfiles de demostración de la matriz de roles, conservar el perfil válido al recargar y limitar la navegación y las operaciones a su función.
+- **FR-046**: Ensamble DEBE consultar órdenes abiertas y registrar ejecuciones de etapas de tipo Ensamble o Ensamblaje. Las recepciones, los proveedores y las fechas de entrega DEBEN omitirse de esa perspectiva.
+- **FR-047**: El sistema DEBE rechazar modificaciones fuera del perfil antes de escribir registros, y cerrar formularios previos al cambiar el perfil.
+- **FR-048**: El sistema DEBE impedir finalizar órdenes sin ruta, con etapas pendientes o con ejecuciones abiertas. Las órdenes finalizadas o canceladas DEBEN rechazar recepciones nuevas, conservando la consulta de entregas históricas.
 
 ### Requisitos de Extensibilidad *(obligaciones del módulo)*
 

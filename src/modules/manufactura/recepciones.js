@@ -2,7 +2,6 @@ import {
   listar,
   buscar,
   guardarRegistro,
-  eliminarRegistro,
   fallo,
 } from './almacenamiento.js';
 import { referencia, numero, fecha } from './validacion.js';
@@ -21,18 +20,14 @@ export function validarRecepcion(d) {
   fecha(e, d, 'fecha_recepcion', 'una fecha de recepción');
 
   const orden = buscar('ordenes', d.orden_id);
-  if (orden && ['Finalizada', 'Cancelada'].includes(orden.estado)) {
+  const existente = buscar('recepciones', d.recepcion_id);
+  if (!existente && orden && ['Finalizada', 'Cancelada'].includes(orden.estado)) {
     e.orden_id = `No se pueden registrar recepciones en una orden ${orden.estado.toLowerCase()}.`;
   }
   return e;
 }
-
 export function guardarRecepcion(d, id) {
-  if (id != null) {
-    return fallo(
-      'Una recepción de materiales ya registrada no se puede editar; si hubo un error, elimínala y regístrala nuevamente.',
-    );
-  }
+  if (id != null) return fallo('Una recepción registrada no se puede editar.');
   return guardarRegistro(
     'recepciones',
     {
@@ -45,5 +40,4 @@ export function guardarRecepcion(d, id) {
     validarRecepcion,
   );
 }
-
-export const eliminarRecepcion = (id) => eliminarRegistro('recepciones', id);
+export const eliminarRecepcion = () => fallo('Una recepción registrada no se puede eliminar.');

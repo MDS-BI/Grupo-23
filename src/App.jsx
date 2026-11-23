@@ -6,10 +6,16 @@ import RecepcionesPage from './components/manufactura/RecepcionesPage.jsx';
 import RecursosPage from './components/manufactura/RecursosPage.jsx';
 import ReferenciasPage from './components/manufactura/ReferenciasPage.jsx';
 import ResumenPage from './components/manufactura/ResumenPage.jsx';
+import useManufactura from './hooks/useManufactura.js';
+import { cambiarRol, puedeAcceder, ROLES, rolActual } from './modules/manufactura/roles.js';
 
 export default function App() {
+  useManufactura();
+  const rol = rolActual();
   const [pagina, setPagina] = useState('productos');
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [errorRol, setErrorRol] = useState('');
+  const paginaActual = puedeAcceder(pagina) ? pagina : ROLES[rol].inicio;
   const menu = [
     ['resumen', 'Panel de producción'],
     ['productos', 'Productos y materiales'],
@@ -58,14 +64,14 @@ export default function App() {
           aria-label="Navegación de Manufactura"
           data-abierto={menuAbierto}
         >
-          {menu.map(([id, label, icono]) => (
+          {menu.filter(([id]) => puedeAcceder(id)).map(([id, label, icono]) => (
             <button
               key={id}
               type="button"
               aria-label={label}
-              aria-current={pagina === id ? 'page' : undefined}
+              aria-current={paginaActual === id ? 'page' : undefined}
               className={`nav-item transition-all duration-200 ${
-                pagina === id ? 'nav-activo' : ''
+                paginaActual === id ? 'nav-activo' : ''
               }`}
               onClick={() => {
                 setPagina(id);
@@ -87,10 +93,31 @@ export default function App() {
           <span>
             ERP Base <span className="muted">/</span> <b>Manufactura</b>
           </span>
-          <span className="storage-chip">Guardado en este navegador</span>
+          <div className="rol-selector">
+            <label htmlFor="rol-manufactura">Rol de demostración</label>
+            <select
+              id="rol-manufactura"
+              value={rol}
+              onChange={(event) => {
+                const nuevoRol = event.target.value;
+                const resultado = cambiarRol(nuevoRol);
+                setErrorRol(resultado.errores?.general || '');
+                if (!resultado.errores) {
+                  setPagina(ROLES[nuevoRol].inicio);
+                  setMenuAbierto(false);
+                }
+              }}
+            >
+              {Object.entries(ROLES).map(([id, perfil]) => (
+                <option key={id} value={id}>{perfil.nombre}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        <main id="contenido" className="manufactura-app" key={pagina}>
-          {paginas[pagina]}
+        <main id="contenido" className="manufactura-app" key={`${rol}-${paginaActual}`}>
+          {errorRol && <p className="error" role="alert">{errorRol}</p>}
+          <p className="rol-perspectiva">{ROLES[rol].descripcion}</p>
+          {paginas[paginaActual]}
         </main>
         <footer className="workspace-footer">
           Grupo 23 · Modelación de Sistemas{' '}

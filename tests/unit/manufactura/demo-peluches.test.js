@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, expect, it } from 'vitest';
+import { beforeEach, expect, it, vi } from 'vitest';
 import { buscar, listar, tablas } from '../../../src/modules/manufactura/almacenamiento.js';
 import { cargarDemoPeluches, demoPeluchesCargada } from '../../../src/modules/manufactura/demo-peluches.js';
 import { validarEtapa } from '../../../src/modules/manufactura/etapas.js';
@@ -13,6 +13,27 @@ import { obtenerRuta } from '../../../src/modules/manufactura/rutas.js';
 const hoy = new Date(2026, 10, 16, 12);
 
 beforeEach(() => localStorage.clear());
+
+it('genera el mismo estado inicial con independencia del reloj del computador', () => {
+  vi.useFakeTimers();
+  try {
+    vi.setSystemTime(new Date('2026-11-23T12:00:00'));
+    cargarDemoPeluches();
+    const primero = Object.fromEntries(
+      Object.keys(tablas).map((tabla) => [tabla, listar(tabla)]),
+    );
+    localStorage.clear();
+    vi.setSystemTime(new Date('2027-03-15T12:00:00'));
+    cargarDemoPeluches();
+    const segundo = Object.fromEntries(
+      Object.keys(tablas).map((tabla) => [tabla, listar(tabla)]),
+    );
+    expect(segundo).toEqual(primero);
+    expect(segundo.ordenes[0].fecha_inicio).toBe('2026-11-04');
+  } finally {
+    vi.useRealTimers();
+  }
+});
 
 it('conecta cinco productos con lotes, rutas, insumos, proveedores y recursos', () => {
   expect(cargarDemoPeluches({ hoy })).toEqual({ errores: null, cargada: true });

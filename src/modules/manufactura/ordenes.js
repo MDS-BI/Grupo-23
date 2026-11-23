@@ -148,6 +148,9 @@ export function avanceOrden(orden) {
 
 export function eliminarOrden(id) {
   if (!buscar('ordenes', id)) return fallo('La orden ya no existe.');
+  if (listar('recepciones').some((r) => Number(r.orden_id) === Number(id))) {
+    return fallo('La orden tiene recepciones registradas. Conserva su historial y cambia su estado si corresponde.');
+  }
   return guardarCambios({
     ordenes: listar('ordenes').filter((o) => Number(o.orden_id) !== Number(id)),
     ejecuciones: listar('ejecuciones').filter(

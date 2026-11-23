@@ -344,7 +344,7 @@ Con varios desarrolladores:
 | FR-017 | Calcular tiempo de uso desde inicio/fin reales | T053, T056, T058 |
 | FR-018 | Consultar etapas ejecutadas y avance de la orden | T059, T062 |
 | FR-019 | Validar obligatorios y fechas de ejecución | T050, T053, T058 |
-| FR-020 | Registrar/editar recepciones con material, proveedor, cantidad y fecha | T072, T074, T075, T077 |
+| FR-020 | Registrar y conservar recepciones con material, proveedor, cantidad y fecha | T072, T074, T075, T077, T131 |
 | FR-021 | Consultar recepciones de una orden | T076, T078 |
 | FR-022 | Validar recepción y señalar campo faltante | T070, T072, T075, T079 |
 | FR-023 | Crear/editar/eliminar máquinas con capacidad > 0 | T090, T093, T098, T101, T105 |
@@ -415,3 +415,47 @@ Se conserva íntegro el plan anterior. La implementación actual y las decisione
 - [x] Añadir pruebas unitarias y de interfaz conectadas para las cinco historias; retirar las pruebas heredadas incompatibles de la plantilla antigua.
 - [x] Formalizar en la Fase 8 el panel de alertas, la barra de filtros, el alta local de materiales y el dataset de demostración.
 - [ ] Sustituir las referencias de muestra por las integraciones reales cuando los módulos externos estén disponibles.
+
+## Fase 9: Roles, reproducción y conservación del historial
+
+Revisión solicitada el 2026-11-23 a partir del feedback docente y del documento
+de consulta sobre Spec Kit. Los criterios de referencia son FR-020 y FR-043 a
+FR-047. Esta fase amplía el MVP sobre la rama existente.
+
+- [x] T128 Hacer deterministas las fechas del dataset en `demo-peluches.js` y
+  comprobar la igualdad del estado inicial con relojes diferentes, según FR-043.
+- [x] T129 Documentar Node y npm, mantener el lockfile y alinear `plan.md` y
+  `quickstart.md` con los puntos de entrada React y las rutas reales, según FR-044.
+- [x] T130 Implementar el selector y la matriz de cinco perfiles en `roles.js`
+  y `App.jsx`, con perspectivas y operaciones en la interfaz, según FR-045/FR-046.
+- [x] T131 Proteger recepciones contra edición, eliminación y cascadas desde
+  órdenes; actualizar el contrato y los escenarios de HU4, según FR-020.
+- [x] T132 Verificar permisos antes de persistir y desmontar formularios al
+  cambiar de perfil; probar acciones permitidas y rechazadas, según FR-047.
+- [x] T133 Comprobar una instalación limpia con `npm ci`, ejecutar toda la suite
+  y compilar la copia sin usar dependencias del directorio de desarrollo, según FR-044.
+- [x] T134 Revisar las perspectivas de roles en el navegador y registrar el
+  resultado y los límites de la revisión, según FR-045/FR-046.
+
+Las integraciones externas y la autenticación multiusuario quedan como
+ampliaciones explícitas. Los objetivos de rendimiento con 500 registros y
+las métricas de usabilidad requieren su propia evaluación.
+
+Verificación del 2026-11-23. La copia de trabajo y una copia nueva instalada
+con `npm ci` pasaron 43 pruebas en ocho archivos y la compilación de producción.
+Se revisaron las cinco perspectivas en el navegador, el detalle de Ensamble,
+la consulta histórica de Bodega y el regreso a Supervisor.
+
+La auditoría de la instalación limpia informó cinco avisos de dependencias
+(dos moderados y tres altos) en Vite, Vitest y dependencias indirectas.
+La actualización de dependencias queda pendiente de la decisión del equipo.
+
+## Integración con las correcciones del equipo
+
+- [x] T135 Integrar las validaciones de cierre de órdenes y de recepción en
+  órdenes abiertas, conservando los perfiles y el historial, según FR-048.
+
+El 2026-11-23 se integraron los commits `55ad22a` y `50395f7` de la rama
+existente `main`. Se resolvieron las coincidencias en controles, página de
+recepciones y repositorio de recepciones. La suite integrada pasó 44 pruebas
+en ocho archivos y la compilación de producción.

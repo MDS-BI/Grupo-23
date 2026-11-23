@@ -27,6 +27,7 @@ import {
   formatoFecha,
 } from './Controles.jsx';
 import { RecepcionesGestion } from './RecepcionesPage.jsx';
+import { esEtapaEnsamble, puedeAcceder, rolActual } from '../../modules/manufactura/roles.js';
 
 export function Progreso({ orden }) {
   const a = avanceOrden(orden);
@@ -48,7 +49,10 @@ function OrdenDetalle({ ordenId, cerrar }) {
   useManufactura();
   const orden = buscar('ordenes', ordenId);
   if (!orden) return null;
-  const ruta = obtenerRuta(orden.producto_id);
+  const ensamble = rolActual() === 'ensamble';
+  const ruta = obtenerRuta(orden.producto_id).filter(
+    (paso) => !ensamble || esEtapaEnsamble(buscar('etapas', paso.etapa_id)),
+  );
   const avance = avanceOrden(orden);
   const campos = [
     {
@@ -105,12 +109,12 @@ function OrdenDetalle({ ordenId, cerrar }) {
           <dt>Estado</dt>
           <dd>{orden.estado}</dd>
         </div>
-        <div>
+        {!ensamble && <div>
           <dt>Periodo</dt>
           <dd>
             {formatoFecha(orden.fecha_inicio)} — {formatoFecha(orden.fecha_fin)}
           </dd>
-        </div>
+        </div>}
         <div>
           <dt>Tiempo real acumulado</dt>
           <dd>{avance.minutos} min</dd>
@@ -153,7 +157,9 @@ function OrdenDetalle({ ordenId, cerrar }) {
         nuevoTexto="Registrar ejecución"
         textoEditar="Finalizar / editar"
         idCampo="ejecucion_id"
-        registros={obtenerEjecuciones(ordenId)}
+        registros={obtenerEjecuciones(ordenId).filter(
+          (ejecucion) => !ensamble || esEtapaEnsamble(buscar('etapas', ejecucion.etapa_id)),
+        )}
         campos={campos}
         guardar={(d, id) => guardarEjecucion({ ...d, orden_id: ordenId }, id)}
         eliminar={(id) => eliminarRegistro('ejecuciones', id)}
@@ -192,7 +198,7 @@ function OrdenDetalle({ ordenId, cerrar }) {
           },
         ]}
       />
-      <RecepcionesGestion ordenId={ordenId} />
+      {puedeAcceder('recepciones') && <RecepcionesGestion ordenId={ordenId} />}
     </article>
   );
 }
@@ -202,7 +208,10 @@ export default function OrdenesPage() {
   const [detalle, setDetalle] = useState(null);
 
   const productos = obtenerProductos();
-  const ordenes = obtenerOrdenes();
+  const ensamble = rolActual() === 'ensamble';
+  const ordenes = obtenerOrdenes().filter(
+    (orden) => !ensamble || ['Planificada', 'En producción'].includes(orden.estado),
+  );
 
   const {
     filtros,
@@ -224,9 +233,9 @@ export default function OrdenesPage() {
         <div>
           <span className="eyebrow">Planificación y ejecución</span>
           <h1>Órdenes de producción</h1>
-          <p>
-            Planifica la fabricación y registra el avance real de cada etapa.
-          </p>
+          <p>{ensamble
+            ? 'Consulta las órdenes abiertas y registra tus etapas de ensamblaje.'
+            : 'Planifica la fabricación y registra el avance real de cada etapa.'}</p>
         </div>
       </header>
       {!productos.length && (
@@ -294,11 +303,11 @@ export default function OrdenesPage() {
             label: 'Estado',
             render: (r) => <span className="badge">{r.estado}</span>,
           },
-          {
+          ...(!ensamble ? [{
             key: 'fecha_fin',
             label: 'Término',
             render: (r) => formatoFecha(r.fecha_fin),
-          },
+          }] : []),
           {
             key: 'avance',
             label: 'Avance',

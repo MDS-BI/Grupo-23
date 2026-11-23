@@ -6,6 +6,7 @@ import ProductoList from './ProductoList.jsx';
 import ProductoForm from './ProductoForm.jsx';
 import ProductoDetalle from './ProductoDetalle.jsx';
 import portadaPeluches from '../../assets/manufactura/peluches-portada.jpg';
+import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
 import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js';
 import {
   cargarDemoPeluches,
@@ -112,7 +113,7 @@ export default function ProductosPage() {
         </div>
       </header>
 
-      {!demoPeluchesCargada() && !mostrarFormulario && (
+      {puedeModificarTabla('demo_peluches') && !demoPeluchesCargada() && !mostrarFormulario && (
         <article className="card catalogo-demo">
           <h2>Fábrica de peluches de ejemplo</h2>
           <p className="muted">
