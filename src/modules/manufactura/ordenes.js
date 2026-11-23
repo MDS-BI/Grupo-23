@@ -14,15 +14,19 @@ import {
   vacio,
 } from './validacion.js';
 import { obtenerRuta } from './rutas.js';
+
 export const ESTADOS_ORDEN = [
   'Planificada',
   'En producción',
   'Finalizada',
   'Cancelada',
 ];
+
 export const obtenerOrdenes = () => listar('ordenes');
+
 export const obtenerEjecuciones = (id) =>
   listar('ejecuciones').filter((r) => Number(r.orden_id) === Number(id));
+
 export function validarOrden(d) {
   const e = {};
   referencia(e, d, 'producto_id', 'productos', 'un producto');
@@ -31,6 +35,7 @@ export function validarOrden(d) {
   fecha(e, d, 'fecha_inicio', 'una fecha de inicio');
   fecha(e, d, 'fecha_fin', 'una fecha de término');
   rango(e, d, 'fecha_inicio', 'fecha_fin');
+
   const anterior = buscar('ordenes', d.orden_id);
   if (
     anterior &&
@@ -39,11 +44,36 @@ export function validarOrden(d) {
       listar('recepciones').some(
         (r) => Number(r.orden_id) === Number(d.orden_id),
       ))
-  )
+  ) {
     e.producto_id =
       'No se puede cambiar el producto de una orden con movimientos registrados.';
+  }
+
+  if (!e.producto_id && !e.estado && d.estado === 'Finalizada') {
+    const ruta = obtenerRuta(d.producto_id);
+    const ejecuciones = anterior ? obtenerEjecuciones(d.orden_id) : [];
+    const hayEnCurso = ejecuciones.some((ej) => !ej.fin_real);
+    const terminadas = new Set(
+      ejecuciones.filter((ej) => ej.fin_real).map((ej) => Number(ej.etapa_id)),
+    );
+    const faltantes = ruta.filter(
+      (r) => !terminadas.has(Number(r.etapa_id)),
+    ).length;
+
+    if (!ruta.length) {
+      e.estado =
+        'No se puede finalizar una orden cuyo producto no tiene ruta de fabricación.';
+    } else if (hayEnCurso) {
+      e.estado =
+        'No se puede finalizar la orden mientras tenga ejecuciones en curso sin fecha de término.';
+    } else if (faltantes > 0) {
+      e.estado = `No se puede finalizar la orden: faltan ${faltantes} de ${ruta.length} etapas por completar.`;
+    }
+  }
+
   return e;
 }
+
 export const guardarOrden = (d, id) =>
   guardarRegistro(
     'ordenes',
@@ -55,6 +85,7 @@ export const guardarOrden = (d, id) =>
     validarOrden,
     id,
   );
+
 export function validarEjecucion(d) {
   const e = {};
   referencia(e, d, 'orden_id', 'ordenes', 'una orden');
@@ -75,6 +106,7 @@ export function validarEjecucion(d) {
       'La etapa debe formar parte de la ruta del producto de esta orden.';
   return e;
 }
+
 export function guardarEjecucion(d, id) {
   const datos = {
     ...d,
@@ -93,6 +125,7 @@ export function guardarEjecucion(d, id) {
     : null;
   return guardarRegistro('ejecuciones', datos, validarEjecucion, id);
 }
+
 export function avanceOrden(orden) {
   const ruta = obtenerRuta(orden.producto_id);
   const ejecuciones = obtenerEjecuciones(orden.orden_id);
@@ -112,6 +145,7 @@ export function avanceOrden(orden) {
     ),
   };
 }
+
 export function eliminarOrden(id) {
   if (!buscar('ordenes', id)) return fallo('La orden ya no existe.');
   return guardarCambios({
