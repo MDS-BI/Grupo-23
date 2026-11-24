@@ -7,9 +7,12 @@ import {
 } from './modules/manufactura/demo-peluches.js';
 import './styles.css';
 import { inicializarPedidosDemo } from './modules/manufactura/pedidos-locales.js';
+import { agregarEjemploOsoCascabel } from './modules/manufactura/oso-cascabel.js';
+import { puedeModificarTabla } from './modules/manufactura/roles.js';
 
 if (!hayRegistrosManufactura()) cargarDemoPeluches();
 inicializarPedidosDemo();
+if (puedeModificarTabla('demo_peluches')) agregarEjemploOsoCascabel();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

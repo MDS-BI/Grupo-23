@@ -9,11 +9,11 @@ export default function ReferenciasPage() {
     <section>
       <header className="page-heading">
         <div>
-          <span className="eyebrow">Integración entre módulos</span>
+          <span className="eyebrow">Insumos y recursos textiles</span>
           <h1>Catálogos de referencia</h1>
           <p>
-            Consulta los materiales de fabricación y las referencias de los
-            otros módulos.
+            Consulta las telas, rellenos, accesorios, repuestos textiles,
+            personal y proveedores de la fábrica de peluches.
           </p>
         </div>
       </header>

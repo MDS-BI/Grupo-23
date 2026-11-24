@@ -15,7 +15,7 @@ npm run dev
 
 Abra la dirección que muestre Vite, normalmente `http://localhost:5173/`.
 Con la misma revisión del repositorio y un perfil nuevo de navegador, se cargan
-los mismos cinco peluches, seis etapas, cinco rutas, cinco órdenes, 28 recepciones
+los mismos seis peluches, ocho etapas, seis rutas, seis órdenes, 37 recepciones
 y cinco máquinas. El dataset usa como fecha base el 16 de noviembre de 2026.
 Las alertas de vencimiento usan la fecha actual del navegador.
 
@@ -23,6 +23,24 @@ Los datos existentes se conservan en las claves `manufactura:` del navegador.
 Cada navegador tiene su propia copia. Para comparar el estado inicial use un
 perfil nuevo. La imagen y la fuente están incluidas en `src/assets/manufactura/`.
 Los catálogos externos se representan con muestras y un adaptador sustituible.
+
+La fábrica de ejemplo muestra 14 materiales textiles, 5 repuestos de sus
+máquinas, 6 trabajadores y 5 proveedores. Los catálogos y los selectores usan
+las mismas referencias. Los respaldos de un almacén vacío también son textiles;
+cuando se carga la fábrica solo se conservan respaldos que tengan relaciones
+previas. Esta selección no modifica productos, mantenimientos ni recepciones.
+
+El **Oso Bruno con cascabel de 30 cm** es un sexto modelo independiente del
+oso original. Cada unidad lleva nueve insumos, incluidos un cascabel y un
+bolsillo textil protector. Su ruta tiene ocho etapas, con montaje del cascabel
+y prueba de sonido. Su orden de 64 unidades está en producción, con cuatro
+etapas terminadas, nueve recepciones completas y cinco pedidos de locales
+asignados (16, 12, 10, 14 y 12 unidades).
+
+La ampliación se añade una sola vez al abrir con Supervisor. Conserva los
+cinco modelos y todos los movimientos anteriores. Si todavía falta, el botón
+**Agregar ejemplo de oso con cascabel** en Productos permite incorporarla.
+No requiere sustituir registros ni restablecer el navegador.
 
 ## Vistas por rol
 
@@ -32,12 +50,12 @@ El primer arranque usa Supervisor y el perfil elegido se conserva al recargar.
 | Rol | Funciones |
 |---|---|
 | Supervisor | Supervisa todas las áreas y prepara los datos de ejemplo |
-| Planificación | Gestiona productos, materiales, rutas y órdenes; consulta ejecuciones |
-| Ensamble | Consulta órdenes abiertas y registra sus etapas de ensamblaje |
+| Planificador de producción | Gestiona productos, materiales, rutas y órdenes; consulta ejecuciones |
+| Operario de producción | Consulta órdenes abiertas y registra sus etapas de ensamblaje |
 | Bodega | Registra recepciones y consulta el historial de entregas |
 | Mantenimiento | Gestiona máquinas, mantenimientos, repuestos y equipamiento |
 
-Las operaciones de persistencia también comprueban el perfil. Ensamble ve sus
+Las operaciones de persistencia también comprueban el perfil. El operario de producción ve sus
 etapas y Bodega ve las entregas. Los perfiles son una simulación de interfaz en
 el navegador. Un despliegue multiusuario requiere cuentas y autorización en un
 servidor, dentro de una ampliación del alcance.
@@ -50,24 +68,55 @@ Las entregas nuevas requieren una orden abierta. Para finalizar una orden,
 su producto debe tener una ruta completa y todas las ejecuciones deben estar
 cerradas. Las recepciones anteriores se conservan después del cierre.
 
+## Métricas del panel de producción
+
+En el perfil **Supervisor**, el **Panel de producción** incluye un filtro por
+peluche y cuatro métricas: unidades planificadas, unidades de órdenes
+finalizadas, cumplimiento del volumen y horas registradas en ejecuciones
+terminadas. Los gráficos comparan estados de órdenes, volumen por peluche y
+tiempos promedio por etapa frente al estándar. Se actualizan al guardar o
+deshacer; no requieren servicios ni dependencias adicionales.
+
+El volumen y los tiempos excluyen órdenes canceladas. El gráfico de estados sí
+las incluye. El cierre de una orden aporta su cantidad planificada a las
+unidades finalizadas; terminar varias etapas no suma peluches adicionales.
+Las alertas de planta y los indicadores generales conservan su alcance global.
+
 ## Deshacer y planificar pedidos
 
 **Deshacer cambios** restaura el borrador de un formulario o ruta.
-**Deshacer** revierte el último cambio guardado de la pestaña. Permite recuperar
-eliminaciones válidas junto con sus relaciones, hasta veinte operaciones en
-orden. Está disponible en la barra global y en las acciones de los registros
-afectados. Respeta los perfiles y detecta modificaciones de otras pestañas.
+Cada apartado muestra una lista de los últimos veinte cambios del navegador,
+con su propio **Deshacer** o **Rehacer**. Puede revertir un cambio anterior sin
+perder los posteriores que sean independientes. Guardar otro cambio conserva
+las opciones de rehacer. Las eliminaciones recuperan también sus relaciones.
+La barra global y las acciones de los registros conservan el acceso al último
+cambio. Los encabezados de
+los listados no duplican ese botón. Respeta los perfiles y detecta modificaciones de otras pestañas.
+El historial se conserva al recargar o reabrir la página; ya no depende solo
+de la sesión. Si el cambio no está disponible, el botón indica el motivo.
 Las recepciones confirmadas conservan su historial.
+Si existen ediciones posteriores del mismo campo o dependencias, la lista
+explica qué debe deshacer primero para conservar la coherencia de los datos.
 
-Al pulsar **Eliminar**, confirme dentro de la página. Tras confirmar,
-**Deshacer eliminación** aparece en el aviso y en una fila marcada **Eliminado**
-en la tabla. Esa fila permite recuperar el registro aunque salga y vuelva al
-apartado, mientras la eliminación siga siendo el último cambio deshacible.
+Al pulsar **Eliminar**, la página comprueba sus vínculos. Si está protegido,
+muestra el motivo, las rutas u órdenes que lo utilizan y cómo proceder, sin
+ofrecer una confirmación que no pueda realizarse. Esos registros permanecen
+visibles. Cuando la eliminación está permitida, confirme dentro de la página:
+el registro sale de la tabla y **Deshacer eliminación** queda en la lista de
+cambios, también al salir y volver al apartado. Los productos usan la misma
+confirmación que los demás listados, sin ventanas de confirmación del navegador.
+Las ejecuciones de órdenes finalizadas requieren reabrir la orden antes de
+eliminarlas para no contradecir su estado y avance.
+
+En **Equipamiento y asignaciones**, la confirmación muestra los trabajadores
+afectados. Al confirmar se eliminan juntos el equipamiento y sus asignaciones;
+desaparecen de las tablas activas. Un aviso separado ofrece **Deshacer
+eliminación**, que recupera ambos con sus identificadores originales.
 
 En **Órdenes de producción**, pulse un modelo en **Pedidos por peluche**.
 El menú muestra el código de cada pedido, el código y nombre del local y su
 cantidad. La demo incluye cinco locales ficticios y cinco pedidos por modelo,
-que suman 64. Los perfiles de Supervisor y Planificación pueden registrar pedidos
+que suman 64. Los perfiles de Supervisor y Planificador de producción pueden registrar pedidos
 y abrir una orden con **Planificar estos pedidos**.
 
 Cada orden nueva requiere al menos 64 peluches enteros. Las órdenes históricas

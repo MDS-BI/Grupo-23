@@ -487,3 +487,127 @@ cantidades, y el salto con foco al formulario de una orden de 64.
 La revisión de eliminación añade confirmación dentro de la página y
 **Deshacer eliminación** tanto en el aviso como en la fila eliminada. Las
 pruebas cubren cancelación, recuperación al volver al apartado y etapas en uso.
+
+## Fase 11: Métricas y gráficos del panel de producción
+
+- [x] T142 Calcular volumen planificado/finalizado, cumplimiento y tiempos sin
+  duplicar unidades por etapa ni incluir órdenes canceladas (FR-054).
+- [x] T143 Añadir gráficos accesibles de estados, volumen por peluche y tiempos
+  por etapa, con filtro por producto y estados vacíos (FR-055).
+- [x] T144 Verificar cálculos, actualización al guardar/deshacer, permisos,
+  compilación y presentación adaptable en navegador.
+
+Validación del 2026-11-23: 63 pruebas en doce archivos y compilación de
+producción correctas. En navegador se verificaron el filtro por peluche,
+los gráficos sin errores de consola y la presentación en pantalla pequeña
+sin desbordamiento horizontal. No se modificaron los registros existentes.
+
+## Fase 12: Catálogos exclusivos de la fábrica de peluches
+
+- [x] T145 Sustituir respaldos de carpintería por insumos y repuestos textiles
+  y evitar mezclar respaldos sin uso con la fábrica de ejemplo (FR-056).
+- [x] T146 Adaptar las instrucciones de nuevos materiales a un ejemplo de
+  peluche con cascabel y conservar referencias ya relacionadas (FR-056).
+- [x] T147 Validar catálogos, selectores, historial y relaciones, ejecutar
+  las pruebas y compilar la versión final.
+
+Validación del 2026-11-23: 66 pruebas en trece archivos y compilación correctas.
+En navegador se comprobaron los doce materiales de la fábrica tanto en el
+catálogo como en el selector del producto, los cinco repuestos textiles y las
+instrucciones de un peluche con cascabel. No se borraron datos persistidos.
+
+## Fase 13: Oso con cascabel relacionado
+
+- [x] T148 Añadir una ampliación idempotente y transaccional del ejemplo,
+  con producto independiente, nueve materiales y ruta de ocho etapas (FR-057).
+- [x] T149 Asociar orden de 64 unidades, cuatro ejecuciones, nueve recepciones
+  y pedidos de cinco locales; reutilizar recursos de la fábrica (FR-057).
+- [x] T150 Incorporar el ejemplo al arranque de Supervisor y ofrecer su carga
+  en Productos, conservando datos y modificaciones anteriores (FR-057).
+- [x] T151 Verificar relaciones, rechazo de unidades incompatibles, permisos,
+  recuperación ante fallos, reproducibilidad, interfaz y compilación.
+
+Validación del 2026-11-23: 73 pruebas en quince archivos y compilación
+correctas. En navegador se verificaron composición y ruta, OP-0006 al 50 %,
+pedidos PED-0026 a PED-0030 vinculados a cinco locales y las nueve recepciones.
+Tras recargar se mantienen seis productos sin duplicar la ampliación.
+
+## Fase 14: Recuperación persistente de equipamiento
+
+- [x] T152 Reproducir con una prueba la pérdida de deshacer al vaciar la sesión
+  y recargar la aplicación después de eliminar equipamiento (FR-049).
+- [x] T153 Persistir veinte operaciones con respaldo de sesión, selección de la
+  revisión más reciente y compatibilidad con el historial anterior (FR-049).
+- [x] T154 Explicar la indisponibilidad de Deshacer y actualizar el aviso del
+  listado cuando la barra global revierte un cambio (FR-049).
+- [x] T155 Verificar recuperación de equipamiento y asignaciones, rechazos
+  por rol o cambios externos, recarga, compilación y navegador.
+
+Validación del 2026-11-23: la prueba de pérdida de sesión falló con el historial
+anterior y pasó después de la corrección. Pasaron 78 pruebas en dieciséis
+archivos y la compilación de producción. En navegador se eliminó equipamiento,
+se recargó y se restauró desde Deshacer global; se retiró el registro temporal
+al terminar. Se conservan las protecciones de recepciones y los permisos.
+
+## Fase 15: Eliminación confirmada de equipamiento asignado
+
+- [x] T156 Corregir la contradicción entre la confirmación de eliminación y el
+  bloqueo por asignación; mostrar los trabajadores afectados (FR-058).
+- [x] T157 Guardar eliminación y retiro de asignaciones en una transacción
+  reversible, conservando el bloqueo de la API sin opción explícita (FR-058).
+- [x] T158 Retirar los registros de las tablas activas y ofrecer recuperación
+  en un aviso separado para evitar confundirlos con registros vigentes (FR-058).
+- [x] T159 Validar cancelación, eliminación, reversión y recuperación ante
+  fallos; revisar navegador y compilación.
+
+Validación del 2026-11-23: 81 pruebas en dieciséis archivos y compilación
+correctas. En navegador se reprodujo el bloqueo del Guante térmico asignado
+a Fernanda, se comprobó su eliminación de ambas tablas, se recuperaron ambos
+con Deshacer y se dejó nuevamente eliminado por solicitud del usuario.
+
+## Fase 16: Deshacer junto a los avisos de cambios
+
+- [x] T160 Retirar el botón Deshacer de los encabezados compartidos de listados
+  y conservarlo en los avisos de sus operaciones reversibles (FR-059).
+- [x] T161 Unificar el aviso de eliminación de equipamiento y asignaciones,
+  conservando su recuperación al volver a la sección (FR-059).
+- [x] T162 Colocar Deshacer junto a avisos de rutas y materiales locales;
+  limpiar las referencias del borrador al deshacer un material nuevo (FR-059).
+- [x] T163 Verificar creación, edición, eliminación, avisos y compilación;
+  revisar en navegador el encabezado y el aviso seleccionados.
+
+Validación del 2026-11-23: 83 pruebas en dieciséis archivos y compilación
+correctas. En navegador se comprobaron cero botones Deshacer en encabezados de
+listados y su permanencia junto a los avisos. No se modificaron registros.
+
+## Fase 17: Historial con reversión individual
+
+- [x] T170 Mostrar una lista vertical por apartado con Deshacer o Rehacer
+  junto a cada operación, sin botones en los encabezados (FR-060).
+- [x] T171 Conservar pasos deshechos al guardar otros cambios y al recargar;
+  aplicar diferencias por registro y campo sin sobrescribir datos posteriores.
+- [x] T172 Verificar dependencias, conflictos, permisos y recepciones protegidas;
+  reservar identificadores para restaurar registros sin colisiones.
+- [x] T173 Validar 92 pruebas en diecisiete archivos, compilación de producción
+  y el flujo en navegador: crear A y B, deshacer A, crear C y rehacer A.
+
+Validación del 2026-11-23: pruebas y compilación correctas. Se deshicieron los
+tres registros temporales de navegador, conservando los cinco equipamientos
+y cinco asignaciones originales. La lista conserva Rehacer para las pruebas.
+
+## Fase 18: Eliminación coherente y bloqueos explicados
+
+- [x] T180 Compartir el análisis de eliminación entre las confirmaciones y las
+  funciones de dominio; identificar rutas, órdenes y entregas que bloquean (FR-061).
+- [x] T181 Mantener visibles los registros protegidos, por decisión del usuario
+  del 2026-11-23, mostrando el motivo sin una confirmación imposible.
+- [x] T182 Usar confirmación interna también para productos; retirar de las
+  tablas activas los registros eliminados y conservar Deshacer en el historial.
+- [x] T183 Mostrar errores de escritura sin avisos falsos de éxito y bloquear
+  la eliminación de ejecuciones de órdenes finalizadas hasta reabrir la orden.
+- [x] T184 Validar 106 pruebas en dieciocho archivos, compilación y en navegador
+  el bloqueo de Tizado y corte de tela y la eliminación/recuperación de una etapa libre.
+
+Validación del 2026-11-23: pruebas y compilación correctas. Se deshizo la creación
+de la etapa temporal tras probar eliminación y recuperación. Las ocho etapas
+originales y su historial de producción se conservaron. Trabajo local en main.

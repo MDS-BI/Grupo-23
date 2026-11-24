@@ -5,6 +5,7 @@ import {
   fallo,
 } from './almacenamiento.js';
 import { texto, numero } from './validacion.js';
+import { analizarEliminacion } from './eliminacion.js';
 export const obtenerEtapas = () => listar('etapas');
 export function validarEtapa(d) {
   const e = {};
@@ -27,12 +28,7 @@ export function guardarEtapa(d, id) {
   );
 }
 export function eliminarEtapa(id) {
-  if (
-    listar('rutas').some((r) => Number(r.etapa_id) === Number(id)) ||
-    listar('ejecuciones').some((r) => Number(r.etapa_id) === Number(id))
-  )
-    return fallo(
-      'La etapa está en uso en una ruta o ejecución y no se puede eliminar.',
-    );
+  const estado = analizarEliminacion('etapas', id);
+  if (!estado.permitida) return fallo(estado.motivo);
   return eliminarRegistro('etapas', id);
 }

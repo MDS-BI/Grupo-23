@@ -142,7 +142,14 @@ function Equipamiento() {
         idCampo="equipamiento_id"
         registros={obtenerEquipamiento()}
         guardar={guardarEquipamiento}
-        eliminar={eliminarEquipamiento}
+        eliminar={(id) => eliminarEquipamiento(id, { retirarAsignaciones: true })}
+        mostrarEliminadosEnTabla={false}
+        descripcionEliminar={(registro) => {
+          const asignaciones = obtenerAsignaciones().filter((asignacion) => Number(asignacion.equipamiento_id) === Number(registro.equipamiento_id));
+          return asignaciones.length
+            ? `Se eliminará este equipamiento y ${asignaciones.length === 1 ? 'se retirará su asignación a' : `se retirarán ${asignaciones.length} asignaciones de`}: ${asignaciones.map((asignacion) => nombreReferencia('trabajadores', asignacion.trabajador_id)).join(', ')}. Deshacer eliminación recuperará el equipamiento y sus asignaciones.`
+            : 'Se eliminará este equipamiento del listado. Podrás recuperarlo con Deshacer eliminación.';
+        }}
         campos={[
           { name: 'nombre', label: 'Nombre del equipamiento' },
           { name: 'tipo', label: 'Tipo de equipamiento' },
@@ -190,6 +197,7 @@ function Equipamiento() {
         )}
         guardar={guardarAsignacion}
         eliminar={eliminarAsignacion}
+        mostrarEliminadosEnTabla={false}
         campos={[
           {
             name: 'trabajador_id',

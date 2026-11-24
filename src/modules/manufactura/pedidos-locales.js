@@ -2,6 +2,7 @@ import { buscar, eliminarRegistro, fallo, guardarCambios, guardarRegistro, lista
 import { MINIMO_PRODUCCION, validarOrden } from './ordenes.js';
 import { numero, referencia, texto } from './validacion.js';
 import { lotes } from './peluches-ejemplo.js';
+import { analizarEliminacion } from './eliminacion.js';
 
 export const obtenerPedidos = (productoId) => listar('pedidos')
   .filter((pedido) => Number(pedido.producto_id) === Number(productoId));
@@ -35,10 +36,8 @@ export function guardarPedido(datos, id) {
 }
 
 export function eliminarPedido(id) {
-  const pedido = buscar('pedidos', id);
-  if (pedido?.orden_id && buscar('ordenes', pedido.orden_id)?.estado !== 'Cancelada') {
-    return fallo('El pedido tiene una orden de producción asociada.');
-  }
+  const estado = analizarEliminacion('pedidos', id);
+  if (!estado.permitida) return fallo(estado.motivo);
   return eliminarRegistro('pedidos', id);
 }
 

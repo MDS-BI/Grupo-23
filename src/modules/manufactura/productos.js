@@ -1,5 +1,6 @@
-import { guardarCambios, listar, fallo } from './almacenamiento.js';
+import { guardarCambios, listar, fallo, siguienteId } from './almacenamiento.js';
 import { referencia } from './validacion.js';
+import { analizarEliminacion } from './eliminacion.js';
 
 export const PRODUCTO_STORAGE_KEY = 'manufactura:productos';
 export const PRODUCTO_MATERIAL_STORAGE_KEY = 'manufactura:producto_material';
@@ -22,15 +23,6 @@ function leerLista(clave) {
   } catch {
     return [];
   }
-}
-
-function siguienteId(lista, campo) {
-  return (
-    lista.reduce((maximo, item) => {
-      const valor = Number(item[campo]);
-      return Number.isFinite(valor) && valor > maximo ? valor : maximo;
-    }, 0) + 1
-  );
 }
 
 export function obtenerProductos() {
@@ -125,7 +117,7 @@ export function crearProducto(
   if (productoId != null && !previo) return fallo('El producto ya no existe.');
   const producto = {
     ...previo,
-    producto_id: previo?.producto_id ?? siguienteId(productos, 'producto_id'),
+    producto_id: previo?.producto_id ?? siguienteId('productos'),
     nombre: String(nombre).trim(),
     tipo: String(tipo).trim(),
   };
@@ -134,7 +126,7 @@ export function crearProducto(
   const relaciones = anteriores.filter(
     (r) => Number(r.producto_id) !== Number(producto.producto_id),
   );
-  let siguienteProdMat = siguienteId(anteriores, 'prod_mat_id');
+  let siguienteProdMat = siguienteId('producto_material');
 
   materiales.forEach((material) => {
     relaciones.push({
@@ -166,13 +158,8 @@ export const actualizarProducto = (id, datos) => crearProducto(datos, id);
 
 export function eliminarProducto(producto_id) {
   const id = Number(producto_id);
-  if (listar('pedidos').some((pedido) => Number(pedido.producto_id) === id)) {
-    return fallo('El producto tiene pedidos de locales. Conserva su historial.');
-  }
-  if (listar('ordenes').some((o) => Number(o.producto_id) === id))
-    return fallo(
-      'El producto tiene órdenes asociadas. Conserva su historial; no se puede eliminar.',
-    );
+  const estado = analizarEliminacion('productos', id);
+  if (!estado.permitida) return fallo(estado.motivo);
   return guardarCambios({
     productos: obtenerProductos().filter((p) => Number(p.producto_id) !== id),
     producto_material: leerLista(PRODUCTO_MATERIAL_STORAGE_KEY).filter(

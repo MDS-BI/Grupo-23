@@ -8,6 +8,7 @@ import {
   fallo,
 } from './almacenamiento.js';
 import { referencia, numero, texto, fecha, vacio } from './validacion.js';
+import { analizarEliminacion } from './eliminacion.js';
 export const ESTADOS_MAQUINA = [
   'Disponible',
   'En uso',
@@ -116,6 +117,8 @@ export function guardarMantenimiento(d, id) {
   return { ...resultado, registro };
 }
 export function eliminarMantenimiento(id) {
+  const estado = analizarEliminacion('mantenimientos', id);
+  if (!estado.permitida) return fallo(estado.motivo);
   return guardarCambios({
     mantenimientos: listar('mantenimientos').filter(
       (m) => Number(m.mantenimiento_id) !== Number(id),
@@ -126,10 +129,8 @@ export function eliminarMantenimiento(id) {
   });
 }
 export function eliminarMaquina(id) {
-  if (listar('ejecuciones').some((e) => Number(e.maquina_id) === Number(id)))
-    return fallo(
-      'La máquina tiene ejecuciones registradas. Conserva su historial cambiando su estado.',
-    );
+  const estado = analizarEliminacion('maquinas', id);
+  if (!estado.permitida) return fallo(estado.motivo);
   const ids = new Set(
     obtenerMantenimientos(id).map((r) => Number(r.mantenimiento_id)),
   );
@@ -162,14 +163,15 @@ export const guardarEquipamiento = (d, id) =>
     validarEquipamiento,
     id,
   );
-export function eliminarEquipamiento(id) {
-  if (
-    listar('asignaciones').some((a) => Number(a.equipamiento_id) === Number(id))
-  )
-    return fallo(
-      'El equipamiento está asignado a un trabajador. Quita su asignación antes de eliminarlo.',
-    );
-  return eliminarRegistro('equipamiento', id);
+export function eliminarEquipamiento(id, { retirarAsignaciones = false } = {}) {
+  const estado = analizarEliminacion('equipamiento', id, { retirarAsignaciones });
+  if (!estado.permitida) return fallo(estado.motivo);
+  return guardarCambios({
+    equipamiento: listar('equipamiento').filter((equipo) => Number(equipo.equipamiento_id) !== Number(id)),
+    ...(retirarAsignaciones ? {
+      asignaciones: listar('asignaciones').filter((asignacion) => Number(asignacion.equipamiento_id) !== Number(id)),
+    } : {}),
+  });
 }
 export function validarAsignacion(d) {
   const e = {};

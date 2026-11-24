@@ -8,8 +8,9 @@ import { obtenerProductos } from '../../modules/manufactura/productos.js';
 import { obtenerRuta, guardarRuta } from '../../modules/manufactura/rutas.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import { Campo, GestionRegistros, opciones } from './Controles.jsx';
-import DeshacerCambios from './DeshacerCambios.jsx';
+import HistorialCambios from './HistorialCambios.jsx';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
+import { cambioParaDeshacer } from '../../modules/manufactura/almacenamiento.js';
 
 export default function EtapasPage() {
   useManufactura();
@@ -17,6 +18,7 @@ export default function EtapasPage() {
   const [filas, setFilas] = useState([]);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState('');
+  const mensajeRuta = mensaje || (cambioParaDeshacer('rutas') ? 'Última ruta guardada.' : '');
   const destino = useEnfoqueAccion(producto);
   const rutaGuardada = JSON.stringify(producto ? obtenerRuta(producto) : []);
   useEffect(() => {
@@ -175,7 +177,6 @@ export default function EtapasPage() {
               >
                 Deshacer cambios
               </button>
-              <DeshacerCambios tabla="rutas" />
               <button
                 type="button"
                 disabled={!obtenerEtapas().length}
@@ -217,11 +218,12 @@ export default function EtapasPage() {
             )}
           </>
         )}
-        {mensaje && (
+        {mensajeRuta && (
           <p role="status" className="notice">
-            {mensaje}
+            {mensajeRuta}
           </p>
         )}
+        <HistorialCambios tabla="rutas" />
       </article>
     </section>
   );

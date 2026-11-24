@@ -12,14 +12,14 @@ export const ROLES = {
     descripcion: 'Supervisa producción, insumos y recursos de planta.',
   },
   planificacion: {
-    nombre: 'Planificación',
+    nombre: 'Planificador de producción',
     paginas: ['productos', 'etapas', 'ordenes'],
     inicio: 'productos',
     tablas: ['productos', 'producto_material', 'materiales_locales', 'etapas', 'rutas', 'ordenes', 'pedidos'],
     descripcion: 'Define productos, rutas y órdenes de fabricación.',
   },
   ensamble: {
-    nombre: 'Ensamble',
+    nombre: 'Operario de producción',
     paginas: ['ordenes'],
     inicio: 'ordenes',
     tablas: ['ejecuciones'],

@@ -26,8 +26,8 @@ afterEach(async () => {
   delete globalThis.IS_REACT_ACT_ENVIRONMENT;
 });
 
-async function click(text) {
-  const button = [...container.querySelectorAll('button')].find(
+async function click(text, scope = container) {
+  const button = [...scope.querySelectorAll('button')].find(
     (item) => (item.getAttribute('aria-label') || item.textContent.trim()) === text,
   );
   expect(button, `Botón: ${text}`).toBeTruthy();
@@ -66,7 +66,7 @@ describe('Arranque de Manufactura', () => {
       await click('Sustituir registros por el ejemplo');
       expect(container.textContent).not.toContain('Mesa anterior');
       expect(container.textContent).toContain('Oso Bruno de 30 cm');
-      expect(container.querySelectorAll('tbody tr')).toHaveLength(5);
+      expect(container.querySelectorAll('tbody tr')).toHaveLength(6);
 
       await click('Etapas y rutas');
       await input(container.querySelector('[name="producto_ruta"]').id, '1');
@@ -132,29 +132,29 @@ describe('Arranque de Manufactura', () => {
   it('registra un material nuevo, lo selecciona y lo conserva junto a los ejemplos', async () => {
     await act(async () => root.render(<App />));
     await click('Nuevo producto');
-    await input('nombre', 'Computador');
-    await input('tipo', 'Electrónica');
+    await input('nombre', 'Oso con nariz decorativa');
+    await input('tipo', 'Peluche');
     await click('Añadir nuevo material');
     expect(container.querySelector('fieldset').textContent).toContain(
-      '12 clavos',
+      '1 cascabel',
     );
     await click('Guardar material');
     expect(container.textContent).toContain('Escribe el nombre del material.');
 
     const nombre = container.querySelector('[name="nombre_material_nuevo"]');
-    await input(nombre.id, 'Memoria RAM de 8 GB');
+    await input(nombre.id, 'Nariz de seguridad');
     await click('Guardar material');
     const selector = container.querySelector('#material_id');
     expect(selector.selectedOptions[0].textContent).toBe(
-      'Memoria RAM de 8 GB (unidad)',
+      'Nariz de seguridad (unidad)',
     );
-    expect(container.querySelector('#nombre').value).toBe('Computador');
+    expect(container.querySelector('#nombre').value).toBe('Oso con nariz decorativa');
     await input('cantidad_por_unidad', '2');
     await click('Agregar');
     await click('Guardar producto');
     await click('Ver detalle');
     expect(container.textContent).toContain(
-      'Memoria RAM de 8 GB — 2 por unidad',
+      'Nariz de seguridad — 2 por unidad',
     );
 
     await act(async () => root.unmount());
@@ -164,7 +164,26 @@ describe('Arranque de Manufactura', () => {
     const materiales = [
       ...container.querySelectorAll('#material_id option'),
     ].map((o) => o.textContent);
-    expect(materiales).toContain('Memoria RAM de 8 GB (unidad)');
-    expect(materiales).toContain('Pintura (litro)');
+    expect(materiales).toContain('Nariz de seguridad (unidad)');
+    expect(materiales).toContain('Ojos de seguridad (unidad)');
+  });
+
+  it('ofrece deshacer al lado del aviso de material creado y retira sus referencias del borrador', async () => {
+    await act(async () => root.render(<App />));
+    await click('Nuevo producto');
+    await click('Añadir nuevo material');
+    const nombre = container.querySelector('[name="nombre_material_nuevo"]');
+    await input(nombre.id, 'Cinta de algodón para peluche');
+    await click('Guardar material');
+    await input('cantidad_por_unidad', '0.2');
+    await click('Agregar');
+    const aviso = container.querySelector('form .historial-cambio');
+    expect(aviso.textContent).toContain('Cinta de algodón para peluche');
+    await click('Deshacer', aviso);
+    expect(container.querySelector('#material_id').textContent).not.toContain('Cinta de algodón para peluche');
+    expect(container.querySelector('[aria-label^="Cantidad del material"]')).toBeNull();
+    expect(container.querySelector('#material_id').value).toBe('');
+    expect(container.querySelector('form p.notice').textContent).toContain('Creación del material deshecha.');
+    expect(container.querySelector('form .historial-cambio button').textContent).toBe('Rehacer');
   });
 });

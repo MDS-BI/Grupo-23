@@ -5,6 +5,7 @@ import { obtenerReferencias } from '../../modules/manufactura/referencias.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import { Progreso } from './OrdenesPage.jsx';
 import AlertasProduccion from './AlertasProduccion.jsx';
+import MetricasProduccion from './MetricasProduccion.jsx';
 export default function ResumenPage({ navegar }) {
   useManufactura();
   const ordenes = listar('ordenes');
@@ -73,6 +74,8 @@ export default function ResumenPage({ navegar }) {
           </button>
         ))}
       </div>
+      <MetricasProduccion ordenes={ordenes} productos={listar('productos')}
+        etapas={listar('etapas')} ejecuciones={listar('ejecuciones')} />
       <AlertasProduccion alertas={alertas} navegar={navegar} />
       <article className="card">
         <h2>Tu flujo de trabajo</h2>

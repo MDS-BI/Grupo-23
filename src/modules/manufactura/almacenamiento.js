@@ -1,4 +1,5 @@
 import { esEtapaEnsamble, puedeModificarTabla, rolActual } from './roles.js';
+import { prepararCambio } from './historial-cambios.js';
 
 export const tablas = {
   productos: 'producto_id',
@@ -32,11 +33,18 @@ export function listar(tabla) {
 
 export const buscar = (tabla, id) =>
   listar(tabla).find((r) => Number(r[tablas[tabla]]) === Number(id));
-export const siguienteId = (tabla, lista = listar(tabla)) =>
-  lista.reduce((max, r) => Math.max(max, Number(r[tablas[tabla]]) || 0), 0) + 1;
+export function siguienteId(tabla, lista) {
+  const campo = tabla === 'materiales_locales' ? 'material_id' : tablas[tabla];
+  const registros = lista ?? [
+    ...listar(tabla),
+    ...leerHistorial().pasos.flatMap((p) => [...(p.anteriores[tabla] || []), ...(p.posteriores[tabla] || [])]),
+  ];
+  const ids = registros.map((r) => Number(r[campo]) || 0);
+  return tabla === 'materiales_locales' ? Math.min(0, ...ids) - 1 : Math.max(0, ...ids) + 1;
+}
 export const fallo = (mensaje) => ({ errores: { general: mensaje } });
 
-let historialEnMemoria = { pasos: [], firma: '' };
+let historialEnMemoria = { pasos: [], firma: '', revision: 0 };
 let usarHistorialEnMemoria = false;
 const CLAVE_DESHACER = 'manufactura:deshacer';
 
@@ -47,62 +55,118 @@ function firmaActual() {
   );
 }
 
-function leerHistorial() {
-  if (usarHistorialEnMemoria) return historialEnMemoria;
+function interpretarHistorial(contenido) {
   try {
-    const contenido = window.sessionStorage.getItem(CLAVE_DESHACER);
-    if (!contenido) return { pasos: [], firma: '' };
     const historial = JSON.parse(contenido);
-    if (Array.isArray(historial?.pasos) && typeof historial.firma === 'string' &&
+    if (Array.isArray(historial?.pasos) && historial.pasos.length <= 20 && typeof historial.firma === 'string' &&
       historial.pasos.every((paso) => paso && typeof paso.rol === 'string' &&
         paso.anteriores && paso.posteriores &&
+        Object.keys(paso.anteriores).length > 0 &&
+        Object.keys(paso.anteriores).length === Object.keys(paso.posteriores).length &&
+        Object.keys(paso.anteriores).every((tabla) => Object.hasOwn(paso.posteriores, tabla)) &&
         Object.values(paso.anteriores).every(Array.isArray) &&
         Object.values(paso.posteriores).every(Array.isArray))) {
-      return historial;
+      return { ...historial, pasos: historial.pasos.map((paso, i) => ({ ...paso, id: paso.id || `anterior-${i}` })), revision: Number.isSafeInteger(historial.revision) ? historial.revision : 0 };
     }
-    return { pasos: [], firma: '' };
-  } catch {
-    // El historial puede seguir disponible durante la sesión.
+  } catch { /* Se intenta la otra copia antes de descartar el historial. */ }
+  return null;
+}
+
+function leerHistorial() {
+  const candidatos = [];
+  let errorLectura = false;
+  // Los datos y su recuperación comparten persistencia. La copia de sesión
+  // permite migrar historiales anteriores y sirve de respaldo si hay cuota.
+  for (const nombre of ['localStorage', 'sessionStorage']) {
+    try {
+      const contenido = window[nombre].getItem(CLAVE_DESHACER);
+      if (contenido == null) continue;
+      const historial = interpretarHistorial(contenido);
+      if (historial) candidatos.push(historial);
+      else errorLectura = true;
+    } catch { errorLectura = true; }
   }
+  if (usarHistorialEnMemoria || errorLectura) candidatos.push(historialEnMemoria);
+  historialEnMemoria = candidatos.reduce((ultimo, candidato) =>
+    !ultimo || candidato.revision > ultimo.revision ? candidato : ultimo,
+  null) || { pasos: [], firma: '', revision: 0 };
   return historialEnMemoria;
 }
 
 function guardarHistorial(historial) {
-  historialEnMemoria = historial;
-  try {
-    window.sessionStorage.setItem(CLAVE_DESHACER, JSON.stringify(historial));
-    usarHistorialEnMemoria = false;
-  } catch {
-    usarHistorialEnMemoria = true;
-    // El guardado de los registros conserva prioridad sobre el historial.
+  historialEnMemoria = { ...historial, revision: historialEnMemoria.revision + 1 };
+  let guardado = false;
+  for (const nombre of ['localStorage', 'sessionStorage']) {
+    try {
+      window[nombre].setItem(CLAVE_DESHACER, JSON.stringify(historialEnMemoria));
+      guardado = true;
+    } catch { /* La otra copia o la memoria conservan la recuperación. */ }
   }
+  usarHistorialEnMemoria = !guardado;
 }
 
-export function cambioParaDeshacer(tabla, id) {
+export function estadoDeshacer(tabla, id) {
   const historial = leerHistorial();
-  const paso = historial.pasos.at(-1);
-  if (!paso || paso.rol !== rolActual() || historial.firma !== firmaActual()) return null;
-  if (!Object.keys(paso.anteriores).every(puedeModificarTabla)) return null;
-  if (tabla && !Object.hasOwn(paso.anteriores, tabla)) return null;
+  const paso = historial.pasos.findLast((p) => !p.deshecho);
+  const noDisponible = (motivo) => ({ cambio: null, motivo });
+  if (!paso) return noDisponible('No hay cambios guardados disponibles para deshacer.');
+  if (paso.rol !== rolActual()) return noDisponible('Selecciona el rol que realizó el último cambio para deshacerlo.');
+  if (historial.firma !== firmaActual()) return noDisponible('Los datos cambiaron fuera del historial. Ese cambio ya no se puede deshacer.');
+  if (!Object.keys(paso.anteriores).every(puedeModificarTabla)) return noDisponible('Tu rol no permite deshacer este cambio.');
+  if (tabla && !Object.hasOwn(paso.anteriores, tabla)) return noDisponible('El último cambio corresponde a otra sección.');
   if (tabla && id != null) {
     const campo = tablas[tabla];
     const anterior = paso.anteriores[tabla].find((r) => Number(r[campo]) === Number(id));
     const posterior = paso.posteriores[tabla].find((r) => Number(r[campo]) === Number(id));
-    if (JSON.stringify(anterior) === JSON.stringify(posterior)) return null;
+    if (JSON.stringify(anterior) === JSON.stringify(posterior)) return noDisponible('Este registro no tiene un cambio reciente para deshacer.');
   }
-  return paso;
+  return estadoCambio(paso.id);
 }
+
+export const cambioParaDeshacer = (tabla, id) => estadoDeshacer(tabla, id).cambio;
 
 export function deshacerUltimoCambio(tabla, id) {
   const paso = cambioParaDeshacer(tabla, id);
   if (!paso) return fallo('El cambio ya no está disponible para deshacer. Actualiza el listado.');
+  return deshacerCambio(paso.id);
+}
+
+export function historialCambios(tabla) {
+  return leerHistorial().pasos.filter((p) => p.rol === rolActual() &&
+    Object.keys(p.anteriores).every(puedeModificarTabla) &&
+    (!tabla || Object.hasOwn(p.anteriores, tabla))).toReversed();
+}
+
+export function estadoCambio(cambioId) {
   const historial = leerHistorial();
-  const resultado = guardarCambios(paso.anteriores, { registrarHistorial: false });
+  const paso = historial.pasos.find((p) => p.id === cambioId);
+  const noDisponible = (motivo) => ({ cambio: null, motivo });
+  if (!paso) return noDisponible('El cambio ya no está en los últimos 20 registros del historial.');
+  if (paso.rol !== rolActual() || !Object.keys(paso.anteriores).every(puedeModificarTabla))
+    return noDisponible('Tu rol no permite revertir este cambio.');
+  if (paso.protegido) return noDisponible('Las recepciones guardadas se conservan como historial.');
+  if (historial.firma !== firmaActual()) return noDisponible('Los datos cambiaron fuera del historial. Actualiza el listado antes de continuar.');
+  const actuales = Object.fromEntries([...Object.keys(tablas), 'materiales_locales'].map((tabla) => [tabla, listar(tabla)]));
+  const preparado = prepararCambio(paso, actuales, { ...tablas, materiales_locales: 'material_id' }, !!paso.deshecho);
+  return preparado.motivo ? noDisponible(preparado.motivo) : { cambio: paso, cambios: preparado.cambios, motivo: '' };
+}
+
+function revertirCambio(cambioId, rehacer) {
+  const estado = estadoCambio(cambioId);
+  if (!estado.cambio) return fallo(estado.motivo);
+  if (!!estado.cambio.deshecho !== rehacer) return fallo('El estado de este cambio ya se actualizó.');
+  const historial = leerHistorial();
+  const resultado = guardarCambios(estado.cambios, { registrarHistorial: false });
   if (resultado.errores) return resultado;
-  guardarHistorial({ pasos: historial.pasos.slice(0, -1), firma: firmaActual() });
-  window.dispatchEvent(new Event('manufactura:cambio'));
+  guardarHistorial({ pasos: historial.pasos.map((p) => p.id === cambioId ? { ...p, deshecho: !rehacer } : p), firma: firmaActual() });
+  window.dispatchEvent(new CustomEvent('manufactura:cambio', {
+    detail: { accion: rehacer ? 'rehacer' : 'deshacer', tablas: Object.keys(estado.cambios) },
+  }));
   return { errores: null };
 }
+
+export const deshacerCambio = (id) => revertirCambio(id, false);
+export const rehacerCambio = (id) => revertirCambio(id, true);
 
 // Guarda juntas las relaciones; si el navegador rechaza una escritura se recuperan los valores previos.
 export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
@@ -156,7 +220,7 @@ export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
           !esEtapaEnsamble(buscar('etapas', registro.etapa_id)) ||
           !['Planificada', 'En producción'].includes(buscar('ordenes', registro.orden_id)?.estado),
         )) {
-          return fallo('Ensamble solo puede registrar ejecuciones de sus etapas en órdenes abiertas.');
+          return fallo('El operario de producción solo puede registrar ejecuciones de sus etapas en órdenes abiertas.');
         }
       }
     }
@@ -173,10 +237,12 @@ export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
       if (tablasCambiadas.length) {
         const historial = leerHistorial();
         const pasos = historial.firma === firmaAnterior ? historial.pasos : [];
-        const esHistorialProtegido = tablasCambiadas.some(
-          (tabla) => ['recepciones', 'demo_peluches', 'pedidos_demo'].includes(tabla),
-        );
+        const reiniciar = tablasCambiadas.some((tabla) => ['demo_peluches', 'pedidos_demo'].includes(tabla));
         const paso = {
+          id: `cambio-${historial.revision + 1}`,
+          fecha: new Date().toISOString(),
+          deshecho: false,
+          protegido: tablasCambiadas.includes('recepciones'),
           rol: rolActual(),
           anteriores: Object.fromEntries(tablasCambiadas.map((tabla) => [
             tabla, JSON.parse(anteriores.get(`manufactura:${tabla}`) || '[]'),
@@ -184,7 +250,7 @@ export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
           posteriores: Object.fromEntries(tablasCambiadas.map((tabla) => [tabla, cambios[tabla]])),
         };
         guardarHistorial({
-          pasos: esHistorialProtegido ? [] : [...pasos, paso].slice(-20),
+          pasos: reiniciar ? [] : [...pasos, paso].slice(-20),
           firma: firmaActual(),
         });
       }
@@ -229,6 +295,7 @@ export function guardarRegistro(tabla, datos, validador, id) {
 }
 
 export function eliminarRegistro(tabla, id) {
+  if (!buscar(tabla, id)) return fallo('El registro ya no existe. Actualiza el listado.');
   return guardarCambios({
     [tabla]: listar(tabla).filter(
       (r) => Number(r[tablas[tabla]]) !== Number(id),

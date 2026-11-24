@@ -1,9 +1,11 @@
 import { useEffect, useId, useState } from 'react';
 import useManufactura from '../../hooks/useManufactura.js';
-import { cambioParaDeshacer, tablas } from '../../modules/manufactura/almacenamiento.js';
+import { cambioParaDeshacer, listar, tablas } from '../../modules/manufactura/almacenamiento.js';
 import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import DeshacerCambios from './DeshacerCambios.jsx';
+import HistorialCambios from './HistorialCambios.jsx';
+import ConfirmarEliminacion from './ConfirmarEliminacion.jsx';
 import {
   obtenerReferencias,
   nombreReferencia,
@@ -281,6 +283,8 @@ export function GestionRegistros({
   permitirCrear = true,
   inicialNuevo = {},
   solicitudNueva,
+  descripcionEliminar,
+  mostrarEliminadosEnTabla = false,
 }) {
   useManufactura();
   const tabla = Object.keys(tablas).find((nombre) => tablas[nombre] === idCampo);
@@ -288,11 +292,10 @@ export function GestionRegistros({
   const hayAcciones = onVer || (puedeModificar && (permitirEditar || eliminar));
   const [edicion, setEdicion] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [errorOperacion, setErrorOperacion] = useState('');
   const [formularioId, setFormularioId] = useState(0);
   const [pendienteEliminar, setPendienteEliminar] = useState(null);
   const [eliminado, setEliminado] = useState(null);
-  const confirmacionId = useId();
-  const confirmarEliminacion = useEnfoqueAccion(pendienteEliminar);
   const cambio = cambioParaDeshacer(tabla);
   const registrosEliminados = puedeModificar && cambio
     ? cambio.anteriores[tabla].filter((anterior) =>
@@ -304,9 +307,12 @@ export function GestionRegistros({
   const recuperado = eliminado && registros.some((r) =>
     Number(r[idCampo]) === Number(eliminado[idCampo]),
   );
+  const avisoRecuperacion = !mostrarEliminadosEnTabla && registrosEliminados.length > 0;
   const mensajeVisible = recuperado
     ? `Eliminación deshecha. Se recuperó ${singular.toLowerCase()} «${eliminado.nombre || `#${eliminado[idCampo]}`}».`
-    : mensaje;
+    : avisoRecuperacion
+      ? `Registro eliminado: ${registrosEliminados.map((registro) => registro.nombre || `${singular} #${registro[idCampo]}`).join(', ')}.`
+      : mensaje || (cambio ? 'Último cambio guardado en este apartado.' : '');
   useEffect(() => {
     if (recuperado) {
       setMensaje(mensajeVisible);
@@ -317,10 +323,24 @@ export function GestionRegistros({
     setEdicion(datos);
     setFormularioId((n) => n + 1);
     setMensaje('');
+    setErrorOperacion('');
     setEliminado(null);
     setPendienteEliminar(null);
   };
   const confirmacion = useEnfoqueAccion(mensajeVisible);
+  useEffect(() => {
+    const alDeshacer = (evento) => {
+      if (!['deshacer', 'rehacer'].includes(evento.detail?.accion) || !evento.detail.tablas.includes(tabla)) return;
+      setEdicion(null);
+      setPendienteEliminar(null);
+      setMensaje(evento.detail.accion === 'rehacer' ? 'Cambio rehecho. Se actualizó el listado.' : eliminado && listar(tabla).some((r) => Number(r[idCampo]) === Number(eliminado[idCampo]))
+        ? `Eliminación deshecha. Se recuperó ${singular.toLowerCase()} «${eliminado.nombre || `#${eliminado[idCampo]}`}».`
+        : 'Cambio deshecho. Se actualizó el listado.');
+      setEliminado(null);
+    };
+    window.addEventListener('manufactura:cambio', alDeshacer);
+    return () => window.removeEventListener('manufactura:cambio', alDeshacer);
+  }, [tabla, eliminado, singular, idCampo]);
   useEffect(() => {
     if (solicitudNueva) {
       abrirFormulario({ ...solicitudNueva.datos });
@@ -331,21 +351,33 @@ export function GestionRegistros({
     if (!resultado.errores) {
       setEdicion(null);
       setMensaje('Cambios guardados correctamente.');
+      setErrorOperacion('');
     }
     return resultado;
   };
   const borrar = (registro) => {
-    const resultado = eliminar(registro[idCampo]);
+    let resultado;
+    try {
+      resultado = eliminar(registro[idCampo]);
+    } catch {
+      setErrorOperacion('No se pudo completar la eliminación. No se confirmó ningún cambio. Revisa el listado e inténtalo de nuevo.');
+      return;
+    }
+    if (!resultado || resultado.errores) {
+      setErrorOperacion(resultado?.errores?.general || 'No se pudo eliminar el registro. Revisa sus datos y permisos.');
+      setPendienteEliminar(null);
+      return;
+    }
     setPendienteEliminar(null);
-    setEliminado(resultado?.errores ? null : registro);
-    setMensaje(resultado?.errores?.general ||
+    setErrorOperacion('');
+    setEliminado(registro);
+    setMensaje(
       `Se eliminó ${singular.toLowerCase()} «${registro.nombre || `#${registro[idCampo]}`}». Puedes recuperarlo con Deshacer eliminación.`);
   };
   return (
     <div className="management">
       <header className="section-heading">
         <h2>{titulo}</h2>
-        {tabla !== 'recepciones' && <DeshacerCambios tabla={tabla} />}
         {puedeModificar && permitirCrear && (
           <button
             className="primary"
@@ -359,36 +391,24 @@ export function GestionRegistros({
         )}
       </header>
       {pendienteEliminar && (
-        <div
-          ref={confirmarEliminacion}
-          role="alertdialog"
-          aria-labelledby={confirmacionId}
-          aria-describedby={`${confirmacionId}-detalle`}
-          className="notice delete-confirmation"
-          tabIndex={-1}
-        >
-          <h3 id={confirmacionId}>
-            ¿Eliminar {singular.toLowerCase()} «{pendienteEliminar.nombre || `#${pendienteEliminar[idCampo]}`}»?
-          </h3>
-          <p id={`${confirmacionId}-detalle`}>
-            Se eliminarán sus registros dependientes cuando corresponda. Después podrás usar Deshacer eliminación.
-          </p>
-          <div className="row-actions">
-            <button type="button" onClick={() => setPendienteEliminar(null)}>Cancelar eliminación</button>
-            <button type="button" className="danger" onClick={() => borrar(pendienteEliminar)}>Confirmar eliminación</button>
-          </div>
-        </div>
+        <ConfirmarEliminacion
+          tabla={tabla}
+          registroId={pendienteEliminar[idCampo]}
+          nombre={pendienteEliminar.nombre || pendienteEliminar.codigo || `#${pendienteEliminar[idCampo]}`}
+          singular={singular.toLowerCase()}
+          retirarAsignaciones={tabla === 'equipamiento'}
+          descripcion={descripcionEliminar?.(pendienteEliminar)}
+          cancelar={() => setPendienteEliminar(null)}
+          confirmar={() => borrar(pendienteEliminar)}
+        />
       )}
-      {mensajeVisible && (
-        <p ref={confirmacion} tabIndex={-1} role="status" className="notice">
+      {errorOperacion && <p role="alert" className="error">{errorOperacion}</p>}
+      {!errorOperacion && mensajeVisible && (
+        <p ref={confirmacion} tabIndex={-1} role="status" className="operation-feedback">
           {mensajeVisible}
-          {tabla !== 'recepciones' && !recuperado && <> <DeshacerCambios
-            tabla={tabla}
-            registroId={eliminado?.[idCampo]}
-            texto={eliminado ? 'Deshacer eliminación' : 'Deshacer'}
-          /></>}
         </p>
       )}
+      <HistorialCambios tabla={tabla} />
       {edicion && puedeModificar && permitirCrear && (
         <Formulario
           key={formularioId}
@@ -400,7 +420,7 @@ export function GestionRegistros({
           conRepuestos={conRepuestos}
         />
       )}
-      {registros.length || registrosEliminados.length ? (
+      {registros.length || (mostrarEliminadosEnTabla && registrosEliminados.length) ? (
         <div className="table-wrap">
           <table>
             <caption className="sr-only">{titulo}</caption>
@@ -444,6 +464,7 @@ export function GestionRegistros({
                         onClick={() => {
                           setPendienteEliminar(r);
                           setMensaje('');
+                          setErrorOperacion('');
                           setEliminado(null);
                         }}
                       >
@@ -456,7 +477,7 @@ export function GestionRegistros({
                   )}
                 </tr>
               ))}
-              {registrosEliminados.map((r) => (
+              {mostrarEliminadosEnTabla && registrosEliminados.map((r) => (
                 <tr key={`eliminado-${r[idCampo]}`} className="deleted-record">
                   {columnas.map((c, i) => (
                     <td key={c.key}>

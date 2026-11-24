@@ -147,6 +147,7 @@ Operaciones de cascada:
 - `eliminarOrden(orden_id)`: rechaza la operación si la orden tiene recepciones. Para una orden sin recepciones elimina la orden y sus ejecuciones.
 - `eliminarMaquina(maquina_id)`: elimina la MAQUINA y sus MANTENIMIENTO_MAQUINA, junto con los MANTENIMIENTO_REPUESTO de cada mantenimiento.
 - `eliminarMantenimiento(mantenimiento_id)`: elimina el mantenimiento y sus MANTENIMIENTO_REPUESTO.
+- `eliminarEquipamiento(id, { retirarAsignaciones: true })`: tras la confirmación con trabajadores afectados, elimina conjuntamente EQUIPAMIENTO y sus ASIGNACION_EQUIPAMIENTO. Sin la opción explícita, mantiene el bloqueo si hay asignaciones. La reversión restaura ambas tablas conjuntamente; un fallo de escritura conserva los dos conjuntos anteriores.
 
 ## Expectativas de validación
 
@@ -157,6 +158,7 @@ Operaciones de cascada:
 - `fin_real` no puede ser anterior a `inicio_real`.
 - `costo_tecnico` no puede ser negativo.
 - Toda FK debe referenciar un registro existente; las referencias externas deben existir en su catálogo de solo lectura.
+- Las referencias de respaldo son textiles. Con `demo_peluches` cargada se muestran sus catálogos y los materiales locales; los respaldos solo se agregan si su identificador ya está usado en composición, recepciones, ejecuciones, mantenimiento o asignaciones. La lectura no escribe ni elimina datos. Un adaptador externo conserva su propio catálogo.
 - Las operaciones deben preservar el orden actual de las listas y devolver errores por campo cuando la validación falla.
 
 ## Recepciones y perfiles
@@ -172,7 +174,7 @@ Finalizar una orden requiere ruta completa y todas sus ejecuciones cerradas.
 
 `manufactura:rol` contiene el identificador del perfil seleccionado. Los
 perfiles válidos y sus tablas modificables están en `roles.js`. La capa de
-persistencia devuelve un error para tablas fuera de su alcance. Ensamble puede
+persistencia devuelve un error para tablas fuera de su alcance. El operario de producción puede
 modificar ejecuciones de sus etapas en órdenes abiertas. El cargador de la demo
 puede inicializar un almacén vacío, y Supervisor puede cargar el ejemplo sobre
 datos previos mediante la opción explícita de Productos.
@@ -180,16 +182,50 @@ datos previos mediante la opción explícita de Productos.
 El selector representa roles de demostración en el cliente. La protección
 multiusuario en servidor requiere una integración de autenticación posterior.
 
+## Ampliación del oso con cascabel
+
+`demo_peluches[0].ejemplos.oso_cascabel` conserva `version`, `producto_id` y
+`orden_id` de la ampliación. `agregarEjemploOsoCascabel()` solo la añade una vez
+con Supervisor; no se vuelve a crear si el usuario modifica después el ejemplo.
+Añade producto, nueve relaciones de materiales, dos insumos, dos etapas,
+ocho pasos de ruta, una orden de 64, cuatro ejecuciones terminadas, nueve
+recepciones y cinco pedidos asignados, reutilizando proveedores, locales,
+personal y máquinas. Si ya existe un insumo compatible, reutiliza su identidad.
+La escritura conjunta conserva los registros anteriores y revierte todas las
+tablas afectadas si una escritura falla. El marcador y las recepciones fijan
+el mismo límite de deshacer que la carga inicial de la fábrica.
+
 ## Reversión de transacciones
 
-`manufactura:deshacer` se guarda en `sessionStorage` y conserva veinte
-operaciones de la pestaña. Incluye el rol, las tablas afectadas y sus valores
+`manufactura:deshacer` se guarda en `localStorage`, con una copia en
+`sessionStorage`, y conserva veinte operaciones del navegador. Incluye una
+revisión incremental para elegir la copia más reciente, el rol, las tablas
+afectadas y sus valores
 anteriores y posteriores. La firma del estado global se compara antes de
 restaurar para evitar sobrescribir cambios de otras pestañas. La reversión
 debe pasar los mismos permisos y protecciones que las escrituras normales.
-Guardar una recepción confirmada o cargar la demo inicia un historial nuevo.
+Cada paso tiene un `id`, `fecha` y estado `deshecho`. Deshacer marca el paso;
+rehacer vuelve a aplicarlo. Guardar cambios nuevos conserva los pasos deshechos
+dentro del límite de veinte. La interfaz presenta una lista por apartado con
+un botón por operación. Se revierten diferencias por registro y campo sobre
+los datos actuales, no tablas completas. Las dependencias y los conflictos
+con ediciones posteriores bloquean la operación con una explicación. Los
+identificadores del historial se reservan para evitar colisiones al recuperar.
+Guardar una recepción añade un paso protegido y conserva los cambios
+independientes anteriores. Cargar o ampliar la demo inicia un historial nuevo.
+Se aceptan historiales de sesión anteriores sin revisión. Si ambas escrituras
+del historial fallan, se mantiene una copia en memoria mientras dure la página.
+La pérdida de la sesión no elimina el respaldo persistente. Al deshacer, el
+listado actualiza su confirmación para no conservar un aviso de guardado viejo.
 
 ## Expectativas de extensibilidad
+
+`analizarEliminacion()` comprueba existencia, rol y vínculos antes de confirmar.
+Productos con órdenes o pedidos, etapas usadas en rutas o ejecuciones, máquinas
+con ejecuciones, órdenes con recepciones y ejecuciones de órdenes finalizadas
+conservan sus restricciones también en las funciones de dominio. Los registros
+protegidos permanecen visibles con el motivo y sus referencias. Los registros
+eliminados salen de las tablas activas; su recuperación está en el historial.
 
 - La capa de almacenamiento usa claves con prefijo `manufactura:` para permitir añadir nuevas entidades sin cambiar la base.
 - Las referencias externas están encapsuladas en `src/modules/manufactura/referencias.js` y pueden sustituirse por integraciones reales sin modificar los repositorios de Manufactura.

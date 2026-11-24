@@ -121,24 +121,24 @@ Como encargado de producción, quiero supervisar alertas, filtrar registros, reg
 
 ### Vistas por rol
 
-El MVP permite seleccionar Supervisor, Planificación, Ensamble, Bodega o
+El MVP permite seleccionar Supervisor, Planificador de producción, Operario de producción, Bodega o
 Mantenimiento. Se trata de perfiles de demostración locales. La autenticación
 de cuentas y la autorización en servidor corresponden a una ampliación del alcance.
 
 | Rol | Perspectiva y acciones |
 |---|---|
 | Supervisor | Acceso a todas las áreas y gestión de la demo |
-| Planificación | Alta, edición y baja de productos, composición, etapas, rutas y órdenes; consulta de ejecuciones |
-| Ensamble | Órdenes abiertas, ruta de ensamblaje e inicio/finalización de sus ejecuciones |
+| Planificador de producción | Alta, edición y baja de productos, composición, etapas, rutas y órdenes; consulta de ejecuciones |
+| Operario de producción | Órdenes abiertas, ruta de ensamblaje e inicio/finalización de sus ejecuciones |
 | Bodega | Alta y consulta de recepciones por orden |
 | Mantenimiento | Gestión de máquinas, mantenimiento, repuestos, equipamiento y asignaciones |
 
 Escenarios de aceptación adicionales.
 
-1. Al seleccionar Ensamble, solo se ofrece la navegación a órdenes. Sus detalles
+1. Al seleccionar Operario de producción, solo se ofrece la navegación a órdenes. Sus detalles
    muestran etapas de tipo Ensamble o Ensamblaje y permiten registrar sus
    ejecuciones. Se omiten proveedores, recepciones y fechas de entrega.
-2. Al seleccionar Planificación se pueden gestionar órdenes y consultar su
+2. Al seleccionar Planificador de producción se pueden gestionar órdenes y consultar su
    ejecución. Al seleccionar Bodega se puede registrar una entrega y consultar
    las anteriores.
 3. Una operación fuera del perfil se rechaza en la capa de persistencia. Cambiar
@@ -232,14 +232,22 @@ Escenarios de aceptación adicionales.
 - **FR-043**: Al instalar la misma revisión con el entorno documentado y abrir un perfil de navegador sin registros, el sistema DEBE presentar los mismos productos, composiciones, rutas, órdenes, recepciones y recursos iniciales. Las fechas de esos registros DEBEN ser deterministas.
 - **FR-044**: El repositorio DEBE contener los pasos de instalación, versiones del entorno, dependencias resueltas, recursos visuales y trazabilidad entre especificación, plan, tareas y pruebas. La reproducción DEBE poder verificarse con una instalación limpia, la suite automatizada y la compilación.
 - **FR-045**: El sistema DEBE ofrecer los cinco perfiles de demostración de la matriz de roles, conservar el perfil válido al recargar y limitar la navegación y las operaciones a su función.
-- **FR-046**: Ensamble DEBE consultar órdenes abiertas y registrar ejecuciones de etapas de tipo Ensamble o Ensamblaje. Las recepciones, los proveedores y las fechas de entrega DEBEN omitirse de esa perspectiva.
+- **FR-046**: Operario de producción DEBE consultar órdenes abiertas y registrar ejecuciones de etapas de tipo Ensamble o Ensamblaje. Las recepciones, los proveedores y las fechas de entrega DEBEN omitirse de esa perspectiva.
 - **FR-047**: El sistema DEBE rechazar modificaciones fuera del perfil antes de escribir registros, y cerrar formularios previos al cambiar el perfil.
 - **FR-048**: El sistema DEBE impedir finalizar órdenes sin ruta, con etapas pendientes o con ejecuciones abiertas. Las órdenes finalizadas o canceladas DEBEN rechazar recepciones nuevas, conservando la consulta de entregas históricas.
-- **FR-049**: El sistema DEBE ofrecer deshacer cambios sin guardar en formularios y rutas, y revertir en orden los últimos veinte cambios guardados de la pestaña, incluidas eliminaciones válidas y sus relaciones. La operación DEBE respetar el rol y rechazarse si otra pestaña cambió los datos. Las recepciones confirmadas conservan su historial y solo ofrecen deshacer en el formulario sin guardar.
+- **FR-049**: El sistema DEBE ofrecer deshacer cambios sin guardar en formularios y rutas, y revertir en orden los últimos veinte cambios guardados del navegador, incluidas eliminaciones válidas y sus relaciones. El historial DEBE persistir al perder la sesión o recargar la página. La operación DEBE respetar el rol y rechazarse si el estado actual no coincide con el historial. Un botón no disponible DEBE explicar el motivo. Las recepciones confirmadas conservan su historial y solo ofrecen deshacer en el formulario sin guardar.
 - **FR-050**: Al abrir un formulario, detalle o menú de pedidos, el sistema DEBE llevar la vista a ese apartado y enfocar un control apropiado. La navegación entre páginas DEBE llevar al inicio del contenido y respetar la preferencia de movimiento reducido.
 - **FR-051**: Una orden nueva o un cambio de producto o cantidad DEBE requerir un número entero de al menos 64 peluches. Las órdenes históricas con cantidades inferiores pueden conservar su cantidad al editar otros campos.
-- **FR-052**: Órdenes de producción DEBE ofrecer un menú por modelo de peluche con código de pedido, código y nombre del local, cantidad solicitada y orden asociada. Supervisor y Planificación pueden registrar pedidos y planificar conjuntamente pedidos pendientes del mismo producto cuando sumen al menos 64 unidades.
+- **FR-052**: Órdenes de producción DEBE ofrecer un menú por modelo de peluche con código de pedido, código y nombre del local, cantidad solicitada y orden asociada. Supervisor y Planificador de producción pueden registrar pedidos y planificar conjuntamente pedidos pendientes del mismo producto cuando sumen al menos 64 unidades.
 - **FR-053**: La creación de una orden desde pedidos DEBE guardar la orden y sus vínculos conjuntamente. Los pedidos ya planificados DEBEN rechazarse si se intenta planificarlos otra vez. Deshacer esa creación DEBE restablecer los pedidos pendientes.
+- **FR-054**: El panel de Supervisor DEBE mostrar unidades planificadas, unidades de órdenes finalizadas, porcentaje de cumplimiento de volumen y horas de ejecuciones terminadas. Las órdenes canceladas DEBEN excluirse de volumen y tiempos. Las ejecuciones de etapas NO DEBEN contarse como unidades adicionales.
+- **FR-055**: El panel DEBE ofrecer gráficos de órdenes por estado (incluidas canceladas), volumen planificado y finalizado por producto, y promedio de tiempos reales por etapa comparado con su estándar. Un filtro por producto DEBE aplicarse a estas métricas y gráficos, conservando las alertas globales de planta. Los datos DEBEN actualizarse al guardar o deshacer, y mostrar estados vacíos sin divisiones por cero.
+- **FR-056**: Los catálogos, selectores e instrucciones de ejemplo de Manufactura DEBEN referirse a fabricación de peluches y maquinaria textil. La fábrica de ejemplo NO DEBE mezclar respaldos genéricos sin uso con sus referencias. La selección de referencias DEBE conservar identificadores que ya estén relacionados y el historial de recepciones, sin alterar adaptadores de otros módulos.
+- **FR-057**: Supervisor DEBE poder añadir una sola vez el ejemplo Oso Bruno con cascabel de 30 cm sin reemplazar los registros previos: nueve materiales (un cascabel y un bolsillo protector por unidad), ruta de ocho etapas con montaje y prueba de sonido, orden de 64 unidades al 50 % de sus etapas, nueve recepciones y cinco pedidos que sumen 64 vinculados a esa orden. La ampliación DEBE guardar todas sus relaciones conjuntamente, conservar el historial e impedir duplicados al recargar. El arranque de Supervisor DEBE incluirla con fechas reproducibles.
+- **FR-058**: Al eliminar equipamiento asignado desde la interfaz, la confirmación DEBE mostrar los trabajadores afectados. Confirmar DEBE eliminar conjuntamente el equipamiento y sus asignaciones, retirándolos de las tablas activas. Deshacer DEBE restaurar ambos en una operación con sus identificadores. La API DEBE conservar el bloqueo de equipamiento asignado si no recibe autorización explícita para retirar sus asignaciones.
+- **FR-059**: Los encabezados de los listados NO DEBEN duplicar el botón Deshacer. Los avisos de creación, edición y eliminación reversibles DEBEN mantener su botón junto al mensaje, incluidas rutas y materiales locales. Al volver a un apartado, su último cambio disponible DEBE seguir ofreciendo recuperación en un aviso. Las recepciones confirmadas conservan su protección histórica.
+- **FR-060**: Cada apartado DEBE mostrar una lista vertical de los últimos veinte cambios con Deshacer o Rehacer individual. Una nueva operación NO DEBE descartar las opciones de rehacer conservadas en ese límite. La reversión de un paso anterior DEBE conservar los registros y campos independientes posteriores, respetar roles y recepciones inmutables, y explicar los conflictos o dependencias que impidan revertirlo. La lista y sus estados DEBEN persistir al recargar.
+- **FR-061**: Eliminar DEBE comprobar las restricciones antes de ofrecer confirmar. Los registros protegidos DEBEN permanecer visibles con un aviso que identifique sus vínculos y explique el bloqueo. La interfaz y las funciones de dominio DEBEN compartir las reglas de eliminación. Al confirmar una eliminación permitida, la fila DEBE desaparecer de la tabla activa y su recuperación DEBE quedar en la lista de cambios. Los productos DEBEN usar la misma confirmación interna. Los errores de escritura DEBEN mostrarse como errores sin anunciar éxito, incluso si existe una eliminación anterior recuperable. Eliminar ejecuciones de una orden finalizada DEBE requerir reabrirla primero.
 
 ### Requisitos de Extensibilidad *(obligaciones del módulo)*
 

@@ -7,9 +7,12 @@ import ProductoForm from './ProductoForm.jsx';
 import ProductoDetalle from './ProductoDetalle.jsx';
 import portadaPeluches from '../../assets/manufactura/peluches-portada.jpg';
 import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
-import DeshacerCambios from './DeshacerCambios.jsx';
+import HistorialCambios from './HistorialCambios.jsx';
+import ConfirmarEliminacion from './ConfirmarEliminacion.jsx';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js';
+import { inicializarPedidosDemo } from '../../modules/manufactura/pedidos-locales.js';
+import { agregarEjemploOsoCascabel, ejemploOsoCascabelCargado } from '../../modules/manufactura/oso-cascabel.js';
 import {
   cargarDemoPeluches,
   demoPeluchesCargada,
@@ -22,6 +25,8 @@ export default function ProductosPage() {
   const [edicion, setEdicion] = useState(null);
   const [detalle, setDetalle] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [errorEliminar, setErrorEliminar] = useState('');
+  const [pendienteEliminar, setPendienteEliminar] = useState(null);
   const [errorDemo, setErrorDemo] = useState('');
   const [busquedaNombre, setBusquedaNombre] = useState('');
   const confirmacion = useEnfoqueAccion(mensaje);
@@ -42,6 +47,9 @@ export default function ProductosPage() {
     const resultado = cargarDemoPeluches({ reemplazar });
     setErrorDemo(resultado.errores?.general || '');
     if (!resultado.errores) {
+      inicializarPedidosDemo();
+      const ampliacion = agregarEjemploOsoCascabel();
+      setErrorDemo(ampliacion.errores?.general || '');
       setDetalle(null);
       setEdicion(null);
       setMostrarFormulario(false);
@@ -63,15 +71,13 @@ export default function ProductosPage() {
   };
 
   const handleEliminar = (producto) => {
-    if (
-      !window.confirm(
-        `¿Eliminar el producto ${producto.nombre} y sus materiales y ruta?`,
-      )
-    )
-      return;
     const resultado = eliminar(producto.producto_id);
-    setMensaje(resultado.errores?.general || 'Producto eliminado.');
-    if (!resultado.errores) setDetalle(null);
+    setPendienteEliminar(null);
+    setErrorEliminar(resultado.errores?.general || '');
+    if (!resultado.errores) {
+      setMensaje('Producto eliminado.');
+      setDetalle(null);
+    }
   };
 
   return (
@@ -120,7 +126,7 @@ export default function ProductosPage() {
         <article className="card catalogo-demo">
           <h2>Fábrica de peluches de ejemplo</h2>
           <p className="muted">
-            Carga cinco productos con sus materiales, proveedores, rutas,
+            Carga seis productos, incluido el oso con cascabel, con sus materiales, proveedores, rutas,
             órdenes, recepciones y máquinas.
           </p>
           {hayRegistros && (
@@ -156,6 +162,20 @@ export default function ProductosPage() {
         </article>
       )}
 
+      {puedeModificarTabla('demo_peluches') && demoPeluchesCargada() && !ejemploOsoCascabelCargado() && (
+        <article className="card catalogo-demo">
+          <h2>Oso con cascabel de ejemplo</h2>
+          <p className="muted">Añade un modelo con nueve materiales, montaje y prueba de sonido, un lote de 64 peluches, sus recepciones y los pedidos de cinco locales.</p>
+          <button type="button" onClick={() => {
+            inicializarPedidosDemo();
+            const resultado = agregarEjemploOsoCascabel();
+            setErrorDemo(resultado.errores?.general || '');
+            if (!resultado.errores) setMensaje('Oso con cascabel añadido con materiales, ruta, orden, recepciones y pedidos.');
+          }}>Agregar ejemplo de oso con cascabel</button>
+          {errorDemo && <p className="error" role="alert">{errorDemo}</p>}
+        </article>
+      )}
+
       {mostrarGuia && (
         <article className="card catalogo-guia" id="guia-productos">
           <h2>Cómo registrar un producto</h2>
@@ -176,8 +196,16 @@ export default function ProductosPage() {
       )}
 
       {mensaje && <p ref={confirmacion} tabIndex={-1} className="notice" role="status">
-        {mensaje} <DeshacerCambios />
+        {mensaje}
       </p>}
+      <HistorialCambios tabla="productos" />
+      {errorEliminar && <p role="alert" className="error">{errorEliminar}</p>}
+      {pendienteEliminar && <ConfirmarEliminacion
+        tabla="productos" registroId={pendienteEliminar.producto_id}
+        nombre={pendienteEliminar.nombre} singular="producto"
+        cancelar={() => setPendienteEliminar(null)}
+        confirmar={() => handleEliminar(pendienteEliminar)}
+      />}
 
       {mostrarFormulario && (
         <ProductoForm
@@ -206,7 +234,11 @@ export default function ProductosPage() {
       />
       <ProductoList
         productos={productosFiltrados}
-        onEliminar={handleEliminar}
+        onEliminar={(producto) => {
+          setErrorEliminar('');
+          setMensaje('');
+          setPendienteEliminar(producto);
+        }}
         onEditar={(producto) => {
           setEdicion(producto);
           setMensaje('');

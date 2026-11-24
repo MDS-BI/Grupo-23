@@ -19,8 +19,8 @@ En **Rol de demostración** seleccione cada perfil y compruebe lo siguiente.
 | Perfil | Comprobación |
 |---|---|
 | Supervisor | Ofrece todas las áreas |
-| Planificación | Permite crear productos, rutas y órdenes; consulta ejecuciones |
-| Ensamble | Ofrece órdenes abiertas y ejecuciones de ensamblaje; omite recepciones y proveedores |
+| Planificador de producción | Permite crear productos, rutas y órdenes; consulta ejecuciones |
+| Operario de producción | Ofrece órdenes abiertas y ejecuciones de ensamblaje; omite recepciones y proveedores |
 | Bodega | Permite registrar una recepción; el historial carece de edición y eliminación |
 | Mantenimiento | Ofrece recursos, intervenciones y equipamiento |
 
@@ -67,7 +67,7 @@ Los materiales, repuestos, trabajadores y proveedores provienen de otros módulo
 
 ## Evaluar deshacer y pedidos
 
-1. Con Supervisor o Planificación, abra **Etapas y rutas** y cree una etapa.
+1. Con Supervisor o Planificador de producción, abra **Etapas y rutas** y cree una etapa.
    El foco debe pasar al formulario.
 2. Edite su nombre, guarde y pulse **Deshacer** en sus acciones. Compruebe que
    recupera el nombre anterior.
@@ -81,6 +81,19 @@ Los materiales, repuestos, trabajadores y proveedores provienen de otros módulo
    pendientes. Intente crear otra orden de 63 para comprobar el error.
 7. En Recepción de materiales, compruebe la restauración del formulario sin
    guardar. Las entregas confirmadas conservan sus datos.
+
+## Evaluar el oso con cascabel
+
+1. Abra con Supervisor. Si aún no aparece, pulse **Agregar ejemplo de oso con
+   cascabel** en Productos; no es necesario sustituir el ejemplo anterior.
+2. Abra el detalle de **Oso Bruno con cascabel de 30 cm**. Compruebe sus nueve
+   materiales y ocho etapas, incluidos montaje y prueba de sonido.
+3. En Órdenes, seleccione ese modelo en **Pedidos por peluche**. Los cinco
+   locales solicitan 16, 12, 10, 14 y 12 unidades, vinculadas a su orden de 64.
+4. Abra la orden: debe mostrar cuatro de ocho etapas terminadas (50 %).
+5. En Recepciones filtre por esa orden. Debe mostrar nueve entregas, incluidos
+   64 cascabeles de Accesorios Ojito y 64 bolsillos de Textiles Nube Austral.
+6. Recargue: el ejemplo no se duplica y los modelos anteriores se conservan.
 
 ## Revisar con Spec Kit
 

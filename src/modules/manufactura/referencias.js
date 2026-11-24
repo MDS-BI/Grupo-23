@@ -1,33 +1,52 @@
-import { guardarCambios, listar } from './almacenamiento.js';
+import { guardarCambios, listar, siguienteId } from './almacenamiento.js';
 
-// Las muestras siguen disponibles hasta conectar los catálogos de los otros módulos.
+// Catálogos de respaldo textiles para un almacén sin la fábrica de ejemplo.
 const muestras = {
   materiales: [
-    { material_id: 1, nombre: 'Tablero de madera', unidad: 'unidad' },
-    { material_id: 2, nombre: 'Tornillos', unidad: 'unidad' },
-    { material_id: 3, nombre: 'Pintura', unidad: 'litro' },
+    { material_id: 1, nombre: 'Tela de felpa', unidad: 'metro' },
+    { material_id: 2, nombre: 'Relleno de poliéster', unidad: 'kilogramo' },
+    { material_id: 3, nombre: 'Ojos de seguridad', unidad: 'unidad' },
   ],
   repuestos: [
-    { repuesto_id: 1, nombre: 'Rodamiento' },
-    { repuesto_id: 2, nombre: 'Correa de transmisión' },
-    { repuesto_id: 3, nombre: 'Disco de corte' },
+    { repuesto_id: 1, nombre: 'Aguja para máquina de coser' },
+    { repuesto_id: 2, nombre: 'Prensatelas para felpa' },
+    { repuesto_id: 3, nombre: 'Canilla para máquina de coser' },
   ],
   trabajadores: [
-    { trabajador_id: 1, nombre: 'Operador de muestra' },
-    { trabajador_id: 2, nombre: 'Técnico de muestra' },
-    { trabajador_id: 3, nombre: 'Encargado de muestra' },
+    { trabajador_id: 1, nombre: 'Operario de costura de peluches' },
+    { trabajador_id: 2, nombre: 'Técnico de maquinaria textil' },
+    { trabajador_id: 3, nombre: 'Encargado del taller de peluches' },
   ],
   proveedores: [
-    { proveedor_id: 1, razon_social: 'Proveedor de materiales de muestra' },
-    { proveedor_id: 2, razon_social: 'Proveedor industrial de muestra' },
+    { proveedor_id: 1, razon_social: 'Proveedor de telas y felpa' },
+    { proveedor_id: 2, razon_social: 'Proveedor de accesorios para peluches' },
   ],
 };
+const relaciones = {
+  materiales: ['material_id', [['producto_material', 'material_id'], ['recepciones', 'material_id']]],
+  repuestos: ['repuesto_id', [['mantenimiento_repuestos', 'repuesto_id']]],
+  trabajadores: ['trabajador_id', [['ejecuciones', 'trabajador_id'], ['mantenimientos', 'tecnico_id'], ['asignaciones', 'trabajador_id']]],
+  proveedores: ['proveedor_id', [['recepciones', 'proveedor_id']]],
+};
+
+function muestrasEnUso(tipo) {
+  const [campo, enlaces] = relaciones[tipo] || [];
+  if (!campo) return [];
+  const usados = new Set(enlaces.flatMap(([tabla, columna]) =>
+    listar(tabla).map((registro) => Number(registro[columna])),
+  ));
+  return muestras[tipo].filter((registro) => usados.has(Number(registro[campo])));
+}
+
 let proveedor = null;
 export function configurarReferencias(adaptador) {
   proveedor = adaptador;
 }
 export function obtenerReferencias(tipo) {
-  const lista = proveedor ? proveedor(tipo) : muestras[tipo];
+  const fabrica = listar('demo_peluches')[0];
+  // La fábrica usa sus propios catálogos; los respaldos solo permanecen si
+  // están referenciados por registros previos para conservar sus relaciones.
+  const lista = proveedor ? proveedor(tipo) : fabrica ? muestrasEnUso(tipo) : muestras[tipo];
   const catalogo = Array.isArray(lista) ? lista.map((r) => ({ ...r })) : [];
   if (tipo === 'materiales') {
     const externos = catalogo.filter(({ material_id }) => {
@@ -36,7 +55,7 @@ export function obtenerReferencias(tipo) {
     });
     return [...externos, ...listar('materiales_locales')];
   }
-  const demo = listar('demo_peluches')[0]?.[tipo];
+  const demo = fabrica?.[tipo];
   return Array.isArray(demo) ? [...catalogo, ...demo] : catalogo;
 }
 
@@ -66,11 +85,7 @@ export function registrarMaterialLocal(datos) {
 
   const locales = listar('materiales_locales');
   // Los identificadores locales son negativos para reservar los positivos al catálogo externo.
-  const materialId =
-    locales.reduce((menor, material) => {
-      const id = Number(material.material_id);
-      return Number.isSafeInteger(id) ? Math.min(menor, id) : menor;
-    }, 0) - 1;
+  const materialId = siguienteId('materiales_locales');
   const registro = { material_id: materialId, nombre, unidad };
   const resultado = guardarCambios({
     materiales_locales: [...locales, registro],

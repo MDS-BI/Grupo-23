@@ -22,10 +22,11 @@ export default function NuevoMaterial({ onCreado, onCancelar }) {
     <fieldset ref={destino} id="nuevo-material">
       <legend>Registrar un material para reutilizar</legend>
       <p className="muted">
+        Si el material ya aparece en la lista, selecciónalo sin registrarlo otra vez.{' '}
         Escribe un nombre y una unidad de medida. Por ejemplo,{' '}
-        <strong>Clavos</strong> y <strong>unidad</strong>. Pulsa{' '}
+        <strong>Cascabel para peluche</strong> y <strong>unidad</strong>. Pulsa{' '}
         <strong>Guardar material</strong> y se seleccionará en el producto. Si
-        cada mesa usa 12 clavos, escribe <strong>12</strong> en Cantidad por
+        cada oso usa 1 cascabel, escribe <strong>1</strong> en Cantidad por
         unidad y pulsa <strong>Agregar</strong>.
       </p>
       <div className="form-grid">

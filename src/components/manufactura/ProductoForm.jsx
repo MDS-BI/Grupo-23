@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   obtenerReferencias,
   nombreReferencia,
@@ -10,6 +10,7 @@ import {
 import useManufactura from '../../hooks/useManufactura.js';
 import NuevoMaterial from './NuevoMaterial.jsx';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
+import HistorialCambios from './HistorialCambios.jsx';
 
 const FORMULARIO_VACIO = { nombre: '', tipo: '' };
 const MATERIAL_VACIO = { material_id: '', cantidad_por_unidad: '' };
@@ -34,12 +35,32 @@ export default function ProductoForm({
   const [erroresMaterial, setErroresMaterial] = useState({});
   const [mostrarNuevoMaterial, setMostrarNuevoMaterial] = useState(false);
   const [avisoMaterial, setAvisoMaterial] = useState('');
+  const [ultimoMaterialCreado, setUltimoMaterialCreado] = useState(null);
   const cantidadRef = useRef(null);
   const nuevoMaterialRef = useRef(null);
   const destino = useEnfoqueAccion();
   const catalogoMateriales = obtenerReferencias('materiales');
+  const idsCatalogo = JSON.stringify(catalogoMateriales.map((r) => Number(r.material_id)));
+  const catalogoAnterior = useRef(idsCatalogo);
+  useEffect(() => {
+    const disponibles = new Set(JSON.parse(idsCatalogo));
+    const retirados = new Set(JSON.parse(catalogoAnterior.current).filter((id) => !disponibles.has(id)));
+    catalogoAnterior.current = idsCatalogo;
+    if (!retirados.size) return;
+    setMaterial((actual) => retirados.has(Number(actual.material_id)) ? MATERIAL_VACIO : actual);
+    setMateriales((actuales) => actuales.filter((r) => !retirados.has(Number(r.material_id))));
+  }, [idsCatalogo]);
+  const existeMaterialCreado = catalogoMateriales.some((registro) => Number(registro.material_id) === ultimoMaterialCreado);
+  useEffect(() => {
+    if (ultimoMaterialCreado == null || existeMaterialCreado) return;
+    setMaterial((actual) => Number(actual.material_id) === ultimoMaterialCreado ? MATERIAL_VACIO : actual);
+    setMateriales((actuales) => actuales.filter((registro) => Number(registro.material_id) !== ultimoMaterialCreado));
+    setAvisoMaterial('Creación del material deshecha.');
+    setUltimoMaterialCreado(null);
+  }, [ultimoMaterialCreado, existeMaterialCreado]);
 
   const materialCreado = (registro) => {
+    setUltimoMaterialCreado(Number(registro.material_id));
     setMaterial((actual) => ({
       ...actual,
       material_id: String(registro.material_id),
@@ -72,7 +93,7 @@ export default function ProductoForm({
       [name]: undefined,
       general: undefined,
     }));
-    if (name === 'material_id') setAvisoMaterial('');
+    if (name === 'material_id' && ultimoMaterialCreado == null) setAvisoMaterial('');
   };
 
   const agregarMaterial = () => {
@@ -97,7 +118,7 @@ export default function ProductoForm({
     ]);
     setMaterial(MATERIAL_VACIO);
     setErroresMaterial({});
-    setAvisoMaterial('');
+    setAvisoMaterial(ultimoMaterialCreado == null ? '' : `${nombreReferencia('materiales', ultimoMaterialCreado)} quedó guardado en el catálogo.`);
   };
 
   const quitarMaterial = (indice) => {
@@ -113,6 +134,7 @@ export default function ProductoForm({
     setErroresProducto({});
     setErroresMaterial({});
     setAvisoMaterial('');
+    setUltimoMaterialCreado(null);
   };
 
   const handleSubmit = (evento) => {
@@ -296,7 +318,6 @@ export default function ProductoForm({
                 if (mostrarNuevoMaterial) {
                   cerrarNuevoMaterial();
                 } else {
-                  setAvisoMaterial('');
                   setMostrarNuevoMaterial(true);
                 }
               }}
@@ -316,6 +337,7 @@ export default function ProductoForm({
                 {avisoMaterial}
               </p>
             )}
+            <HistorialCambios tabla="materiales_locales" />
           </div>
 
           <div>

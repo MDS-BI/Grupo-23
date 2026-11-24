@@ -131,7 +131,7 @@ it('mantiene disponibles los últimos veinte cambios de la sesión', () => {
 it('permite deshacer durante la sesión aunque el navegador rechace guardar el historial', () => {
   const escritura = Storage.prototype.setItem;
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (clave, valor) {
-    if (this === sessionStorage) throw new Error('Historial sin espacio');
+    if (clave === 'manufactura:deshacer') throw new Error('Historial sin espacio');
     return escritura.call(this, clave, valor);
   });
   const etapa = guardarEtapa({ nombre: 'Control', tipo: 'Calidad', tiempo_estandar_min: 5 }).registro;

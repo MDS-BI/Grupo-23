@@ -135,7 +135,7 @@ página para desmontar formularios y detalles al cambiar la perspectiva.
 `Controles.jsx` condiciona las acciones a la tabla y al perfil.
 
 `guardarCambios` valida permisos antes de escribir cualquiera de las tablas
-de una operación. Ensamble solo puede modificar ejecuciones de etapas cuyo
+de una operación. El operario de producción solo puede modificar ejecuciones de etapas cuyo
 tipo sea Ensamble o Ensamblaje en órdenes abiertas. Las páginas de órdenes
 filtran esas etapas y omiten entregas y proveedores para ese perfil.
 

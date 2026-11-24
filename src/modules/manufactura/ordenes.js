@@ -4,6 +4,7 @@ import {
   guardarRegistro,
   guardarCambios,
   fallo,
+  eliminarRegistro,
 } from './almacenamiento.js';
 import {
   referencia,
@@ -14,6 +15,7 @@ import {
   vacio,
 } from './validacion.js';
 import { obtenerRuta } from './rutas.js';
+import { analizarEliminacion } from './eliminacion.js';
 export const MINIMO_PRODUCCION = 64;
 
 export const ESTADOS_ORDEN = [
@@ -173,10 +175,8 @@ export function avanceOrden(orden) {
 }
 
 export function eliminarOrden(id) {
-  if (!buscar('ordenes', id)) return fallo('La orden ya no existe.');
-  if (listar('recepciones').some((r) => Number(r.orden_id) === Number(id))) {
-    return fallo('La orden tiene recepciones registradas. Conserva su historial y cambia su estado si corresponde.');
-  }
+  const estado = analizarEliminacion('ordenes', id);
+  if (!estado.permitida) return fallo(estado.motivo);
   return guardarCambios({
     ordenes: listar('ordenes').filter((o) => Number(o.orden_id) !== Number(id)),
     ejecuciones: listar('ejecuciones').filter(
@@ -189,4 +189,9 @@ export function eliminarOrden(id) {
       Number(pedido.orden_id) === Number(id) ? { ...pedido, orden_id: null } : pedido,
     ),
   });
+}
+
+export function eliminarEjecucion(id) {
+  const estado = analizarEliminacion('ejecuciones', id);
+  return estado.permitida ? eliminarRegistro('ejecuciones', id) : fallo(estado.motivo);
 }

@@ -62,7 +62,7 @@ describe('Historias del PDF en la interfaz', () => {
     await click('Agregar');
     await click('Guardar producto');
     await click('Ver detalle');
-    expect(texto()).toContain('Tablero de madera — 2.5 por unidad');
+    expect(texto()).toContain('Tela de felpa — 2.5 por unidad');
     await click('Cerrar detalle');
     await click('Editar');
     await campo('nombre', 'Mesa PDF revisada');
@@ -133,10 +133,10 @@ describe('Historias del PDF en la interfaz', () => {
       fecha_recepcion: '2026-11-10',
     });
     await click('Guardar');
-    expect(texto()).toContain('Proveedor de materiales de muestra');
+    expect(texto()).toContain('Proveedor de telas y felpa');
     await click('Recepción de materiales');
     expect(container.querySelector('tbody').textContent).toContain(
-      'Tablero de madera',
+      'Tela de felpa',
     );
     await campo('filtro_orden', '1');
     expect(listar('recepciones')).toHaveLength(1);
@@ -156,7 +156,7 @@ describe('Historias del PDF en la interfaz', () => {
     await click('Agregar repuesto');
     await click('Guardar');
     await click('Ver detalle');
-    expect(texto()).toContain('Rodamiento · 2 unidades');
+    expect(texto()).toContain('Aguja para máquina de coser · 2 unidades');
     await click('Equipamiento y asignaciones');
     await click('Nuevo equipamiento');
     await rellenar({ nombre: 'Taladro de planta', tipo: 'Herramienta' });
@@ -187,7 +187,7 @@ describe('Historias del PDF en la interfaz', () => {
     await click('Órdenes de producción');
     await click('Ver detalle');
     expect(texto()).toContain('45 min');
-    expect(texto()).toContain('Proveedor de materiales de muestra');
+    expect(texto()).toContain('Proveedor de telas y felpa');
     await click('Panel de producción');
     expect(texto()).toContain('OP-0001');
     expect(texto()).toContain('50%');

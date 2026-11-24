@@ -16,7 +16,7 @@ it('valida datos obligatorios y evita duplicar nombres de muestra o locales', ()
     unidad: 'Escribe una unidad de medida.',
   });
   expect(
-    registrarMaterialLocal({ nombre: '  PINTURA  ', unidad: 'litro' }).errores
+    registrarMaterialLocal({ nombre: '  TELA DE FELPA  ', unidad: 'metro' }).errores
       .nombre,
   ).toContain('Ya existe');
   expect(

@@ -7,6 +7,7 @@ import {
   obtenerOrdenes,
   guardarOrden,
   eliminarOrden,
+  eliminarEjecucion,
   obtenerEjecuciones,
   guardarEjecucion,
   avanceOrden,
@@ -17,7 +18,6 @@ import { obtenerProductos } from '../../modules/manufactura/productos.js';
 import { obtenerRuta } from '../../modules/manufactura/rutas.js';
 import {
   buscar,
-  eliminarRegistro,
 } from '../../modules/manufactura/almacenamiento.js';
 import { obtenerMaquinas } from '../../modules/manufactura/recursos.js';
 import { nombreReferencia } from '../../modules/manufactura/referencias.js';
@@ -172,7 +172,7 @@ function OrdenDetalle({ ordenId, cerrar }) {
         )}
         campos={campos}
         guardar={(d, id) => guardarEjecucion({ ...d, orden_id: ordenId }, id)}
-        eliminar={(id) => eliminarRegistro('ejecuciones', id)}
+        eliminar={eliminarEjecucion}
         columnas={[
           {
             key: 'etapa_id',
