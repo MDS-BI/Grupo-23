@@ -669,3 +669,7 @@ de 30, 15 y 19; permaneció al recargar. Se deshizo la prueba y se descartó su
 aviso, conservando los seis lotes y treinta pedidos iniciales. Sin errores de
 consola desde la recarga. Capturas locales del formulario y estado final.
 Los cambios siguen locales en main, sin crear ramas, commit ni push.
+
+- [x] T207 Retirar de la página el botón Descargar respaldo anterior, por
+  solicitud posterior del usuario; conservar el respaldo previo y actualizar
+  la documentación para reproducir la interfaz vigente.

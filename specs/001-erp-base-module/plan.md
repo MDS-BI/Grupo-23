@@ -185,7 +185,7 @@ Supervisor, por autorización del 27 de noviembre de 2026. Genera seis lotes de
 10, 14 y 12 suman 64. Los cinco lotes iniciados o finalizados tienen todos sus
 pedidos asignados y sus materiales recibidos; el planificado tiene pedidos
 pendientes y tres materiales por recibir. Las fechas fijas permiten reproducir
-el mismo estado. El respaldo se descarga desde la interfaz; un fallo recupera
+el mismo estado. El respaldo permanece en el navegador sin botón de descarga; un fallo recupera
 el estado previo. Las recargas posteriores conservan las ediciones.
 
 ## Seguimiento de Complejidad

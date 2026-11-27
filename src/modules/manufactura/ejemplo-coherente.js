@@ -13,7 +13,6 @@ function datosActuales() {
     .filter((clave) => clave.startsWith('manufactura:') && !clave.startsWith('manufactura:respaldo_'))
     .map((clave) => [clave, window.localStorage.getItem(clave)]));
 }
-
 // Reconstrucción de los ejemplos autorizada por el usuario. Los datos previos
 // se respaldan antes de escribir; una avería restaura tablas e historial.
 export function reconstruirEjemploCoherente() {
@@ -43,22 +42,7 @@ export function reconstruirEjemploCoherente() {
       for (const [clave, valor] of Object.entries(anteriores)) window.localStorage.setItem(clave, valor);
       if (historialSesion === null) window.sessionStorage.removeItem(CLAVE_HISTORIAL);
       else window.sessionStorage.setItem(CLAVE_HISTORIAL, historialSesion);
-    } catch { return { errores: { general: 'La reconstrucción falló. El respaldo previo sigue disponible para descargar.' }, reconstruido: false }; }
+    } catch { return { errores: { general: 'La reconstrucción falló. El respaldo previo sigue guardado en este navegador.' }, reconstruido: false }; }
     return { errores: { general: 'No se pudo completar el ejemplo. Se recuperaron los registros anteriores y se conservó su respaldo.' }, reconstruido: false };
   }
-}
-
-export function hayRespaldoEjemplo() {
-  try { return !!window.localStorage.getItem(CLAVE_RESPALDO_EJEMPLO); } catch { return false; }
-}
-
-export function descargarRespaldoEjemplo() {
-  const contenido = window.localStorage.getItem(CLAVE_RESPALDO_EJEMPLO);
-  if (!contenido) return;
-  const url = URL.createObjectURL(new Blob([contenido], { type: 'application/json' }));
-  const enlace = document.createElement('a');
-  enlace.href = url;
-  enlace.download = 'manufactura-respaldo-antes-reconstruccion.json';
-  enlace.click();
-  URL.revokeObjectURL(url);
 }

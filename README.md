@@ -22,8 +22,8 @@ Las alertas de vencimiento usan la fecha actual del navegador.
 Los datos se guardan en las claves `manufactura:` del navegador. Por autorización
 del usuario del 27 de noviembre de 2026, el primer arranque con Supervisor de
 esta versión respalda los ejemplos anteriores y reconstruye únicamente los
-datos de Manufactura. **Descargar respaldo anterior** conserva acceso al JSON
-previo. Si el respaldo falla, no se sustituyen registros; si falla la carga,
+datos de Manufactura. El respaldo previo permanece guardado en el navegador;
+no se muestra un botón para descargarlo. Si el respaldo falla, no se sustituyen registros; si falla la carga,
 se recuperan los datos anteriores. La reconstrucción se ejecuta una sola vez
 por navegador y las ediciones posteriores se conservan al recargar.
 Cada navegador tiene su propia copia. Para comparar el estado inicial use un

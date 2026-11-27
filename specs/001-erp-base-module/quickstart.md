@@ -114,8 +114,8 @@ Los materiales, repuestos, trabajadores y proveedores provienen de otros módulo
 ## Evaluar la fábrica reconstruida
 
 1. Abra con Supervisor. La primera carga de esta versión respalda y sustituye
-   los ejemplos de Manufactura una sola vez. Compruebe **Descargar respaldo
-   anterior**; no se vuelve a restablecer la fábrica al recargar.
+   los ejemplos de Manufactura una sola vez. El respaldo previo se conserva
+   en el navegador; no se vuelve a restablecer la fábrica al recargar.
 2. Compruebe seis modelos, seis órdenes de 64 y treinta pedidos. Dos órdenes
    están finalizadas y tres en producción; todas muestran 64/64 asignados.
    Las dos finalizadas tienen el 100 % de sus etapas terminadas.

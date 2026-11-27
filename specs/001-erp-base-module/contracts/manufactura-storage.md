@@ -250,7 +250,7 @@ seis órdenes y treinta pedidos fija `manufactura:ejemplo_coherente_v2` a `1`.
 La demo usa fechas fijas del 27 de noviembre de 2026, asigna completamente los
 lotes iniciados/finalizados y completa sus materiales. El lote planificado
 conserva pedidos y materiales pendientes como ejemplo de planificación.
-La acción Descargar respaldo anterior entrega el JSON localmente.
+El respaldo se conserva en el navegador sin un control de descarga en la interfaz.
 Esta sustitución explícita de ejemplos no modifica la protección habitual de
 las recepciones confirmadas ni afecta datos de otros módulos.
 

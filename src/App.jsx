@@ -10,7 +10,7 @@ import useManufactura from './hooks/useManufactura.js';
 import { cambiarRol, puedeAcceder, ROLES, rolActual } from './modules/manufactura/roles.js';
 import DeshacerCambios from './components/manufactura/DeshacerCambios.jsx';
 import useEnfoqueAccion from './hooks/useEnfoqueAccion.js';
-import { reconstruirEjemploCoherente, hayRespaldoEjemplo, descargarRespaldoEjemplo } from './modules/manufactura/ejemplo-coherente.js';
+import { reconstruirEjemploCoherente } from './modules/manufactura/ejemplo-coherente.js';
 import AvisoOperacion from './components/manufactura/AvisoOperacion.jsx';
 
 export default function App({ prepararEjemplo = false }) {
@@ -132,7 +132,6 @@ export default function App({ prepararEjemplo = false }) {
           <p className="rol-perspectiva">{ROLES[rol].descripcion}</p>
           {avisoLotes && ['supervisor', 'planificacion'].includes(rol) && <AvisoOperacion onCerrar={() => setAvisoLotes('')}>{avisoLotes}</AvisoOperacion>}
           {errorLotes && <p role="alert" className="error">{errorLotes}</p>}
-          {rol === 'supervisor' && hayRespaldoEjemplo() && <button type="button" className="respaldo-ejemplo" onClick={descargarRespaldoEjemplo}>Descargar respaldo anterior</button>}
           <div className="deshacer-global">
             <span>Último cambio guardado</span>
             <DeshacerCambios />
