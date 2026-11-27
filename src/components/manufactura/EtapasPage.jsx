@@ -9,8 +9,8 @@ import { obtenerRuta, guardarRuta } from '../../modules/manufactura/rutas.js';
 import useManufactura from '../../hooks/useManufactura.js';
 import { Campo, GestionRegistros, opciones } from './Controles.jsx';
 import HistorialCambios from './HistorialCambios.jsx';
+import AvisoOperacion from './AvisoOperacion.jsx';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
-import { cambioParaDeshacer } from '../../modules/manufactura/almacenamiento.js';
 
 export default function EtapasPage() {
   useManufactura();
@@ -18,7 +18,7 @@ export default function EtapasPage() {
   const [filas, setFilas] = useState([]);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState('');
-  const mensajeRuta = mensaje || (cambioParaDeshacer('rutas') ? 'Última ruta guardada.' : '');
+  const mensajeRuta = mensaje;
   const destino = useEnfoqueAccion(producto);
   const rutaGuardada = JSON.stringify(producto ? obtenerRuta(producto) : []);
   useEffect(() => {
@@ -219,9 +219,9 @@ export default function EtapasPage() {
           </>
         )}
         {mensajeRuta && (
-          <p role="status" className="notice">
+          <AvisoOperacion onCerrar={() => setMensaje('')}>
             {mensajeRuta}
-          </p>
+          </AvisoOperacion>
         )}
         <HistorialCambios tabla="rutas" />
       </article>

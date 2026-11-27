@@ -16,6 +16,6 @@ if (puedeModificarTabla('demo_peluches')) agregarEjemploOsoCascabel();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <App prepararEjemplo />
   </StrictMode>,
 );

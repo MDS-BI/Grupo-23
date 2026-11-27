@@ -107,7 +107,7 @@ function guardarHistorial(historial) {
 
 export function estadoDeshacer(tabla, id) {
   const historial = leerHistorial();
-  const paso = historial.pasos.findLast((p) => !p.deshecho);
+  const paso = historial.pasos.findLast((p) => !p.deshecho && !p.oculto);
   const noDisponible = (motivo) => ({ cambio: null, motivo });
   if (!paso) return noDisponible('No hay cambios guardados disponibles para deshacer.');
   if (paso.rol !== rolActual()) return noDisponible('Selecciona el rol que realizó el último cambio para deshacerlo.');
@@ -132,7 +132,7 @@ export function deshacerUltimoCambio(tabla, id) {
 }
 
 export function historialCambios(tabla) {
-  return leerHistorial().pasos.filter((p) => p.rol === rolActual() &&
+  return leerHistorial().pasos.filter((p) => !p.oculto && p.rol === rolActual() &&
     Object.keys(p.anteriores).every(puedeModificarTabla) &&
     (!tabla || Object.hasOwn(p.anteriores, tabla))).toReversed();
 }
@@ -142,6 +142,7 @@ export function estadoCambio(cambioId) {
   const paso = historial.pasos.find((p) => p.id === cambioId);
   const noDisponible = (motivo) => ({ cambio: null, motivo });
   if (!paso) return noDisponible('El cambio ya no está en los últimos 20 registros del historial.');
+  if (paso.oculto) return noDisponible('El aviso de este cambio fue descartado.');
   if (paso.rol !== rolActual() || !Object.keys(paso.anteriores).every(puedeModificarTabla))
     return noDisponible('Tu rol no permite revertir este cambio.');
   if (paso.protegido) return noDisponible('Las recepciones guardadas se conservan como historial.');
@@ -168,8 +169,18 @@ function revertirCambio(cambioId, rehacer) {
 export const deshacerCambio = (id) => revertirCambio(id, false);
 export const rehacerCambio = (id) => revertirCambio(id, true);
 
+export function descartarAvisoCambio(id) {
+  const historial = leerHistorial();
+  const paso = historial.pasos.find((p) => p.id === id);
+  if (!paso || paso.rol !== rolActual() || !Object.keys(paso.anteriores).every(puedeModificarTabla))
+    return fallo('Tu rol no permite descartar este aviso.');
+  guardarHistorial({ ...historial, pasos: historial.pasos.map((p) => p.id === id ? { ...p, oculto: true } : p) });
+  window.dispatchEvent(new CustomEvent('manufactura:cambio', { detail: { accion: 'descartar', tablas: [] } }));
+  return { errores: null };
+}
+
 // Guarda juntas las relaciones; si el navegador rechaza una escritura se recuperan los valores previos.
-export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
+export function guardarCambios(cambios, { registrarHistorial = true, ajusteLotes = false } = {}) {
   const cargaPedidos = cambios.pedidos_demo && listar('demo_peluches').length > 0 &&
     !listar('pedidos').length && !listar('locales').length &&
     Object.keys(cambios).every((tabla) => ['locales', 'pedidos', 'pedidos_demo'].includes(tabla));
@@ -242,6 +253,7 @@ export function guardarCambios(cambios, { registrarHistorial = true } = {}) {
           id: `cambio-${historial.revision + 1}`,
           fecha: new Date().toISOString(),
           deshecho: false,
+          ajusteLotes,
           protegido: tablasCambiadas.includes('recepciones'),
           rol: rolActual(),
           anteriores: Object.fromEntries(tablasCambiadas.map((tabla) => [

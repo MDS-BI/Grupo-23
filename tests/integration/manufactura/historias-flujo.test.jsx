@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from '../../../src/App.jsx';
-import { listar } from '../../../src/modules/manufactura/almacenamiento.js';
+import { guardarCambios, listar } from '../../../src/modules/manufactura/almacenamiento.js';
 
 let container;
 let root;
@@ -52,6 +52,7 @@ const texto = () => container.textContent;
 
 describe('Historias del PDF en la interfaz', () => {
   it('completa HU1 → HU2 → HU3 → HU4 y los recursos de HU5; conserva todas las relaciones al reabrir', async () => {
+    await act(async () => guardarCambios({ locales: [{ local_id: 1, codigo: 'LOC-001', nombre: 'Tienda de prueba' }] }));
     await click('Nuevo producto');
     await rellenar({
       nombre: 'Mesa PDF',
@@ -104,12 +105,12 @@ describe('Historias del PDF en la interfaz', () => {
     await click('Nueva orden');
     await rellenar({
       producto_id: '1',
-      cantidad_plan: '64',
-      estado: 'Planificada',
+      local_id: '1',
+      cantidad: '64',
       fecha_inicio: '2026-11-10',
       fecha_fin: '2026-11-12',
     });
-    await click('Guardar');
+    await click('Crear orden');
     await click('Ver detalle');
     await click('Registrar ejecución');
     await rellenar({
@@ -205,7 +206,7 @@ describe('Historias del PDF en la interfaz', () => {
     );
     await click('Órdenes de producción');
     await click('Nueva orden');
-    await click('Guardar');
+    await click('Crear orden');
     expect(texto()).toContain('Selecciona un producto existente.');
     expect(texto()).toContain('una fecha de término válida');
     await click('Recepción de materiales');

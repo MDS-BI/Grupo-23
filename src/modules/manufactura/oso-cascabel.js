@@ -35,16 +35,16 @@ const etapasAdicionales = {
 
 const normalizar = (valor) => String(valor || '').trim().toLocaleLowerCase('es');
 const mismoNombre = (a, b) => normalizar(a) === normalizar(b);
-function fechaRelativa(dias) {
-  const fecha = new Date(`${FECHA_BASE_DEMO}T12:00:00Z`);
+function fechaRelativa(dias, base = FECHA_BASE_DEMO) {
+  const fecha = new Date(`${base}T12:00:00Z`);
   fecha.setUTCDate(fecha.getUTCDate() + dias);
   return fecha.toISOString().slice(0, 10);
 }
-const hora = (minutos) => `${fechaRelativa(1)}T${String(Math.floor(minutos / 60)).padStart(2, '0')}:${String(minutos % 60).padStart(2, '0')}`;
+const hora = (minutos, base) => `${fechaRelativa(1, base)}T${String(Math.floor(minutos / 60)).padStart(2, '0')}:${String(minutos % 60).padStart(2, '0')}`;
 
 // Amplía la fábrica una sola vez. La composición, ruta, orden, entregas y
 // pedidos se guardan juntos; no se reemplazan los cinco modelos originales.
-export function agregarEjemploOsoCascabel() {
+export function agregarEjemploOsoCascabel({ fechaBase = FECHA_BASE_DEMO } = {}) {
   if (ejemploOsoCascabelCargado()) return { errores: null, cargada: false };
   const fabrica = listar('demo_peluches')[0];
   if (!fabrica) return fallo('Carga primero la fábrica de peluches para añadir el oso con cascabel.');
@@ -101,14 +101,14 @@ export function agregarEjemploOsoCascabel() {
   const producto = agregar('productos', { nombre: NOMBRE_OSO_CASCABEL, tipo: 'Peluche con accesorio sonoro' });
   const orden = agregar('ordenes', {
     producto_id: producto.producto_id, cantidad_plan: 64, estado: 'En producción',
-    fecha_inicio: fechaRelativa(1), fecha_fin: fechaRelativa(4),
+    fecha_inicio: fechaRelativa(1, fechaBase), fecha_fin: fechaRelativa(4, fechaBase),
   });
   for (const material of composicion) {
     agregar('producto_material', { producto_id: producto.producto_id, material_id: material.material_id, cantidad_por_unidad: material.cantidad_por_unidad });
     agregar('recepciones', {
       orden_id: orden.orden_id, material_id: material.material_id, proveedor_id: material.proveedor_id,
       cantidad_recibida: Math.round(material.cantidad_por_unidad * 64 * 1000) / 1000,
-      fecha_recepcion: fechaRelativa(0),
+      fecha_recepcion: fechaRelativa(0, fechaBase),
     });
   }
   let inicio = 8 * 60;
@@ -117,7 +117,7 @@ export function agregarEjemploOsoCascabel() {
     agregar('rutas', { producto_id: producto.producto_id, etapa_id: paso.etapa_id, secuencia: indice + 1 });
     if (indice >= tiempos.length) return;
     const duracion = tiempos[indice];
-    agregar('ejecuciones', { ...paso, orden_id: orden.orden_id, inicio_real: hora(inicio), fin_real: hora(inicio + duracion), tiempo_uso_min: duracion });
+    agregar('ejecuciones', { ...paso, orden_id: orden.orden_id, inicio_real: hora(inicio, fechaBase), fin_real: hora(inicio + duracion, fechaBase), tiempo_uso_min: duracion });
     inicio += duracion + 15;
   });
   const codigos = new Set(cambios.pedidos.map((pedido) => normalizar(pedido.codigo)));

@@ -1290,4 +1290,33 @@ button:disabled {
 .cambio-deshecho { border-left-style: dashed; }
 .delete-dependencies { margin: .75rem 0; padding-left: 1.3rem; display: grid; gap: .35rem; }
 .delete-blocked { border-left-color: #a56826; }
+.cerrar-aviso { padding: .2rem .45rem; min-width: 1.9rem; min-height: 1.9rem; border: 0; background: transparent; color: var(--accent, #5d3c90); font-size: 1.35rem; line-height: 1; border-radius: 50%; }
+.cerrar-aviso:hover { background: #dac8f080; }
+.aviso-operacion { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.aviso-operacion > span { flex: 1; }
+.historial-detalle { flex: 1; }
+.ordenes-guia { display: grid; gap: .4rem; border-left: 3px solid #a98ac8; padding: 1rem 1.25rem; background: #e9ddf780; margin-bottom: 1.25rem; }
+.selector-modelos { margin: 1.3rem 0; }
+.selector-modelos [aria-pressed="true"] { background: #5d3c90; color: #fff; border-color: #5d3c90; }
+.ordenes-indicadores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+.ordenes-indicadores > div { padding: 1.2rem; border: 1px solid #e2d8ea; border-radius: 1rem; background: #fff; display: grid; gap: .35rem; }
+.ordenes-indicadores strong { font-size: 1.6rem; color: #5d3c90; }
+.ordenes-indicadores span { font-size: .9rem; }
+.orden-form { border: 2px solid #bba0d4; box-shadow: 0 8px 32px #251c3210; }
+.orden-form fieldset { border: 1px solid #e1d4ec; border-radius: .85rem; padding: 1.2rem; margin: 1.2rem 0; min-width: 0; }
+.orden-form legend { padding: 0 .4rem; font-weight: 700; }
+.orden-reparto { display: flex; flex-wrap: wrap; gap: .8rem 1.5rem; background: #ede4f780; border-radius: .6rem; padding: 1rem; margin: 1rem 0; }
+.orden-reparto strong { color: #5d3c90; font-size: 1.15rem; }
+.reparto-excedido { background: #fff0e2; }
+.reparto-excedido strong { color: #944415; }
+.orden-pedidos-lista { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: .65rem; }
+.orden-pedidos-lista > li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 1rem; border: 1px solid #e1d4ec; border-radius: .65rem; background: #fff; }
+.orden-pedidos-lista label { display: flex; align-items: center; gap: .8rem; width: 100%; cursor: pointer; }
+.orden-pedidos-lista input[type="checkbox"] { width: 1.15rem; height: 1.15rem; flex-shrink: 0; accent-color: #5d3c90; }
+.orden-pedidos-lista small, .orden-vinculos small { display: block; margin-top: .25rem; color: #695d78; }
+.pedido-borrador { border-radius: .7rem; padding: 1.2rem; margin-top: 1rem; background: #e9ddf780; }
+.pedido-borrador h4 { margin: 0 0 1rem; }
+.orden-form-acciones { border-top: 1px solid #dfd2e9; padding-top: 1rem; justify-content: flex-end; position: sticky; bottom: 0; z-index: 1; background: #fff; padding-bottom: .75rem; }
+.orden-locales-resumen { margin: 1.5rem 0; padding: 1rem; border: 1px solid #e1d4ec; border-radius: .75rem; }
+@media (max-width: 650px) { .ordenes-indicadores { grid-template-columns: 1fr; } .orden-pedidos-lista > li { flex-wrap: wrap; } .orden-form fieldset { padding: .85rem; } }
 @media (max-width: 600px) { .historial-cambio { align-items: flex-start; flex-direction: column; } }

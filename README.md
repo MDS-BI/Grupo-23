@@ -15,11 +15,17 @@ npm run dev
 
 Abra la dirección que muestre Vite, normalmente `http://localhost:5173/`.
 Con la misma revisión del repositorio y un perfil nuevo de navegador, se cargan
-los mismos seis peluches, ocho etapas, seis rutas, seis órdenes, 37 recepciones
-y cinco máquinas. El dataset usa como fecha base el 16 de noviembre de 2026.
+los mismos seis peluches, ocho etapas, seis rutas, seis órdenes, 38 recepciones
+y cinco máquinas. El dataset reconstruido usa como fecha base el 27 de noviembre de 2026.
 Las alertas de vencimiento usan la fecha actual del navegador.
 
-Los datos existentes se conservan en las claves `manufactura:` del navegador.
+Los datos se guardan en las claves `manufactura:` del navegador. Por autorización
+del usuario del 27 de noviembre de 2026, el primer arranque con Supervisor de
+esta versión respalda los ejemplos anteriores y reconstruye únicamente los
+datos de Manufactura. **Descargar respaldo anterior** conserva acceso al JSON
+previo. Si el respaldo falla, no se sustituyen registros; si falla la carga,
+se recuperan los datos anteriores. La reconstrucción se ejecuta una sola vez
+por navegador y las ediciones posteriores se conservan al recargar.
 Cada navegador tiene su propia copia. Para comparar el estado inicial use un
 perfil nuevo. La imagen y la fuente están incluidas en `src/assets/manufactura/`.
 Los catálogos externos se representan con muestras y un adaptador sustituible.
@@ -37,10 +43,13 @@ y prueba de sonido. Su orden de 64 unidades está en producción, con cuatro
 etapas terminadas, nueve recepciones completas y cinco pedidos de locales
 asignados (16, 12, 10, 14 y 12 unidades).
 
-La ampliación se añade una sola vez al abrir con Supervisor. Conserva los
-cinco modelos y todos los movimientos anteriores. Si todavía falta, el botón
-**Agregar ejemplo de oso con cascabel** en Productos permite incorporarla.
-No requiere sustituir registros ni restablecer el navegador.
+La fábrica reconstruida incluye 30 pedidos de cinco locales. Las dos órdenes
+finalizadas y las tres en producción tienen 64/64 unidades asignadas y todos
+sus materiales recibidos. Las finalizadas tienen el 100 % de su ruta terminada;
+las iniciadas muestran avances parciales. El lote planificado de Ajolote Lila
+tiene cinco pedidos pendientes que suman 64 y tres materiales pendientes de
+recepción para demostrar el trabajo previo al inicio. El oso con cascabel ya
+está incluido; su ampliación manual conserva la protección contra duplicados.
 
 ## Vistas por rol
 
@@ -81,6 +90,9 @@ El volumen y los tiempos excluyen órdenes canceladas. El gráfico de estados s�
 las incluye. El cierre de una orden aporta su cantidad planificada a las
 unidades finalizadas; terminar varias etapas no suma peluches adicionales.
 Las alertas de planta y los indicadores generales conservan su alcance global.
+Los faltantes se calculan por orden abierta y luego se agrupan por material.
+Las entregas de lotes cerrados y los excedentes de otra orden no cubren esos
+faltantes: cada recepción está destinada a su propia orden.
 
 ## Deshacer y planificar pedidos
 
@@ -113,16 +125,39 @@ afectados. Al confirmar se eliminan juntos el equipamiento y sus asignaciones;
 desaparecen de las tablas activas. Un aviso separado ofrece **Deshacer
 eliminación**, que recupera ambos con sus identificadores originales.
 
-En **Órdenes de producción**, pulse un modelo en **Pedidos por peluche**.
-El menú muestra el código de cada pedido, el código y nombre del local y su
-cantidad. La demo incluye cinco locales ficticios y cinco pedidos por modelo,
-que suman 64. Los perfiles de Supervisor y Planificador de producción pueden registrar pedidos
-y abrir una orden con **Planificar estos pedidos**.
+En **Órdenes de producción**, **Nueva orden** abre un único formulario:
+primero las fechas de inicio y término; después el peluche, el local y la
+cantidad. Puede incluir varios pedidos del mismo modelo. **Crear orden**
+guarda el lote, los pedidos nuevos y sus vínculos juntos. La cantidad a fabricar
+se calcula con la suma de los pedidos incluidos; cancelar no guarda borradores.
+También puede seleccionar pedidos pendientes ya registrados.
 
-Cada orden nueva requiere al menos 64 peluches enteros. Las órdenes históricas
-mantienen sus cantidades al editar otros campos. Los pedidos se asignan a la
-orden al guardar y vuelven a quedar pendientes si se deshace esa creación.
-Los botones de apertura desplazan la vista y enfocan el formulario o detalle.
+El mínimo es **64 peluches por lote del mismo modelo**, sumando uno o varios
+pedidos. Un local puede pedir 30, otro 15 y otro 19, o un solo local puede pedir
+64 o más. Cada pedido requiere una cantidad entera positiva. Las fechas de
+inicio y término son comunes a todos los pedidos del lote. Los ejemplos
+reconstruidos tienen lotes de 64. Los botones de peluches filtran las órdenes y
+muestran debajo sus pedidos, códigos y locales.
+
+**Asignar pedidos**, en una orden planificada existente, permite vincular pedidos
+pendientes, añadir pedidos de locales o ampliar el lote sin crear otra orden.
+La selección no puede superar la cantidad del lote ni mezclar modelos o pedidos
+ya asignados a otra orden. El detalle muestra los locales y sus cantidades.
+Los perfiles de Supervisor y Planificador de producción gestionan este flujo;
+el Operario de producción conserva su vista de ejecuciones sin datos de locales.
+
+El resumen distingue **órdenes en esta vista** de **órdenes con cupo para
+pedidos**: solo las planificadas con unidades sin asignar
+cuentan con cupo. Una orden 64/64 sigue en producción si corresponde, pero no
+incrementa el contador de cupos. Antes de iniciar producción, todo el lote debe
+estar asignado a locales. Al salir de planificación se bloquean los cambios
+de cantidad, modelo y pedidos; las órdenes iniciadas, finalizadas o canceladas
+no ofrecen nuevos cupos. La asignación a locales y el avance de fabricación
+son indicadores distintos.
+
+Cada aviso de Deshacer/Rehacer tiene una **×** para descartarlo sin modificar
+registros. El aviso descartado permanece oculto al recargar y deja de ofrecerse
+en Deshacer global. Las confirmaciones de operaciones también pueden cerrarse.
 
 ## Comprobación y trazabilidad
 

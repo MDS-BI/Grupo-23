@@ -95,6 +95,45 @@ Los materiales, repuestos, trabajadores y proveedores provienen de otros módulo
    64 cascabeles de Accesorios Ojito y 64 bolsillos de Textiles Nube Austral.
 6. Recargue: el ejemplo no se duplica y los modelos anteriores se conservan.
 
+## Probar órdenes y avisos
+
+1. Abra **Nueva orden**, indique las fechas y seleccione Conejo Nube.
+2. Incluya un pedido de 30: debe aceptarse en la selección, pero no debe
+   permitir crear el lote todavía. Añada otro de 15 y uno de 19, de otros locales.
+3. Pulse **Crear orden** cuando la suma sea 64 o más. Los pedidos deben quedar
+   vinculados a la misma orden, con sus fechas comunes y la cantidad total.
+4. Abra **Asignar pedidos** desde una orden planificada ya existente. Seleccione
+   pedidos pendientes del mismo modelo o añada uno nuevo. Si no caben, amplíe
+   la cantidad del lote en ese formulario. Guarde y compruebe que el código de
+   la orden se mantiene y no aparece una orden adicional.
+5. Use un botón de peluche para ver sus órdenes y pedidos. Compruebe que se
+   conserva la vista de órdenes, sin saltar directamente al listado inferior.
+6. Descarte un aviso mediante **×**, recargue y compruebe que los registros
+   permanecen y el aviso no reaparece.
+
+## Evaluar la fábrica reconstruida
+
+1. Abra con Supervisor. La primera carga de esta versión respalda y sustituye
+   los ejemplos de Manufactura una sola vez. Compruebe **Descargar respaldo
+   anterior**; no se vuelve a restablecer la fábrica al recargar.
+2. Compruebe seis modelos, seis órdenes de 64 y treinta pedidos. Dos órdenes
+   están finalizadas y tres en producción; todas muestran 64/64 asignados.
+   Las dos finalizadas tienen el 100 % de sus etapas terminadas.
+3. Seleccione Ajolote Lila: hay un lote planificado con 0/64 asignados y cinco
+   pedidos pendientes que suman 64. Es el único lote con cupo en el resumen
+   global. Asígnelos al mismo lote sin crear otra orden.
+4. Las órdenes en producción, finalizadas y canceladas no ofrecen Asignar
+   pedidos ni permiten cambiar cantidad/modelo. Una planificada con pedidos
+   incompletos debe rechazar pasar a producción.
+5. Compruebe 38 recepciones y que cada lote iniciado tiene todos los materiales
+   que requiere su composición por 64 unidades, recibidos antes del inicio.
+   El Ajolote planificado conserva tres insumos pendientes. La edición y baja
+   de recepciones confirmadas continúan bloqueadas.
+6. En el panel, distinga 128 unidades finalizadas de 384 planificadas y consulte
+   el avance parcial de los tres lotes iniciados. Recargue y compruebe que las
+   acciones realizadas después de la reconstrucción se conservan.
+
+
 ## Revisar con Spec Kit
 
 Los comandos de OpenCode están versionados en `.opencode/commands/`.

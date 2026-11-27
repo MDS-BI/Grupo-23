@@ -220,6 +220,40 @@ listado actualiza su confirmación para no conservar un aviso de guardado viejo.
 
 ## Expectativas de extensibilidad
 
+`guardarOrdenConPedidos(datos, ids, ordenId, nuevos)` valida roles, cantidades,
+modelo, disponibilidad y capacidad antes de guardar conjuntamente las tablas
+`ordenes` y `pedidos`. Crear exige pedidos por al menos 64 unidades. Los pedidos
+nuevos requieren cantidades enteras positivas; el mínimo de 64 corresponde a
+la suma del lote del mismo modelo, no a cada tienda. Las fechas se guardan en
+la orden y se comparten por todos sus pedidos. Modificar asignaciones requiere
+una orden planificada. Antes de pasar a producción, los pedidos deben cubrir
+todo el lote; fuera de planificación se congelan cantidad, modelo y asignaciones.
+Los IDs y las
+fechas de una orden existente se conservan salvo edición explícita. La
+recuperación sigue siendo atómica, y Deshacer no puede dejar pedidos sin
+capacidad ni asociados a un modelo diferente.
+
+Cada paso del historial puede incluir `oculto: true`. Descartar un aviso solo
+actualiza esa propiedad y la revisión de los respaldos, preservando la firma de
+los datos y todos los registros. La interfaz y el acceso global excluyen los
+pasos ocultos; se reservan sus IDs dentro del límite histórico para evitar
+colisiones.
+
+`reconstruirEjemploCoherente()` aplica la reconstrucción de demo autorizada,
+solo con Supervisor y una vez por navegador. Antes de escribir guarda las
+claves originales del prefijo `manufactura:` en
+`manufactura:respaldo_antes_ejemplo_coherente_v2`, con versión, fecha y valores
+sin transformar; excluye respaldos previos para evitar copias recursivas.
+Si falla el respaldo no cambia los datos. Ante una carga parcial restaura las
+claves originales y el historial de sesión. Tras completar los seis productos,
+seis órdenes y treinta pedidos fija `manufactura:ejemplo_coherente_v2` a `1`.
+La demo usa fechas fijas del 27 de noviembre de 2026, asigna completamente los
+lotes iniciados/finalizados y completa sus materiales. El lote planificado
+conserva pedidos y materiales pendientes como ejemplo de planificación.
+La acción Descargar respaldo anterior entrega el JSON localmente.
+Esta sustitución explícita de ejemplos no modifica la protección habitual de
+las recepciones confirmadas ni afecta datos de otros módulos.
+
 `analizarEliminacion()` comprueba existencia, rol y vínculos antes de confirmar.
 Productos con órdenes o pedidos, etapas usadas en rutas o ejecuciones, máquinas
 con ejecuciones, órdenes con recepciones y ejecuciones de órdenes finalizadas

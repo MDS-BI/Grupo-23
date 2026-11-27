@@ -611,3 +611,61 @@ y cinco asignaciones originales. La lista conserva Rehacer para las pruebas.
 Validación del 2026-11-23: pruebas y compilación correctas. Se deshizo la creación
 de la etapa temporal tras probar eliminación y recuperación. Las ocho etapas
 originales y su historial de producción se conservaron. Trabajo local en main.
+
+## Fase 19: Flujo unificado de órdenes y avisos descartables
+
+- [x] T190 Unificar Nueva orden: fechas primero, después peluche, local y
+  cantidad; calcular el lote desde sus pedidos y guardar todo conjuntamente (FR-062).
+- [x] T191 Exigir 64 unidades enteras o más para cada pedido nuevo y cada lote;
+  conservar e identificar las cantidades históricas sin cambios (FR-063).
+- [x] T192 Permitir asignar pedidos a una orden existente, ampliar su lote y
+  consultar locales y cantidades sin crear otra orden (FR-064).
+- [x] T193 Mantener los botones de peluches para filtrar órdenes y consultar
+  pedidos, sin saltos inesperados de pantalla; respetar las vistas por rol.
+- [x] T194 Rechazar duplicados, pedidos de otro modelo, asignados a otro lote,
+  excesos de capacidad y escrituras parciales; conservar Deshacer/Rehacer atómico.
+- [x] T195 Añadir equis accesibles a avisos y confirmaciones de operaciones;
+  descartar avisos de recuperación sin modificar datos y conservarlo al recargar (FR-065).
+- [x] T196 Validar 124 pruebas en diecinueve archivos, compilación de producción
+  y revisión visual: rechazar 63, crear lote/pedido de 64, liberar y reasignar
+  el pedido en la misma orden, deshacer los datos temporales y cerrar sus avisos.
+
+Decisiones del usuario del 2026-11-26: formulario con fechas antes de peluche,
+cantidad y local; conservar botones por peluche; mínimo de 64 por pedido nuevo;
+equis para avisos que ya no se quieran deshacer. Se preservaron los registros
+históricos. La prueba de navegador conservó los seis lotes iniciales, retiró
+su lote temporal y confirmó el arranque limpio después de recargar. Las capturas
+del formulario y del listado quedan como evidencia local. No se crearon ramas.
+
+## Fase 20: Lotes agregados y fábrica de ejemplo coherente
+
+Las aclaraciones del usuario del 27 de noviembre de 2026 sustituyen la regla
+anterior de 64 por pedido: el mínimo corresponde al lote de un modelo y puede
+reunir varios locales (por ejemplo, 30 + 15 + 19) con fechas comunes. Solo una
+orden planificada admite cambios de cantidad y pedidos. El usuario autorizó
+sustituir todos los registros de prueba de Manufactura para alinear el ejemplo.
+
+- [x] T200 Aplicar el mínimo agregado de 64 y cantidades enteras positivas por
+  local, conservando el formulario unificado y sus fechas comunes (FR-062/063).
+- [x] T201 Contar cupos solo de órdenes planificadas con unidades libres y
+  congelar cantidad, modelo y pedidos fuera de planificación (FR-064/066/067).
+- [x] T202 Exigir pedidos por el lote completo antes de iniciar producción y
+  bloquear reversiones antiguas que alterarían el lote ya iniciado.
+- [x] T203 Respaldar las claves anteriores antes de reconstruir una sola vez;
+  ofrecer descarga y recuperar los datos ante fallos de carga (FR-068).
+- [x] T204 Generar seis productos, seis lotes de 64 y treinta pedidos; los cinco
+  lotes iniciados/finalizados quedan totalmente asignados y abastecidos. Los
+  finalizados completan su ruta; el planificado conserva pendientes coherentes.
+- [x] T205 Calcular faltantes por orden para que entregas históricas o excedentes
+  ajenos no oculten los materiales pendientes de otros lotes (FR-039).
+- [x] T206 Completar pruebas, compilación y revisión en navegador; comprobar
+  descarga del respaldo, asignación/deshacer, bloqueo de producción y recarga.
+
+Validación: 133 pruebas en veinte archivos y compilación de producción
+correctas. En navegador se descargó el respaldo previo, se comprobaron seis
+órdenes y 38 recepciones, el bloqueo de cantidad/modelo en producción y los tres
+materiales pendientes del Ajolote. Se creó una orden de Conejo Nube con pedidos
+de 30, 15 y 19; permaneció al recargar. Se deshizo la prueba y se descartó su
+aviso, conservando los seis lotes y treinta pedidos iniciales. Sin errores de
+consola desde la recarga. Capturas locales del formulario y estado final.
+Los cambios siguen locales en main, sin crear ramas, commit ni push.

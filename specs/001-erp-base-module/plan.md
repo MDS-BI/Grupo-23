@@ -104,13 +104,15 @@ Las ejecuciones están en `ordenes.js` y los recursos en `recursos.js`.
 
 - Entorno de referencia Node.js 24.19.0 y npm 11.17.0, indicado también en
   `.nvmrc` y `package.json`. `npm ci` instala las versiones de `package-lock.json`.
-- Los cinco lotes usan como fecha de referencia el 16 de noviembre de 2026.
+- La reconstrucción vigente genera seis lotes con fecha base del 27 de noviembre de 2026.
   El cargador acepta una fecha explícita para las pruebas. El reloj del equipo
   no altera el dataset inicial. Las alertas de vencimiento se evalúan con la
   fecha actual del navegador, por lo que pueden variar con el paso del tiempo.
 - La imagen y la tipografía de la interfaz están versionadas en `src/assets/`.
 - Un navegador nuevo carga la demo desde `src/main.jsx`. Una sesión con registros
-  conserva sus datos. Para comparar estados iniciales se usa un perfil nuevo de
+  se respalda y reconstruye una sola vez al abrir con Supervisor en esta versión,
+  por autorización del usuario; las ediciones posteriores se conservan.
+  Para comparar estados iniciales se usa un perfil nuevo de
   navegador y la misma revisión del repositorio.
 - La comprobación de entrega usa instalación limpia, `npm test -- --run` y
   `npm run build`. El procedimiento está en [quickstart.md](quickstart.md).
@@ -155,7 +157,7 @@ de cuentas y los permisos aplicados en un servidor son una ampliación futura.
 
 ## Deshacer, navegación y demanda de locales
 
-`almacenamiento.js` conserva en `sessionStorage` hasta veinte transacciones
+`almacenamiento.js` conserva en `localStorage`, con copia en `sessionStorage`, hasta veinte transacciones
 reversibles con sus listas anteriores y posteriores. Una firma del estado de
 las tablas permite detectar cambios externos antes de restaurar una transacción.
 Deshacer usa la misma capa de permisos y de escritura con recuperación ante
@@ -172,12 +174,28 @@ orden con los pedidos pendientes. La creación de la orden y su asignación de
 pedidos se guardan en una sola transacción. Cancelar una orden vuelve a dejar
 sus pedidos disponibles para otra planificación.
 
-El mínimo de una orden nueva es 64. Los registros históricos pueden conservar
-cantidades anteriores al editar otros campos. La demo nueva usa cinco lotes de
-64 unidades, cinco locales ficticios y 25 pedidos, cinco por producto. Sus
-cantidades 16, 12, 10, 14 y 12 suman 64 por modelo. `main.jsx` incorpora estos
-pedidos una sola vez a la demo existente cuando aún no hay locales ni pedidos.
+El mínimo de una orden nueva es 64, sumando pedidos de uno o varios locales
+del mismo modelo. Cada tienda puede pedir una cantidad entera positiva menor.
+Solo los lotes planificados admiten ampliar la cantidad y cambiar asignaciones;
+el inicio de producción exige cubrir la cantidad completa con pedidos.
+
+`ejemplo-coherente.js` respalda y reconstruye una sola vez los ejemplos con
+Supervisor, por autorización del 27 de noviembre de 2026. Genera seis lotes de
+64, cinco locales y treinta pedidos, cinco por modelo. Las cantidades 16, 12,
+10, 14 y 12 suman 64. Los cinco lotes iniciados o finalizados tienen todos sus
+pedidos asignados y sus materiales recibidos; el planificado tiene pedidos
+pendientes y tres materiales por recibir. Las fechas fijas permiten reproducir
+el mismo estado. El respaldo se descarga desde la interfaz; un fallo recupera
+el estado previo. Las recargas posteriores conservan las ediciones.
 
 ## Seguimiento de Complejidad
+
+La revisión de usabilidad del 26 de noviembre de 2026 unifica el alta de órdenes
+y pedidos en `OrdenForm.jsx`, con fechas primero y creación atómica. La misma
+vista permite asignar a órdenes existentes y ampliar el lote. Los selectores por
+peluche se conservan como filtros de órdenes con sus pedidos debajo. La
+aclaración del 27 de noviembre aplica el mínimo al lote agregado, permite
+pedidos pequeños y congela asignaciones al iniciar producción. Los avisos
+pueden descartarse sin alterar registros mediante metadatos del historial.
 
 Este plan no introdujo violaciones de la constitución.

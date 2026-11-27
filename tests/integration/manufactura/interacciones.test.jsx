@@ -11,6 +11,8 @@ import { crearProducto } from '../../../src/modules/manufactura/productos.js';
 import { guardarCambios } from '../../../src/modules/manufactura/almacenamiento.js';
 import { obtenerReferencias } from '../../../src/modules/manufactura/referencias.js';
 import { guardarEquipamiento } from '../../../src/modules/manufactura/recursos.js';
+import { guardarOrden } from '../../../src/modules/manufactura/ordenes.js';
+import { asignarPedidosAOrden, guardarPedido, obtenerPedidosDeOrden } from '../../../src/modules/manufactura/pedidos-locales.js';
 
 let container;
 let root;
@@ -320,11 +322,11 @@ it('muestra códigos, locales y cantidades y planifica sus pedidos en una orden 
   expect(menu.querySelectorAll('tbody tr')).toHaveLength(5);
   expect(menu.textContent).toContain('64 unidades pendientes');
   await pulsar('Planificar estos pedidos', menu);
-  expect(document.activeElement).toBe(container.querySelector('[name="producto_id"]'));
-  expect(container.querySelector('[name="cantidad_plan"]').value).toBe('64');
+  expect(document.activeElement).toBe(container.querySelector('[name="fecha_inicio"]'));
+  expect(container.querySelector('.orden-reparto').textContent).toContain('64 a fabricar');
   await escribir('fecha_inicio', '2026-11-23');
   await escribir('fecha_fin', '2026-11-25');
-  await pulsar('Guardar');
+  await pulsar('Crear orden');
   expect(listar('ordenes')).toHaveLength(6);
   expect(obtenerPedidosPendientes(1)).toHaveLength(0);
   await pulsar('Deshacer', container.querySelector('.deshacer-global'));
@@ -384,4 +386,152 @@ it('conserva una lista con deshacer individual y rehacer después de guardar otr
   await pulsar('Máquinas y equipamiento');
   await pulsar('Equipamiento y asignaciones');
   expect(container.querySelector('.management').querySelectorAll('.historial-cambios li')).toHaveLength(3);
+});
+
+it('crea una orden con fechas, peluche, local y cantidad desde el mismo formulario', async () => {
+  await pulsar('Órdenes de producción');
+  await pulsar('Nueva orden');
+  expect(document.activeElement).toBe(container.querySelector('[name="fecha_inicio"]'));
+  await escribir('fecha_inicio', '2026-11-27');
+  await escribir('fecha_fin', '2026-11-28');
+  await escribir('producto_id', '4');
+  await escribir('local_id', '3');
+  await escribir('cantidad', '63');
+  await pulsar('Crear orden');
+  expect(container.querySelector('.orden-form').textContent).toContain('al menos 64');
+  expect(listar('ordenes')).toHaveLength(5);
+  await escribir('cantidad', '80');
+  expect(container.querySelector('.orden-form [name="cantidad"]').getAttribute('aria-invalid')).toBe('false');
+  await pulsar('Crear orden');
+  const orden = listar('ordenes').at(-1);
+  expect(orden).toMatchObject({ producto_id: 4, cantidad_plan: 80, fecha_inicio: '2026-11-27', fecha_fin: '2026-11-28', estado: 'Planificada' });
+  expect(obtenerPedidosDeOrden(orden.orden_id)).toMatchObject([{ local_id: 3, cantidad: 80, producto_id: 4 }]);
+  expect(container.querySelector('.orden-form')).toBeNull();
+  expect(document.activeElement.textContent).toBe('×');
+  expect(document.activeElement.getAttribute('aria-label')).toBe('Cerrar notificación');
+  expect(container.querySelector('.selector-modelos [aria-pressed="true"]').textContent).toContain('Conejo Nube');
+});
+
+it('asigna un pedido a una orden existente sin crear otra orden', async () => {
+  let orden;
+  let pedido;
+  let segundo;
+  await act(async () => {
+    orden = guardarOrden({ producto_id: 4, cantidad_plan: 64, estado: 'Planificada', fecha_inicio: '2026-11-27', fecha_fin: '2026-11-28' }).registro;
+    pedido = guardarPedido({ codigo: 'PED-CONEJO-64', producto_id: 4, local_id: 3, cantidad: 64 }).registro;
+    segundo = guardarPedido({ codigo: 'PED-CONEJO-OTRO', producto_id: 4, local_id: 1, cantidad: 64 }).registro;
+  });
+  await pulsar('Órdenes de producción');
+  const fila = [...container.querySelectorAll('tbody tr')].find((r) => r.textContent.includes(`OP-${String(orden.orden_id).padStart(4, '0')}`));
+  await pulsar('Asignar pedidos', fila);
+  const checkbox = [...container.querySelectorAll('.orden-form input[type="checkbox"]')].find((c) => c.closest('label').textContent.includes(pedido.codigo));
+  await act(async () => checkbox.click());
+  const otroCheckbox = [...container.querySelectorAll('.orden-form input[type="checkbox"]')].find((c) => c.closest('label').textContent.includes(segundo.codigo));
+  await act(async () => otroCheckbox.click());
+  expect([...container.querySelectorAll('button')].find((b) => b.textContent === 'Guardar asignación').disabled).toBe(true);
+  await escribir('cantidad_plan', '128');
+  await pulsar('Guardar asignación');
+  expect(listar('ordenes')).toHaveLength(6);
+  expect(listar('ordenes').find((o) => o.orden_id === orden.orden_id).cantidad_plan).toBe(128);
+  expect(obtenerPedidosDeOrden(orden.orden_id)).toMatchObject([{ pedido_id: pedido.pedido_id }, { pedido_id: segundo.pedido_id }]);
+  await pulsar('Ver detalle', [...container.querySelectorAll('tbody tr')].find((r) => r.textContent.includes(`OP-${String(orden.orden_id).padStart(4, '0')}`)));
+  expect(container.querySelector('[aria-label="Pedidos vinculados a la orden"]').textContent).toContain('Regalería Bosque');
+});
+
+it('no guarda borradores al cancelar y permite ver las órdenes del peluche seleccionado', async () => {
+  await pulsar('Órdenes de producción');
+  await pulsar('Conejo Nube de 28 cm', container.querySelector('.selector-modelos'));
+  expect(document.activeElement.textContent).not.toBe('Cerrar pedidos');
+  const ordenes = [...container.querySelectorAll('.management')].find((g) => g.querySelector('h2').textContent === 'Órdenes');
+  expect(ordenes.querySelectorAll('tbody tr')).toHaveLength(1);
+  expect(ordenes.textContent).toContain('OP-0004');
+  await pulsar('Nueva orden');
+  await escribir('local_id', '3');
+  await escribir('cantidad', '100');
+  await pulsar('Incluir este pedido');
+  await pulsar('Cancelar', container.querySelector('.orden-form'));
+  expect(listar('ordenes')).toHaveLength(5);
+  expect(listar('pedidos')).toHaveLength(25);
+});
+
+it('cierra avisos de deshacer o rehacer con la equis sin cambiar los datos', async () => {
+  await act(async () => guardarEquipamiento({ nombre: 'Aviso descartable', tipo: 'Herramienta textil' }));
+  await pulsar('Máquinas y equipamiento');
+  await pulsar('Equipamiento y asignaciones');
+  const guardados = listar('equipamiento');
+  const aviso = container.querySelector('.historial-cambios li');
+  await act(async () => aviso.querySelector('.cerrar-aviso').click());
+  expect(listar('equipamiento')).toEqual(guardados);
+  expect(container.querySelector('.historial-cambios')).toBeNull();
+  await pulsar('Productos y materiales');
+  await pulsar('Máquinas y equipamiento');
+  await pulsar('Equipamiento y asignaciones');
+  expect(container.querySelector('.historial-cambios')).toBeNull();
+});
+
+it('cuenta órdenes con cupo sin confundir un lote totalmente asignado con producción finalizada', async () => {
+  let producto;
+  let llena;
+  let vacia;
+  let pedidoPendiente;
+  await act(async () => {
+    producto = crearProducto({ nombre: 'Oso con cascabel para indicador', tipo: 'Peluche' }).producto;
+    const datos = { producto_id: producto.producto_id, cantidad_plan: 64, fecha_inicio: '2026-11-27', fecha_fin: '2026-11-28' };
+    llena = guardarOrden({ ...datos, estado: 'Planificada' }).registro;
+    vacia = guardarOrden({ ...datos, estado: 'Planificada' }).registro;
+    const pedido = guardarPedido({ codigo: 'PED-CUPO-A', producto_id: producto.producto_id, local_id: 1, cantidad: 64 }).registro;
+    pedidoPendiente = guardarPedido({ codigo: 'PED-CUPO-B', producto_id: producto.producto_id, local_id: 2, cantidad: 64 }).registro;
+    asignarPedidosAOrden(llena.orden_id, [pedido.pedido_id]);
+    guardarOrden({ ...llena, estado: 'En producción' }, llena.orden_id);
+  });
+  await pulsar('Órdenes de producción');
+  await pulsar(producto.nombre, container.querySelector('.selector-modelos'));
+  const valores = () => [...container.querySelectorAll('.ordenes-indicadores > div strong')].map((r) => r.textContent);
+  expect(container.querySelector('.ordenes-indicadores').textContent).toContain('órdenes con cupo para pedidos');
+  expect(valores()).toEqual(['2', '1', '64']);
+  expect(listar('ordenes').find((o) => o.orden_id === llena.orden_id).estado).toBe('En producción');
+  await act(async () => asignarPedidosAOrden(vacia.orden_id, [pedidoPendiente.pedido_id]));
+  expect(valores()).toEqual(['2', '0', '0']);
+  await pulsar('Deshacer', container.querySelector('.deshacer-global'));
+  expect(valores()).toEqual(['2', '1', '64']);
+  await act(async () => guardarOrden({ ...vacia, estado: 'Cancelada' }, vacia.orden_id));
+  expect(valores()).toEqual(['2', '0', '0']);
+  expect(container.querySelector('[title^="Solo órdenes planificadas"]').textContent).toContain('Solo en planificación');
+});
+
+it('muestra los lotes en producción sin opciones de añadir pedidos ni cambiar su cantidad', async () => {
+  await pulsar('Órdenes de producción');
+  const fila = [...container.querySelectorAll('tbody tr')].find((r) => r.textContent.includes('OP-0003'));
+  expect(fila.textContent).toContain('Asignación cerrada');
+  expect([...fila.querySelectorAll('button')].some((b) => b.textContent === 'Asignar pedidos')).toBe(false);
+  await pulsar('Editar', fila);
+  expect(container.querySelector('.orden-form [name="cantidad_plan"]').disabled).toBe(true);
+  expect(container.querySelector('.orden-form [name="producto_id"]').disabled).toBe(true);
+  expect([...container.querySelectorAll('.orden-form input[type="checkbox"]')].every((c) => c.disabled)).toBe(true);
+  expect(container.querySelector('.orden-form').textContent).toContain('Solo se pueden añadir pedidos o ampliar el lote mientras esté en planificación');
+});
+
+it('crea un lote común de 64 sumando 30, 15 y 19 de tres locales', async () => {
+  await pulsar('Órdenes de producción');
+  await pulsar('Nueva orden');
+  await escribir('fecha_inicio', '2026-11-27');
+  await escribir('fecha_fin', '2026-11-28');
+  await escribir('producto_id', '1');
+  await escribir('local_id', '1');
+  await escribir('cantidad', '30');
+  await pulsar('Incluir este pedido');
+  expect(container.querySelector('.orden-form').textContent).toContain('Faltan 34 peluches');
+  await pulsar('Añadir pedido de local', container.querySelector('.orden-form'));
+  await escribir('local_id', '2');
+  await escribir('cantidad', '15');
+  await pulsar('Incluir este pedido');
+  expect(container.querySelector('.orden-form').textContent).toContain('Faltan 19 peluches');
+  await pulsar('Añadir pedido de local', container.querySelector('.orden-form'));
+  await escribir('local_id', '3');
+  await escribir('cantidad', '19');
+  await pulsar('Crear orden');
+  const orden = listar('ordenes').at(-1);
+  expect(orden).toMatchObject({ producto_id: 1, cantidad_plan: 64, fecha_inicio: '2026-11-27', fecha_fin: '2026-11-28' });
+  expect(obtenerPedidosDeOrden(orden.orden_id).map((p) => p.cantidad)).toEqual([30, 15, 19]);
+  expect(obtenerPedidosDeOrden(orden.orden_id).map((p) => p.local_id)).toEqual([1, 2, 3]);
 });

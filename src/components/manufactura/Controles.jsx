@@ -6,6 +6,7 @@ import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import DeshacerCambios from './DeshacerCambios.jsx';
 import HistorialCambios from './HistorialCambios.jsx';
 import ConfirmarEliminacion from './ConfirmarEliminacion.jsx';
+import AvisoOperacion from './AvisoOperacion.jsx';
 import {
   obtenerReferencias,
   nombreReferencia,
@@ -38,6 +39,7 @@ export function Campo({ campo, value, onChange, error }) {
     'aria-invalid': !!error,
     'aria-describedby': error ? `${id}-error` : undefined,
     required: !opcional,
+    disabled: !!campo.disabled,
   };
   return (
     <div className="field">
@@ -285,6 +287,10 @@ export function GestionRegistros({
   solicitudNueva,
   descripcionEliminar,
   mostrarEliminadosEnTabla = false,
+  renderFormulario,
+  accionesRegistro,
+  mostrarDeshacerFilas = true,
+  mostrarBotonCrear = true,
 }) {
   useManufactura();
   const tabla = Object.keys(tablas).find((nombre) => tablas[nombre] === idCampo);
@@ -307,12 +313,9 @@ export function GestionRegistros({
   const recuperado = eliminado && registros.some((r) =>
     Number(r[idCampo]) === Number(eliminado[idCampo]),
   );
-  const avisoRecuperacion = !mostrarEliminadosEnTabla && registrosEliminados.length > 0;
   const mensajeVisible = recuperado
     ? `Eliminación deshecha. Se recuperó ${singular.toLowerCase()} «${eliminado.nombre || `#${eliminado[idCampo]}`}».`
-    : avisoRecuperacion
-      ? `Registro eliminado: ${registrosEliminados.map((registro) => registro.nombre || `${singular} #${registro[idCampo]}`).join(', ')}.`
-      : mensaje || (cambio ? 'Último cambio guardado en este apartado.' : '');
+    : mensaje;
   useEffect(() => {
     if (recuperado) {
       setMensaje(mensajeVisible);
@@ -330,9 +333,15 @@ export function GestionRegistros({
   const confirmacion = useEnfoqueAccion(mensajeVisible);
   useEffect(() => {
     const alDeshacer = (evento) => {
+      if (evento.detail?.accion === 'descartar') {
+        setMensaje('');
+        setEliminado(null);
+        return;
+      }
       if (!['deshacer', 'rehacer'].includes(evento.detail?.accion) || !evento.detail.tablas.includes(tabla)) return;
       setEdicion(null);
       setPendienteEliminar(null);
+      setErrorOperacion('');
       setMensaje(evento.detail.accion === 'rehacer' ? 'Cambio rehecho. Se actualizó el listado.' : eliminado && listar(tabla).some((r) => Number(r[idCampo]) === Number(eliminado[idCampo]))
         ? `Eliminación deshecha. Se recuperó ${singular.toLowerCase()} «${eliminado.nombre || `#${eliminado[idCampo]}`}».`
         : 'Cambio deshecho. Se actualizó el listado.');
@@ -378,7 +387,7 @@ export function GestionRegistros({
     <div className="management">
       <header className="section-heading">
         <h2>{titulo}</h2>
-        {puedeModificar && permitirCrear && (
+        {puedeModificar && permitirCrear && mostrarBotonCrear && (
           <button
             className="primary"
             type="button"
@@ -404,13 +413,13 @@ export function GestionRegistros({
       )}
       {errorOperacion && <p role="alert" className="error">{errorOperacion}</p>}
       {!errorOperacion && mensajeVisible && (
-        <p ref={confirmacion} tabIndex={-1} role="status" className="operation-feedback">
+        <AvisoOperacion ref={confirmacion} tabIndex={-1} className="operation-feedback" onCerrar={() => { setMensaje(''); setEliminado(null); }}>
           {mensajeVisible}
-        </p>
+        </AvisoOperacion>
       )}
       <HistorialCambios tabla={tabla} />
       {edicion && puedeModificar && permitirCrear && (
-        <Formulario
+        renderFormulario ? renderFormulario({ inicial: edicion, onGuardar: guardarDatos, onCancelar: () => setEdicion(null), clave: formularioId }) : <Formulario
           key={formularioId}
           titulo={`${edicion[idCampo] ? 'Editar' : 'Registrar'} ${singular.toLowerCase()}`}
           campos={campos}
@@ -447,6 +456,7 @@ export function GestionRegistros({
                         Ver detalle
                       </button>
                     )}
+                    {accionesRegistro?.(r, abrirFormulario)}
                     {permitirEditar && puedeModificar && (
                       <button
                         type="button"
@@ -471,7 +481,7 @@ export function GestionRegistros({
                         Eliminar
                       </button>
                     )}
-                    {puedeModificar && tabla !== 'recepciones' &&
+                    {mostrarDeshacerFilas && puedeModificar && tabla !== 'recepciones' &&
                       <DeshacerCambios tabla={tabla} registroId={r[idCampo]} />}
                     </td>
                   )}

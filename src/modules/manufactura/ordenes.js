@@ -30,7 +30,7 @@ export const obtenerOrdenes = () => listar('ordenes');
 export const obtenerEjecuciones = (id) =>
   listar('ejecuciones').filter((r) => Number(r.orden_id) === Number(id));
 
-export function validarOrden(d) {
+export function validarOrden(d, { cantidadPedidos } = {}) {
   const e = {};
   referencia(e, d, 'producto_id', 'productos', 'un producto');
   numero(e, d, 'cantidad_plan', 'La cantidad planificada');
@@ -40,6 +40,18 @@ export function validarOrden(d) {
   rango(e, d, 'fecha_inicio', 'fecha_fin');
 
   const anterior = buscar('ordenes', d.orden_id);
+  if (anterior && anterior.estado !== 'Planificada' && Number(anterior.cantidad_plan) !== Number(d.cantidad_plan))
+    e.cantidad_plan = 'Solo se puede cambiar la cantidad de un lote en planificación. La producción iniciada conserva su cantidad.';
+  if (anterior && anterior.estado !== 'Planificada' && Number(anterior.producto_id) !== Number(d.producto_id))
+    e.producto_id = 'Solo se puede cambiar el peluche de una orden en planificación.';
+  const vinculados = listar('pedidos').filter((p) => Number(p.orden_id) === Number(d.orden_id));
+  const asignados = cantidadPedidos ?? vinculados.reduce((suma, p) => suma + Number(p.cantidad), 0);
+  if (d.estado === 'En producción' && anterior?.estado !== 'En producción' && asignados !== Number(d.cantidad_plan))
+    e.estado = 'Antes de iniciar producción, asigna a locales todos los peluches del lote.';
+  if (anterior && Number(anterior.producto_id) !== Number(d.producto_id) && vinculados.length)
+    e.producto_id = 'La orden tiene pedidos vinculados. Conserva el modelo de peluche de esos pedidos.';
+  if (asignados > Number(d.cantidad_plan))
+    e.cantidad_plan = 'La cantidad del lote no puede ser menor que los pedidos ya asignados.';
   const cambiaLote = !anterior ||
     Number(anterior.cantidad_plan) !== Number(d.cantidad_plan) ||
     Number(anterior.producto_id) !== Number(d.producto_id);

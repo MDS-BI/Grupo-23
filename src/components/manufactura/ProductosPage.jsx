@@ -9,6 +9,7 @@ import portadaPeluches from '../../assets/manufactura/peluches-portada.jpg';
 import { puedeModificarTabla } from '../../modules/manufactura/roles.js';
 import HistorialCambios from './HistorialCambios.jsx';
 import ConfirmarEliminacion from './ConfirmarEliminacion.jsx';
+import AvisoOperacion from './AvisoOperacion.jsx';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import { obtenerProductoMaterial } from '../../modules/manufactura/productos.js';
 import { inicializarPedidosDemo } from '../../modules/manufactura/pedidos-locales.js';
@@ -195,9 +196,9 @@ export default function ProductosPage() {
         </article>
       )}
 
-      {mensaje && <p ref={confirmacion} tabIndex={-1} className="notice" role="status">
+      {mensaje && <AvisoOperacion ref={confirmacion} tabIndex={-1} onCerrar={() => setMensaje('')}>
         {mensaje}
-      </p>}
+      </AvisoOperacion>}
       <HistorialCambios tabla="productos" />
       {errorEliminar && <p role="alert" className="error">{errorEliminar}</p>}
       {pendienteEliminar && <ConfirmarEliminacion

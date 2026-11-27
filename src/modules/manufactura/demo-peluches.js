@@ -37,12 +37,14 @@ function horaLocal(fecha, minutos) {
 export function cargarDemoPeluches({
   reemplazar = false,
   hoy = new Date(`${FECHA_BASE_DEMO}T12:00:00`),
+  completarMaterialesIniciados = false,
 } = {}) {
-  if (demoPeluchesCargada()) return { errores: null, cargada: false };
+  if (demoPeluchesCargada() && !reemplazar) return { errores: null, cargada: false };
 
   const cambios = Object.fromEntries(
     Object.keys(tablas).map((tabla) => [tabla, reemplazar ? [] : listar(tabla)]),
   );
+  if (reemplazar) cambios.pedidos_demo = [];
   const ids = Object.fromEntries(
     Object.entries(cambios).map(([tabla, registros]) => [
       tabla,
@@ -56,7 +58,7 @@ export function cargarDemoPeluches({
   }
   const fecha = (dias) => fechaCalendario(hoy, dias);
 
-  const proveedorId = idsDeReferencia(obtenerReferencias('proveedores'), 'proveedor_id');
+  const proveedorId = idsDeReferencia(obtenerReferencias('proveedores').filter((r) => !reemplazar || Number(r.proveedor_id) > 0), 'proveedor_id');
   const proveedoresPorClave = Object.fromEntries(
     Object.entries(proveedores).map(([clave, razon_social]) => [
       clave,
@@ -91,7 +93,7 @@ export function cargarDemoPeluches({
     materialesPorClave[clave] = material_id;
   }
 
-  const trabajadorId = idsDeReferencia(obtenerReferencias('trabajadores'), 'trabajador_id');
+  const trabajadorId = idsDeReferencia(obtenerReferencias('trabajadores').filter((r) => !reemplazar || Number(r.trabajador_id) > 0), 'trabajador_id');
   const nombres = new Set(Object.values(estaciones).map(({ trabajador }) => trabajador));
   const tecnico = 'Diego Mella · Mantenimiento';
   nombres.add(tecnico);
@@ -99,7 +101,7 @@ export function cargarDemoPeluches({
   const trabajadoresPorNombre = new Map(
     trabajadores.map(({ nombre, trabajador_id }) => [nombre, trabajador_id]),
   );
-  const repuestoId = idsDeReferencia(obtenerReferencias('repuestos'), 'repuesto_id');
+  const repuestoId = idsDeReferencia(obtenerReferencias('repuestos').filter((r) => !reemplazar || Number(r.repuesto_id) > 0), 'repuesto_id');
   const repuestos = [];
   const codigos = new Set(cambios.maquinas.map(({ codigo }) => String(codigo).trim().toUpperCase()));
   const proceso = [];
@@ -149,7 +151,7 @@ export function cargarDemoPeluches({
     for (const [clave, cantidad_por_unidad] of Object.entries(lote.materiales)) {
       const material_id = materialesPorClave[clave];
       agregar('producto_material', { producto_id, material_id, cantidad_por_unidad });
-      if (lote.pendientes?.includes(clave)) continue;
+      if (lote.pendientes?.includes(clave) && (!completarMaterialesIniciados || lote.estado === 'Planificada')) continue;
 
       const proveedorClave = insumos[clave][2];
       agregar('recepciones', {

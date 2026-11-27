@@ -53,43 +53,41 @@ export function calcularAlertasProduccion(
       )
       .map(({ orden_id }) => Number(orden_id)),
   );
-  const cantidadPlanPorProducto = new Map();
+  const requeridoPorOrden = new Map();
   for (const orden of ordenes) {
     if (!ordenesAbiertas.has(Number(orden.orden_id))) continue;
-    const producto_id = Number(orden.producto_id);
     const cantidad = Number(orden.cantidad_plan) || 0;
-    cantidadPlanPorProducto.set(
-      producto_id,
-      (cantidadPlanPorProducto.get(producto_id) || 0) + cantidad,
-    );
+    for (const relacion of productoMaterial) {
+      if (Number(relacion.producto_id) !== Number(orden.producto_id)) continue;
+      const porUnidad = Number(relacion.cantidad_por_unidad) || 0;
+      if (porUnidad <= 0 || cantidad <= 0) continue;
+      const material_id = Number(relacion.material_id);
+      const clave = `${Number(orden.orden_id)}:${material_id}`;
+      const anterior = requeridoPorOrden.get(clave)?.requerido || 0;
+      requeridoPorOrden.set(clave, { material_id, requerido: anterior + cantidad * porUnidad });
+    }
   }
-  const requeridoPorMaterial = new Map();
-  for (const relacion of productoMaterial) {
-    const porUnidad = Number(relacion.cantidad_por_unidad) || 0;
-    const plan = cantidadPlanPorProducto.get(Number(relacion.producto_id)) || 0;
-    if (porUnidad <= 0 || plan <= 0) continue;
-    const material_id = Number(relacion.material_id);
-    requeridoPorMaterial.set(
-      material_id,
-      (requeridoPorMaterial.get(material_id) || 0) + plan * porUnidad,
-    );
-  }
-  const recibidoPorMaterial = new Map();
+  const recibidoPorOrden = new Map();
   for (const recepcion of recepciones) {
-    const cantidad = Number(recepcion.cantidad_recibida) || 0;
-    const material_id = Number(recepcion.material_id);
-    recibidoPorMaterial.set(
-      material_id,
-      (recibidoPorMaterial.get(material_id) || 0) + cantidad,
-    );
+    const clave = `${Number(recepcion.orden_id)}:${Number(recepcion.material_id)}`;
+    const cantidad = Math.max(0, Number(recepcion.cantidad_recibida) || 0);
+    recibidoPorOrden.set(clave, (recibidoPorOrden.get(clave) || 0) + cantidad);
+  }
+  const totalesPorMaterial = new Map();
+  for (const [clave, { material_id, requerido }] of requeridoPorOrden) {
+    const total = totalesPorMaterial.get(material_id) || { requerido: 0, recibido: 0 };
+    total.requerido += requerido;
+    // Las entregas están destinadas a una orden: ni un lote cerrado ni el
+    // excedente de otro lote pueden ocultar materiales pendientes de este.
+    total.recibido += Math.min(requerido, recibidoPorOrden.get(clave) || 0);
+    totalesPorMaterial.set(material_id, total);
   }
   const nombresMateriales = new Map(
     materiales.map((material) => [Number(material.material_id), material.nombre]),
   );
   const redondear = (valor) => Math.round(valor * 1000) / 1000;
-  const stockCritico = [...requeridoPorMaterial]
-    .map(([material_id, requerido]) => {
-      const recibido = recibidoPorMaterial.get(material_id) || 0;
+  const stockCritico = [...totalesPorMaterial]
+    .map(([material_id, { requerido, recibido }]) => {
       return {
         material_id,
         nombre:

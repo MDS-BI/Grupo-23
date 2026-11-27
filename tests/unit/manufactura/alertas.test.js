@@ -60,8 +60,8 @@ describe('Alertas del panel de producción', () => {
       { producto_id: 1, material_id: 2, cantidad_por_unidad: 3 },
     ];
     const recepciones = [
-      { material_id: 1, cantidad_recibida: 20 },
-      { material_id: 2, cantidad_recibida: 30 },
+      { orden_id: 1, material_id: 1, cantidad_recibida: 20 },
+      { orden_id: 1, material_id: 2, cantidad_recibida: 30 },
     ];
     const materiales = [
       { material_id: 1, nombre: 'Felpa' },
@@ -87,5 +87,23 @@ describe('Alertas del panel de producción', () => {
         faltante: 30,
       },
     ]);
+  });
+
+  it('no usa entregas de lotes cerrados ni excedentes de otro lote para ocultar faltantes', () => {
+    const ordenes = [
+      { orden_id: 1, estado: 'Planificada', producto_id: 1, cantidad_plan: 64 },
+      { orden_id: 2, estado: 'En producción', producto_id: 1, cantidad_plan: 64 },
+      { orden_id: 3, estado: 'Finalizada', producto_id: 1, cantidad_plan: 64 },
+      { orden_id: 4, estado: 'Cancelada', producto_id: 1, cantidad_plan: 64 },
+    ];
+    const productoMaterial = [{ producto_id: 1, material_id: 1, cantidad_por_unidad: 2 }];
+    const recepciones = [
+      { orden_id: 1, material_id: 1, cantidad_recibida: 200 },
+      { orden_id: 2, material_id: 1, cantidad_recibida: 80 },
+      { orden_id: 3, material_id: 1, cantidad_recibida: 128 },
+      { orden_id: 4, material_id: 1, cantidad_recibida: 128 },
+    ];
+    const { stockCritico } = calcularAlertasProduccion({ ordenes, productoMaterial, recepciones }, hoy);
+    expect(stockCritico).toMatchObject([{ material_id: 1, requerido: 256, recibido: 208, faltante: 48 }]);
   });
 });

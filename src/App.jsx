@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProductosPage from './components/manufactura/ProductosPage.jsx';
 import EtapasPage from './components/manufactura/EtapasPage.jsx';
 import OrdenesPage from './components/manufactura/OrdenesPage.jsx';
@@ -10,10 +10,20 @@ import useManufactura from './hooks/useManufactura.js';
 import { cambiarRol, puedeAcceder, ROLES, rolActual } from './modules/manufactura/roles.js';
 import DeshacerCambios from './components/manufactura/DeshacerCambios.jsx';
 import useEnfoqueAccion from './hooks/useEnfoqueAccion.js';
+import { reconstruirEjemploCoherente, hayRespaldoEjemplo, descargarRespaldoEjemplo } from './modules/manufactura/ejemplo-coherente.js';
+import AvisoOperacion from './components/manufactura/AvisoOperacion.jsx';
 
-export default function App() {
+export default function App({ prepararEjemplo = false }) {
   useManufactura();
   const rol = rolActual();
+  const [avisoLotes, setAvisoLotes] = useState('');
+  const [errorLotes, setErrorLotes] = useState('');
+  useEffect(() => {
+    if (!prepararEjemplo) return;
+    const resultado = reconstruirEjemploCoherente();
+    setErrorLotes(resultado.errores?.general || '');
+    if (resultado.reconstruido) setAvisoLotes('Se reconstruyó la fábrica de ejemplo: los lotes iniciados tienen sus pedidos completos y sus materiales recibidos. Se guardó un respaldo de los datos anteriores.');
+  }, [rol, prepararEjemplo]);
   const [pagina, setPagina] = useState('productos');
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [errorRol, setErrorRol] = useState('');
@@ -120,6 +130,9 @@ export default function App() {
         <main ref={destinoPagina} tabIndex={-1} id="contenido" className="manufactura-app" key={`${rol}-${paginaActual}`}>
           {errorRol && <p className="error" role="alert">{errorRol}</p>}
           <p className="rol-perspectiva">{ROLES[rol].descripcion}</p>
+          {avisoLotes && ['supervisor', 'planificacion'].includes(rol) && <AvisoOperacion onCerrar={() => setAvisoLotes('')}>{avisoLotes}</AvisoOperacion>}
+          {errorLotes && <p role="alert" className="error">{errorLotes}</p>}
+          {rol === 'supervisor' && hayRespaldoEjemplo() && <button type="button" className="respaldo-ejemplo" onClick={descargarRespaldoEjemplo}>Descargar respaldo anterior</button>}
           <div className="deshacer-global">
             <span>Último cambio guardado</span>
             <DeshacerCambios />

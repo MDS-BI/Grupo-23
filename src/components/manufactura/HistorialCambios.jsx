@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useManufactura from '../../hooks/useManufactura.js';
-import { deshacerCambio, estadoCambio, historialCambios, listar, rehacerCambio, tablas } from '../../modules/manufactura/almacenamiento.js';
+import { descartarAvisoCambio, deshacerCambio, estadoCambio, historialCambios, listar, rehacerCambio, tablas } from '../../modules/manufactura/almacenamiento.js';
 import { diferencias } from '../../modules/manufactura/historial-cambios.js';
 
 const nombres = {
@@ -53,6 +53,11 @@ export default function HistorialCambios({ tabla }) {
                     setError(resultado.errores?.general || '');
                   }}>
                   {paso.deshecho ? 'Rehacer' : eliminado ? 'Deshacer eliminación' : 'Deshacer'}
+                </button>
+                <button className="cerrar-aviso" type="button" aria-label={`Descartar aviso: ${descripcion(paso, tabla)}`}
+                  title="Quitar este aviso sin modificar los datos guardados"
+                  onClick={() => setError(descartarAvisoCambio(paso.id).errores?.general || '')}>
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
             </li>

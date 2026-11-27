@@ -11,6 +11,7 @@ import useManufactura from '../../hooks/useManufactura.js';
 import NuevoMaterial from './NuevoMaterial.jsx';
 import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import HistorialCambios from './HistorialCambios.jsx';
+import AvisoOperacion from './AvisoOperacion.jsx';
 
 const FORMULARIO_VACIO = { nombre: '', tipo: '' };
 const MATERIAL_VACIO = { material_id: '', cantidad_por_unidad: '' };
@@ -333,9 +334,9 @@ export default function ProductoForm({
               />
             )}
             {avisoMaterial && (
-              <p role="status" className="notice">
+              <AvisoOperacion onCerrar={() => setAvisoMaterial('')}>
                 {avisoMaterial}
-              </p>
+              </AvisoOperacion>
             )}
             <HistorialCambios tabla="materiales_locales" />
           </div>

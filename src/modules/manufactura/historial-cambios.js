@@ -46,6 +46,12 @@ function problemas(datos, campos) {
     if (orden && !lista('rutas').some((r) => Number(r.producto_id) === Number(orden.producto_id) && Number(r.etapa_id) === Number(ej.etapa_id)))
       errores.add(`ejecucion-ruta:${ej.ejecucion_id}`);
   }
+  for (const orden of lista('ordenes')) {
+    const pedidos = lista('pedidos').filter((p) => Number(p.orden_id) === Number(orden.orden_id));
+    const total = pedidos.reduce((suma, p) => suma + Number(p.cantidad), 0);
+    if (total > Number(orden.cantidad_plan)) errores.add(`orden-capacidad:${orden.orden_id}:${orden.cantidad_plan}:${total}`);
+    for (const p of pedidos) if (Number(p.producto_id) !== Number(orden.producto_id)) errores.add(`pedido-modelo:${p.pedido_id}:${orden.producto_id}`);
+  }
   for (const orden of lista('ordenes').filter((o) => o.estado === 'Finalizada')) {
     const ruta = lista('rutas').filter((r) => Number(r.producto_id) === Number(orden.producto_id));
     const ejecuciones = lista('ejecuciones').filter((e) => Number(e.orden_id) === Number(orden.orden_id));
@@ -57,6 +63,7 @@ function problemas(datos, campos) {
     producto_material: (r) => [`material:${r.producto_id}:${r.material_id}`],
     maquinas: (r) => [`codigo:${String(r.codigo).toLocaleLowerCase()}`],
     materiales_locales: (r) => [`nombre:${String(r.nombre).trim().toLocaleLowerCase()}`],
+    pedidos: (r) => [`codigo:${String(r.codigo).trim().toLocaleLowerCase()}`],
   };
   for (const [tabla, obtenerClaves] of Object.entries(unicos)) {
     const vistos = new Set();
@@ -107,6 +114,15 @@ export function prepararCambio(paso, actuales, campos, rehacer = false) {
     cambios[tabla] = registros;
   }
   const previos = problemas(actuales, campos);
+  for (const orden of actuales.ordenes || []) {
+    const posterior = (cambios.ordenes || actuales.ordenes).find((o) => Number(o.orden_id) === Number(orden.orden_id));
+    if (orden.estado !== 'Planificada' && posterior?.estado === orden.estado) {
+      const pedidosAntes = (actuales.pedidos || []).filter((p) => Number(p.orden_id) === Number(orden.orden_id));
+      const pedidosDespues = (cambios.pedidos || actuales.pedidos || []).filter((p) => Number(p.orden_id) === Number(orden.orden_id));
+      if ((!paso.ajusteLotes && Number(posterior.cantidad_plan) !== Number(orden.cantidad_plan)) || Number(posterior.producto_id) !== Number(orden.producto_id) || !igual(pedidosAntes, pedidosDespues))
+        return { motivo: 'El lote ya salió de planificación. Sus pedidos, peluche y cantidad se conservan mientras siga en ese estado.' };
+    }
+  }
   if ([...problemas({ ...actuales, ...cambios }, campos)].some((error) => !previos.has(error)))
     return { motivo: 'Hay registros relacionados que dependen de este cambio. Deshaz primero esos cambios; las recepciones guardadas se conservan.' };
   return { cambios, motivo: '' };

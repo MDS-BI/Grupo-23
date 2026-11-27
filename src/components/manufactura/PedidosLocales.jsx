@@ -7,21 +7,21 @@ import useEnfoqueAccion from '../../hooks/useEnfoqueAccion.js';
 import { GestionRegistros, opciones } from './Controles.jsx';
 
 export default function PedidosLocales({
-  productos, productoId, seleccionarProducto, planificar,
+  productos, productoId, seleccionarProducto, planificar, mostrarSelector = true,
 }) {
-  const destino = useEnfoqueAccion(productoId);
+  const destino = useEnfoqueAccion(productoId, true, mostrarSelector);
   const producto = productos.find((p) => Number(p.producto_id) === Number(productoId));
   const pendientes = obtenerPedidosPendientes(productoId);
   const total = pendientes.reduce((cantidad, pedido) => cantidad + pedido.cantidad, 0);
 
   return (
     <article className="card pedidos-locales">
-      <h2>Pedidos por peluche</h2>
+      <h2>Pedidos de locales</h2>
       <p className="muted">
-        Selecciona un modelo para ver qué locales lo pidieron. Cada orden nueva
-        requiere al menos {MINIMO_PRODUCCION} peluches del mismo producto.
+        Registra lo que solicita cada local o incluye pedidos pendientes en una nueva orden.
+        Un local puede pedir cualquier cantidad entera positiva. Para fabricar, la suma del lote debe llegar a {MINIMO_PRODUCCION} peluches del mismo modelo.
       </p>
-      <div className="pedidos-productos">
+      {mostrarSelector && <div className="pedidos-productos">
         {productos.map((p) => (
           <button
             type="button"
@@ -33,7 +33,7 @@ export default function PedidosLocales({
             {p.nombre}
           </button>
         ))}
-      </div>
+      </div>}
       {producto && (
         <div ref={destino} id="pedidos-del-peluche" className="pedidos-detalle">
           <header>
@@ -71,7 +71,7 @@ export default function PedidosLocales({
               { name: 'codigo', label: 'Código del pedido' },
               { name: 'local_id', label: 'Local solicitante', type: 'select',
                 options: opciones(listar('locales'), 'local_id') },
-              { name: 'cantidad', label: 'Peluches pedidos', type: 'number', min: 1, step: '1' },
+              { name: 'cantidad', label: 'Peluches pedidos', type: 'number', min: 1, step: '1', help: 'El mínimo de 64 corresponde a la suma del lote, no a cada tienda.' },
             ]}
             columnas={[
               { key: 'codigo', label: 'Código de pedido' },
