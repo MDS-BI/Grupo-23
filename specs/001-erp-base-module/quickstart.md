@@ -7,10 +7,42 @@
 3. Inicie el servidor de desarrollo con `npm run dev`.
 4. Abra la URL local de Vite en un perfil nuevo de navegador.
 
-La misma revisión del código presenta el mismo catálogo de peluches, las rutas
-y las relaciones. Los datos iniciales tienen fecha base 2026-11-16. Las alertas
-de vencimiento se calculan respecto al día actual. Los datos de un perfil con
-trabajo previo se conservan.
+La misma revisión del código, con el entorno indicado y un perfil nuevo,
+presenta la misma interfaz, catálogo y relaciones iniciales. La fábrica vigente
+tiene fecha base 2026-11-27. Las alertas de vencimiento usan el día actual.
+La reconstrucción autorizada de los ejemplos se aplica una sola vez con
+Supervisor y respaldo previo; las ediciones posteriores se conservan.
+
+## Comprobarlo desde otra computadora
+
+1. Descargue la misma revisión del repositorio que el equipo haya publicado.
+   Un cambio que solo exista en la PC de un integrante no estará en esa descarga.
+2. Use las versiones de Node/npm indicadas y ejecute `npm ci`, seguido de
+   `npm run dev`. No necesita copiar `node_modules`, archivos `.env`, imágenes
+   externas ni datos privados del navegador de otra persona.
+3. Abra la URL de Vite en un perfil nuevo o una ventana privada. El perfil
+   inicial es Supervisor. Así compara el estado inicial sin borrar trabajo de
+   un navegador utilizado anteriormente.
+4. Compruebe los siguientes datos iniciales.
+
+| Apartado | Resultado esperado |
+|---|---|
+| Productos y materiales | 6 modelos de peluche y 14 materiales textiles |
+| Etapas y rutas | 8 etapas y una ruta por cada uno de los 6 productos |
+| Órdenes | 6 lotes de 64; 1 planificado, 3 en producción y 2 finalizados |
+| Pedidos de locales | 30 pedidos de 5 locales |
+| Recepciones | 38 entregas relacionadas con las órdenes |
+| Máquinas | 5 máquinas |
+| Métricas iniciales | 384 unidades previstas, 128 terminadas y 33,3 % de volumen terminado |
+
+5. Ejecute `npm test -- --run` y `npm run build` para comprobar las reglas y la
+   compilación. El código de los ejemplos, las imágenes, la fuente y el lockfile
+   están versionados en el repositorio.
+
+«La misma página» significa la misma interfaz, funciones y ejemplos iniciales
+para la misma revisión y rol. Las alertas dependen de la fecha actual. Los datos
+que cada integrante agregue o modifique después son locales a su navegador;
+esta aplicación no sincroniza esas ediciones entre computadoras.
 
 ## Evaluación por perfil
 

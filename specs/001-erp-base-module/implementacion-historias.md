@@ -1,6 +1,6 @@
 # Implementación de las historias finales de Manufactura
 
-Fecha: 2026-11-10. Fuente funcional: `Historias_de_Usuario_Modulo_Manufactura_FINAL.pdf` (8 páginas), entregado por el usuario. Se conservan `spec.md`, `tasks.md`, el MER y los contratos originales; este documento registra su implementación en la estructura React existente.
+Fecha inicial: 2026-11-10. Revisado: 2026-11-27 contra el feedback docente. Fuente funcional: `Historias_de_Usuario_Modulo_Manufactura_FINAL.pdf` (8 páginas), entregado por el usuario. Este documento registra su implementación en la estructura React existente y las aclaraciones posteriores del usuario y del profesor.
 
 ## Cobertura de aceptación
 
@@ -16,7 +16,7 @@ Las prioridades P2 de HU4 y HU5 corresponden al PDF final; no se reescribieron l
 
 ## Persistencia y compatibilidad
 
-- Se mantienen las 12 claves y los nombres de campos del MER, con prefijo `manufactura:`. No hay migración destructiva ni reinicio de registros existentes.
+- Se mantienen las 12 entidades originales y sus nombres de campos, con prefijo `manufactura:`. Se añadieron locales, pedidos, materiales propios y metadatos de demo e historial. La reconstrucción de ejemplos autorizada el 27 de noviembre se ejecuta una sola vez con respaldo previo; las recargas posteriores conservan los datos.
 - Las escrituras de varias listas guardan sus valores anteriores y los recuperan si una escritura falla. Si una clave contiene JSON dañado se muestra un error antes de sobrescribirla.
 - Las muestras externas de `referencias.js` siguen siendo de solo lectura. `configurarReferencias(adaptador)` permite suministrar catálogos de Logística, Compras o RRHH sin reescribir los repositorios.
 - Desde el formulario de Productos se puede registrar un material propio con nombre y unidad. Se guarda en `manufactura:materiales_locales` y queda disponible en Productos y Recepciones de ese navegador. Los materiales locales usan identificadores negativos para convivir con los identificadores positivos del catálogo externo.
@@ -29,12 +29,12 @@ Las prioridades P2 de HU4 y HU5 corresponden al PDF final; no se reescribieron l
 - El avance mide etapas distintas completadas sobre la ruta del producto; registrar varias ejecuciones de una etapa no duplica el porcentaje. El estado de la orden se gestiona explícitamente y el tiempo acumula las ejecuciones finalizadas.
 - Para hacer inequívoco el avance se admite una sola aparición de cada etapa en una ruta. Las secuencias deben ser enteros positivos únicos y se ordenan al consultar.
 - No se puede eliminar un producto con órdenes, una etapa en uso ni una máquina con ejecuciones. Una orden con recepciones también queda protegida. Productos sin órdenes eliminan composición/ruta; órdenes sin recepciones eliminan sus ejecuciones; máquinas sin ejecuciones eliminan mantenimientos/repuestos; mantenimientos eliminan sus repuestos.
-- Un equipo asignado no se elimina hasta quitar la asignación. Se puede editar la orden, pero no cambiar su producto cuando ya tiene movimientos.
+- La API protege un equipo asignado salvo autorización explícita para retirar sus asignaciones. La confirmación de la interfaz muestra los trabajadores afectados y elimina equipo y asignaciones conjuntamente; Deshacer recupera ambos. Solo en planificación se puede ampliar el lote o cambiar sus pedidos; una orden con movimientos conserva su producto.
 - Una referencia antigua que ya no esté en un catálogo se muestra con su identificador; al guardar una relación nueva o editada debe seleccionarse una referencia válida.
 
 ## Alertas de producción
 
-El panel de producción identifica órdenes planificadas o en producción cuya fecha de término ya pasó, máquinas marcadas como fuera de servicio, ejecuciones terminadas que excedieron el tiempo estándar de su etapa e insumos cuyo stock no cubre lo requerido por las órdenes abiertas. Una orden que vence hoy se considera atrasada a partir del día siguiente según el calendario local del navegador. El panel usa los registros guardados, muestra los minutos reales y estándar de cada ejecución, compara lo recibido con lo requerido por material y ofrece accesos a órdenes, máquinas y recepciones.
+El panel de producción identifica órdenes planificadas o en producción cuya fecha de término ya pasó, máquinas marcadas como fuera de servicio, ejecuciones terminadas que excedieron el tiempo estándar de su etapa e insumos pendientes de las órdenes abiertas. Una orden que vence hoy se considera atrasada a partir del día siguiente según el calendario local del navegador. Los faltantes se calculan por orden antes de agruparse por material: las recepciones de otros lotes no los cubren. El panel muestra los minutos reales y estándar de cada ejecución y ofrece accesos a órdenes, máquinas y recepciones.
 
 La barra `BarraFiltros.jsx` se reutiliza en productos, órdenes y recursos para búsqueda por texto, estado, producto, rango de fechas y limpieza de filtros. `NuevoMaterial.jsx` permite crear insumos locales con validación de duplicados y dejarlos seleccionables en productos y recepciones. El dataset `demo-peluches.js` se carga desde `main.jsx` en el primer arranque sin registros, y mantiene los controles manuales de carga y reemplazo en `ProductosPage.jsx`.
 

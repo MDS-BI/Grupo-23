@@ -2,6 +2,11 @@
 
 Este documento define el modelo de datos del módulo de Manufactura y Operaciones. Las entidades se persisten en `localStorage`; las referencias externas son catálogos de solo lectura.
 
+Revisión del 2026-11-27: alineado con el código vigente y las aclaraciones del
+profesor. Describe las 12 entidades originales más locales y pedidos. Las
+muestras de referencia y materiales propios de la demo se detallan en el
+[contrato de almacenamiento](contracts/manufactura-storage.md).
+
 ## Convenciones
 
 - **PK**: Primary Key / Clave primaria.
@@ -19,8 +24,8 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 | `cantidad_por_unidad` | Unidades de material por unidad de producto; decimal > 0 |
 | `tiempo_estandar_min` | Minutos; entero > 0 |
 | `secuencia` | Orden dentro de la ruta; entero > 0 y único por producto |
-| `cantidad_plan` | Unidades planificadas; decimal > 0 |
-| `tiempo_uso_min` | Minutos; entero calculado como `fin_real - inicio_real` |
+| `cantidad_plan` | Peluches por lote; entero >= 64 para nuevas órdenes o cambios de cantidad; cantidades históricas menores se conservan al editar otros campos |
+| `tiempo_uso_min` | Minutos; `null` en curso, entero calculado al finalizar |
 | `cantidad_recibida` | Unidades recibidas; decimal > 0 |
 | `capacidad_hora` | Unidades por hora; decimal > 0 |
 | `cantidad` (repuesto) | Unidades de repuesto; entero > 0 |
@@ -69,7 +74,7 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 |---|---|---|---|
 | orden_id | int | PK | Autoincremental |
 | producto_id | int | FK | PRODUCTO |
-| cantidad_plan | decimal | | Obligatorio, > 0 |
+| cantidad_plan | int | | Obligatorio, >= 64 para lotes nuevos; ver compatibilidad histórica |
 | estado | string | | Obligatorio |
 | fecha_inicio | date | | Obligatorio |
 | fecha_fin | date | | Obligatorio; >= `fecha_inicio` |
@@ -81,18 +86,18 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 | ejecucion_id | int | PK | Autoincremental |
 | orden_id | int | FK | ORDEN_PRODUCCION; borrado en cascada |
 | etapa_id | int | FK | ETAPA_FABRICACION |
-| maquina_id | int | FK | MAQUINA |
-| trabajador_id | int | FK | Ext. RRHH (catálogo de solo lectura) |
+| maquina_id | int o null | FK | MAQUINA, opcional |
+| trabajador_id | int o null | FK | Ext. RRHH (catálogo de solo lectura), opcional |
 | inicio_real | datetime | | Obligatorio |
-| fin_real | datetime | | Obligatorio; >= `inicio_real` |
-| tiempo_uso_min | int | | Calculado en minutos a partir de inicio/fin reales |
+| fin_real | datetime o null | | Opcional en curso; al finalizar, >= `inicio_real` |
+| tiempo_uso_min | int o null | | Se calcula al finalizar; `null` mientras esté en curso |
 
 ## 7. RECEPCION_MATERIAL
 
 | Campo | Tipo de dato | Clave | Referencia / Nota |
 |---|---|---|---|
 | recepcion_id | int | PK | Autoincremental |
-| orden_id | int | FK | ORDEN_PRODUCCION; borrado en cascada |
+| orden_id | int | FK | ORDEN_PRODUCCION; la recepción confirmada protege la orden frente al borrado |
 | material_id | int | FK | Ext. Logística (catálogo de solo lectura) |
 | proveedor_id | int | FK | Ext. Compras (catálogo de solo lectura) |
 | cantidad_recibida | decimal | | Obligatorio, > 0 |
@@ -151,6 +156,7 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 |---|---|---|---|
 | material_id | int | PK | Catálogo de solo lectura (Ext. Logística) |
 | nombre | string | | |
+| unidad | string | | Unidad de medida del material |
 
 ## 14. REPUESTO (referencia externa)
 
@@ -173,6 +179,29 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 | trabajador_id | int | PK | Catálogo de solo lectura (Ext. RRHH) |
 | nombre | string | | |
 
+## 17. LOCAL
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| local_id | int | PK | Autoincremental |
+| codigo | string | | Código del local |
+| nombre | string | | Nombre del local solicitante |
+
+## 18. PEDIDO_LOCAL
+
+| Campo | Tipo de dato | Clave | Referencia / Nota |
+|---|---|---|---|
+| pedido_id | int | PK | Autoincremental |
+| codigo | string | | Obligatorio, único |
+| producto_id | int | FK | PRODUCTO |
+| local_id | int | FK | LOCAL |
+| cantidad | int | | Entero positivo; el mínimo de 64 se aplica al lote agregado, no a cada local |
+| orden_id | int o null | FK | ORDEN_PRODUCCION; `null` cuando está pendiente |
+
+Las fechas se guardan en la orden y son comunes a todos sus pedidos. Antes
+de iniciar producción, los pedidos deben cubrir todo el lote. Cantidad,
+modelo y asignaciones se conservan al salir de planificación.
+
 ---
 
 # Relaciones entre entidades
@@ -192,11 +221,14 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 | PROVEEDOR | 1 → 0..N | RECEPCION_MATERIAL | entrega |
 | MATERIAL | 1 → 0..N | RECEPCION_MATERIAL | se recibe |
 | MAQUINA | 1 → 0..N | MANTENIMIENTO_MAQUINA | requiere |
-| TRABAJADOR | 0..1 → 0..N | MANTENIMIENTO_MAQUINA | ejecuta |
+| TRABAJADOR | 1 → 0..N | MANTENIMIENTO_MAQUINA | ejecuta |
 | MANTENIMIENTO_MAQUINA | 1 → 0..N | MANTENIMIENTO_REPUESTO | consume |
 | REPUESTO | 1 → 0..N | MANTENIMIENTO_REPUESTO | se usa |
 | TRABAJADOR | 1 → 0..N | ASIGNACION_EQUIPAMIENTO | recibe |
 | EQUIPAMIENTO | 1 → 0..N | ASIGNACION_EQUIPAMIENTO | se asigna |
+| LOCAL | 1 → 0..N | PEDIDO_LOCAL | solicita |
+| PRODUCTO | 1 → 0..N | PEDIDO_LOCAL | se pide |
+| ORDEN_PRODUCCION | 0..1 → 0..N | PEDIDO_LOCAL | agrupa |
 
 # Claves de almacenamiento
 
@@ -214,14 +246,21 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 | MANTENIMIENTO_REPUESTO | `manufactura:mantenimiento_repuestos` |
 | EQUIPAMIENTO | `manufactura:equipamiento` |
 | ASIGNACION_EQUIPAMIENTO | `manufactura:asignaciones` |
-| MATERIAL, REPUESTO, PROVEEDOR, TRABAJADOR | Catálogos de solo lectura en `referencias.js` (no se persisten) |
+| LOCAL | `manufactura:locales` |
+| PEDIDO_LOCAL | `manufactura:pedidos` |
+| MATERIAL propio | `manufactura:materiales_locales` (IDs negativos) |
+| Muestras de proveedores, trabajadores y repuestos | `manufactura:demo_peluches` |
+| MATERIAL, REPUESTO, PROVEEDOR, TRABAJADOR externos | Adaptador de consulta en `referencias.js`; no se modifican sistemas externos |
 
 # Reglas de integridad y borrado en cascada
 
-- Eliminar un PRODUCTO elimina sus PRODUCTO_MATERIAL y RUTA_PRODUCTO asociadas.
-- Eliminar una ORDEN_PRODUCCION elimina sus EJECUCION_ETAPA y RECEPCION_MATERIAL asociadas.
-- Eliminar una MAQUINA elimina sus MANTENIMIENTO_MAQUINA asociados.
+- Un PRODUCTO con órdenes o pedidos no se elimina. Si está libre, su eliminación retira PRODUCTO_MATERIAL y RUTA_PRODUCTO.
+- Una ORDEN_PRODUCCION con recepciones confirmadas no se elimina. Si no tiene recepciones, su eliminación retira EJECUCION_ETAPA y deja sus pedidos pendientes.
+- Una MAQUINA con ejecuciones no se elimina. Si está libre, su eliminación retira MANTENIMIENTO_MAQUINA y sus repuestos asociados.
 - Eliminar un MANTENIMIENTO_MAQUINA elimina sus MANTENIMIENTO_REPUESTO asociados.
+- Una ETAPA_FABRICACION en una ruta o ejecución se conserva, explicando sus vínculos.
+- Eliminar EQUIPAMIENTO asignado desde la interfaz requiere confirmar el retiro conjunto de sus asignaciones; Deshacer recupera los registros relacionados.
+- RECEPCION_MATERIAL es de alta y consulta: se rechaza editarla o eliminarla, también mediante cascadas o Deshacer.
 - Toda FK debe referenciar un registro existente; las referencias externas deben existir en su catálogo de solo lectura.
 
 # Trazabilidad entidad → requisitos
@@ -240,13 +279,14 @@ Este documento define el modelo de datos del módulo de Manufactura y Operacione
 | MANTENIMIENTO_REPUESTO | FR-025 |
 | EQUIPAMIENTO | FR-027 |
 | ASIGNACION_EQUIPAMIENTO | FR-028, FR-029 |
+| LOCAL, PEDIDO_LOCAL | FR-052, FR-053, FR-062, FR-063, FR-064, FR-067 |
 | MATERIAL, REPUESTO, PROVEEDOR, TRABAJADOR | FR-033, XR-002, XR-004 |
 
 ## Módulos representados
 
 | Módulo | Entidades / referencias |
 |---|---|
-| **7. Manufactura y operaciones** | PRODUCTO, PRODUCTO_MATERIAL, ETAPA_FABRICACION, RUTA_PRODUCTO, ORDEN_PRODUCCION, EJECUCION_ETAPA, RECEPCION_MATERIAL, MAQUINA, MANTENIMIENTO_MAQUINA, MANTENIMIENTO_REPUESTO, EQUIPAMIENTO, ASIGNACION_EQUIPAMIENTO |
+| **7. Manufactura y operaciones** | PRODUCTO, PRODUCTO_MATERIAL, ETAPA_FABRICACION, RUTA_PRODUCTO, ORDEN_PRODUCCION, EJECUCION_ETAPA, RECEPCION_MATERIAL, MAQUINA, MANTENIMIENTO_MAQUINA, MANTENIMIENTO_REPUESTO, EQUIPAMIENTO, ASIGNACION_EQUIPAMIENTO, LOCAL, PEDIDO_LOCAL |
 | **3. Logística e inventario** | MATERIAL, REPUESTO |
 | **2. RRHH y planillas** | TRABAJADOR |
 | **6. Adquisición y compras** | PROVEEDOR |

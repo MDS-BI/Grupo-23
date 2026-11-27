@@ -2,7 +2,7 @@
 
 **Rama de trabajo**: main; carpeta de especificación 001-erp-base-module
 **Creada**: 2026-07-08  
-**Estado**: MVP en revisión; actualización de roles y reproducibilidad del 2026-11-23
+**Estado**: MVP en revisión; roles y reproducción verificados el 2026-11-27
 **Entrada**: Descripción del usuario: "Construir el módulo de Manufactura y Operaciones de un ERP: gestión de productos y sus materiales, definición de etapas y rutas de fabricación, creación y control de órdenes de producción con ejecución real de etapas, registro de recepción de materiales y gestión de máquinas, mantenimientos y equipamiento, con capacidades de crear/editar/eliminar/consultar."
 
 ## Propósito
@@ -118,6 +118,24 @@ Como encargado de producción, quiero supervisar alertas, filtrar registros, reg
 5. **Dado** que el usuario abre la aplicación por primera vez sin registros, **cuando** carga el módulo, **entonces** el dataset de demostración con productos, rutas, órdenes, recepciones y recursos de HU1 a HU5 queda disponible sin borrar datos posteriores.
 
 ---
+
+### Reproducción desde otra computadora
+
+Se considera reproducible cuando una persona descarga la misma revisión
+publicada del repositorio, sigue el entorno y arranque documentados y, desde
+un perfil de navegador nuevo con Supervisor, obtiene la misma interfaz,
+funcionalidades y datos iniciales sin archivos privados del equipo original.
+
+La referencia inicial es: seis productos, catorce materiales, ocho etapas,
+seis rutas de producto, seis órdenes de 64, treinta pedidos de cinco locales,
+38 recepciones y cinco máquinas. Las órdenes se distribuyen en una planificada,
+tres en producción y dos finalizadas. El panel muestra 384 unidades previstas,
+128 terminadas y 33,3 % de volumen terminado.
+
+Las fechas de los ejemplos son fijas. Las alertas por vencimiento se recalculan
+según el día actual. Los datos que se registren después en cada navegador
+pertenecen a ese perfil y no se sincronizan por descargar o actualizar GitHub.
+El procedimiento verificable está en [quickstart.md](quickstart.md).
 
 ### Vistas por rol
 
@@ -235,7 +253,7 @@ Escenarios de aceptación adicionales.
 - **FR-046**: Operario de producción DEBE consultar órdenes abiertas y registrar ejecuciones de etapas de tipo Ensamble o Ensamblaje. Las recepciones, los proveedores y las fechas de entrega DEBEN omitirse de esa perspectiva.
 - **FR-047**: El sistema DEBE rechazar modificaciones fuera del perfil antes de escribir registros, y cerrar formularios previos al cambiar el perfil.
 - **FR-048**: El sistema DEBE impedir finalizar órdenes sin ruta, con etapas pendientes o con ejecuciones abiertas. Las órdenes finalizadas o canceladas DEBEN rechazar recepciones nuevas, conservando la consulta de entregas históricas.
-- **FR-049**: El sistema DEBE ofrecer deshacer cambios sin guardar en formularios y rutas, y revertir en orden los últimos veinte cambios guardados del navegador, incluidas eliminaciones válidas y sus relaciones. El historial DEBE persistir al perder la sesión o recargar la página. La operación DEBE respetar el rol y rechazarse si el estado actual no coincide con el historial. Un botón no disponible DEBE explicar el motivo. Las recepciones confirmadas conservan su historial y solo ofrecen deshacer en el formulario sin guardar.
+- **FR-049**: El sistema DEBE ofrecer deshacer cambios sin guardar en formularios y rutas, y revertir individualmente los últimos veinte cambios guardados del navegador, incluidas eliminaciones válidas y sus relaciones, según las reglas de conflictos de FR-060. El historial DEBE persistir al perder la sesión o recargar la página. La operación DEBE respetar el rol y rechazarse si el estado actual no coincide con el historial. Un botón no disponible DEBE explicar el motivo. Las recepciones confirmadas conservan su historial y solo ofrecen deshacer en el formulario sin guardar.
 - **FR-050**: Al abrir un formulario, detalle o menú de pedidos, el sistema DEBE llevar la vista a ese apartado y enfocar un control apropiado. La navegación entre páginas DEBE llevar al inicio del contenido y respetar la preferencia de movimiento reducido.
 - **FR-051**: Una orden nueva o un cambio de producto o cantidad DEBE requerir un número entero de al menos 64 peluches. Las órdenes históricas con cantidades inferiores pueden conservar su cantidad al editar otros campos.
 - **FR-052**: Órdenes de producción DEBE ofrecer un menú por modelo de peluche con código de pedido, código y nombre del local, cantidad solicitada y orden asociada. Supervisor y Planificador de producción pueden registrar pedidos y planificar conjuntamente pedidos pendientes del mismo producto cuando sumen al menos 64 unidades.

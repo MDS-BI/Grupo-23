@@ -1,6 +1,6 @@
 # Plan de Implementación: Módulo 7 - Manufactura y Operaciones
 
-**Rama de trabajo**: `main` | **Actualizado**: 2026-11-23 | **Especificación**: [spec.md](spec.md)
+**Rama de trabajo**: `main` | **Actualizado**: 2026-11-27 | **Especificación**: [spec.md](spec.md)
 **Entrada**: Especificación de la funcionalidad desde `/specs/001-erp-base-module/spec.md`
 
 ## Resumen
@@ -17,7 +17,7 @@ Construir el módulo **Manufactura y Operaciones** del ERP como una aplicación 
 **Tipo de Proyecto**: Aplicación web  
 **Objetivos de Rendimiento**: Listados y validaciones responsivos con al menos 500 registros por entidad; respuestas menores a 200 ms  
 **Restricciones**: Sin backend; referencias externas simuladas con catálogos de solo lectura; estructura modular por entidad  
-**Escala/Alcance**: 12 entidades de Manufactura y 4 catálogos externos de referencia
+**Escala/Alcance**: 14 entidades persistidas (las 12 originales más locales y pedidos) y 4 catálogos externos de referencia, con materiales locales y muestras persistidas para la demo
 
 ## Verificación de la Constitución
 
@@ -26,7 +26,7 @@ Construir el módulo **Manufactura y Operaciones** del ERP como una aplicación 
 - **Calidad**: La implementación usa módulos por entidad (`src/modules/manufactura/*.js`) con validadores y repositorios, y componentes React por caso de uso (`src/components/manufactura/*.jsx`).
 - **Pruebas**: Cada historia de usuario incluye pruebas unitarias de validación/persistencia y pruebas de integración antes de la implementación. La Fase 7 ejecuta la suite completa y la compilación de producción.
 - **Experiencia de Usuario**: Los formularios y listados comparten patrones de validación por campo, estados vacíos y mensajes de error claros y accesibles.
-- **Rendimiento**: El almacenamiento y los listados se validan con al menos 500 registros por entidad, con respuestas menores a 200 ms.
+- **Rendimiento**: La evaluación con al menos 500 registros por entidad y respuesta menor a 200 ms se sigue en T212; no se acredita ese presupuesto únicamente con las pruebas funcionales o la compilación.
 
 ## Estructura del Proyecto
 
@@ -59,6 +59,11 @@ src/
 │       ├── demo-peluches.js
 │       ├── peluches-ejemplo.js
 │       ├── alertas.js
+│       ├── roles.js
+│       ├── pedidos-locales.js
+│       ├── ejemplo-coherente.js
+│       ├── historial-cambios.js
+│       ├── metricas.js
 │       ├── productos.js
 │       ├── etapas.js
 │       ├── rutas.js
@@ -75,12 +80,14 @@ src/
         ├── NuevoMaterial.jsx
         ├── EtapasPage.jsx
         ├── OrdenesPage.jsx
+        ├── OrdenForm.jsx
         ├── RecepcionesPage.jsx
         ├── RecursosPage.jsx
         ├── ReferenciasPage.jsx
         ├── ResumenPage.jsx
         ├── Controles.jsx
         ├── BarraFiltros.jsx
+        ├── MetricasProduccion.jsx
         └── AlertasProduccion.jsx
 
 tests/

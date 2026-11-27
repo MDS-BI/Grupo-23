@@ -9,7 +9,7 @@ La aplicación persiste los registros del módulo de Manufactura y Operaciones e
 - Cada entidad se guarda como una lista JSON bajo una clave con el prefijo `manufactura:`.
 - Los identificadores (`*_id`) son enteros únicos por entidad y se generan de forma incremental.
 - Los repositorios validan los datos antes de persistir y devuelven errores por campo.
-- Los catálogos externos (MATERIAL, REPUESTO, PROVEEDOR, TRABAJADOR) son de solo lectura y no se persisten en `localStorage`.
+- Los catálogos externos (MATERIAL, REPUESTO, PROVEEDOR, TRABAJADOR) se consultan mediante el adaptador de solo lectura. La demo persiste muestras de proveedores, trabajadores y repuestos en `manufactura:demo_peluches`; los materiales propios se guardan en `manufactura:materiales_locales`. Estas extensiones no escriben en sistemas externos.
 
 ## Claves de almacenamiento
 
@@ -69,7 +69,7 @@ en una orden activa. Eliminar una orden permitida deja sus pedidos pendientes.
 
 - `orden_id`: entero único, autogenerado
 - `producto_id`: entero que referencia un PRODUCTO existente
-- `cantidad_plan`: número mayor que cero
+- `cantidad_plan`: entero de al menos 64 para un lote nuevo o al cambiar la cantidad; una cantidad histórica menor puede conservarse al editar otros campos
 - `estado`: cadena no vacía (obligatorio)
 - `fecha_inicio`: fecha de calendario válida
 - `fecha_fin`: fecha de calendario válida, igual o posterior a `fecha_inicio`
@@ -79,11 +79,11 @@ en una orden activa. Eliminar una orden permitida deja sus pedidos pendientes.
 - `ejecucion_id`: entero único, autogenerado
 - `orden_id`: entero que referencia una ORDEN_PRODUCCION existente
 - `etapa_id`: entero que referencia una ETAPA_FABRICACION existente
-- `maquina_id`: entero que referencia una MAQUINA existente
-- `trabajador_id`: entero que referencia un TRABAJADOR del catálogo externo
+- `maquina_id`: entero que referencia una MAQUINA existente, o `null` si no corresponde asignarla
+- `trabajador_id`: entero que referencia un TRABAJADOR del catálogo, o `null` si no corresponde asignarlo
 - `inicio_real`: fecha y hora válidas
-- `fin_real`: fecha y hora válidas, iguales o posteriores a `inicio_real`
-- `tiempo_uso_min`: entero calculado en minutos a partir de `inicio_real` y `fin_real`
+- `fin_real`: `null` mientras la ejecución esté en curso; al finalizar, fecha y hora válidas, iguales o posteriores a `inicio_real`
+- `tiempo_uso_min`: `null` en curso; al finalizar, entero calculado en minutos a partir de `inicio_real` y `fin_real`
 
 ### RECEPCION_MATERIAL
 

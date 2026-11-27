@@ -34,9 +34,14 @@
 
 - [x] Todos los requisitos funcionales tienen criterios de aceptación claros
 - [x] Los escenarios de usuario cubren los flujos principales
-- [x] La funcionalidad cumple los resultados medibles definidos en los Criterios de Éxito
+- [ ] Completar la medición de rendimiento en navegador y la evaluación con usuarios de los criterios de éxito (T212/T213); las pruebas funcionales y la compilación ya están verificadas
 - [x] No hay filtración de detalles de implementación en la especificación
 
 ## Notas
 
 - La especificación está lista para la planificación y la implementación.
+- Revisión del 2026-11-27: trazabilidad completa de 68 requisitos funcionales;
+  los puntos técnicos del feedback del Avance 03 se verifican en
+  [revision-feedback-2026-11-27.md](../revision-feedback-2026-11-27.md).
+  Los criterios de tiempos y éxito con usuarios no se marcan como medidos
+  sin un estudio. Esta precisión documental no cambia la página.

@@ -179,6 +179,11 @@ Las reglas están en [spec.md](specs/001-erp-base-module/spec.md), las decisione
 técnicas en [plan.md](specs/001-erp-base-module/plan.md) y su trazabilidad en
 [tasks.md](specs/001-erp-base-module/tasks.md).
 
+La [revisión del feedback docente del 27 de noviembre](specs/001-erp-base-module/revision-feedback-2026-11-27.md)
+contrasta cada punto del Avance 03 con el código y las pruebas actuales.
+Incluye la instalación limpia y distingue lo verificado de las evaluaciones
+de rendimiento y usabilidad que todavía requieren mediciones.
+
 El desarrollo utiliza apoyo de OpenCode y Codex para redactar especificaciones,
 implementar las historias y proponer correcciones. Las decisiones de la revisión
 del 23 de noviembre de 2026 se registran en spec, plan y tasks. Las pruebas

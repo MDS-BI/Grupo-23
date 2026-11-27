@@ -43,10 +43,10 @@
 - [x] T013 [P] [US1] Agregar las claves `manufactura:productos` y `manufactura:producto_material` a `src/modules/manufactura/almacenamiento.js`
 - [x] T014 [US1] Implementar el repositorio CRUD de productos y de su composición en `src/modules/manufactura/productos.js` (depende de T012, T013)
 - [x] T015 [P] [US1] Crear el formulario de producto (nombre, tipo) con subformulario de materiales y cantidad por unidad en `src/components/manufactura/ProductoForm.jsx`
-- [x] T016 [P] [US1] Crear el listado y la vista de detalle del producto mostrando todos sus materiales y cantidades en `src/components/manufactura/ProductoList.jsx`
-- [x] T017 [US1] Conectar alta, edición y asociación/eliminación de materiales al producto en `src/App.jsx` (depende de T014, T015)
+- [x] T016 [P] [US1] Crear el listado en `src/components/manufactura/ProductoList.jsx` y el detalle de materiales y cantidades en `src/components/manufactura/ProductoDetalle.jsx`
+- [x] T017 [US1] Conectar alta, edición y asociación/eliminación de materiales al producto en `src/components/manufactura/ProductosPage.jsx` (depende de T014, T015)
 - [x] T018 [US1] Mostrar retroalimentación de validación por campo e impedir el guardado con datos faltantes en `src/components/manufactura/ProductoForm.jsx`
-- [x] T019 [US1] Recargar los datos y la composición del producto al reabrir su edición en `src/App.jsx`
+- [x] T019 [US1] Recargar los datos y la composición del producto al reabrir su edición en `src/components/manufactura/ProductosPage.jsx` y `src/components/manufactura/ProductoForm.jsx`
 - [x] T020 [P] [US1] Estilos del formulario, subformulario de materiales y detalle de producto en `src/styles.css`
 
 **Punto de control**: La Historia de Usuario 1 debe estar completamente funcional y ser comprobable de forma independiente.
@@ -82,9 +82,9 @@
 - [x] T036 [US2] Implementar el repositorio de rutas con ordenamiento por `secuencia` en `src/modules/manufactura/rutas.js` (depende de T033, T034)
 - [x] T037 [P] [US2] Crear el formulario de etapas (nombre, tipo, tiempo estándar) en `src/components/manufactura/EtapasPage.jsx`
 - [x] T038 [P] [US2] Crear el editor de ruta del producto con selección de etapas y asignación de secuencia en `src/components/manufactura/EtapasPage.jsx`
-- [x] T039 [US2] Conectar alta/edición de etapas y configuración de la ruta al producto en `src/App.jsx` (depende de T035, T036, T037, T038)
-- [x] T040 [US2] Mostrar la ruta resultante ordenada por secuencia en la vista de detalle del producto en `src/components/manufactura/ProductoList.jsx`
-- [x] T041 [US2] Validar datos obligatorios de etapa y ruta con mensajes claros en `src/components/manufactura/EtapasPage.jsx` y `src/components/manufactura/EtapasPage.jsx`
+- [x] T039 [US2] Conectar alta/edición de etapas y configuración de la ruta al producto en `src/components/manufactura/EtapasPage.jsx` (depende de T035, T036, T037, T038)
+- [x] T040 [US2] Mostrar la ruta resultante ordenada por secuencia en la vista de detalle del producto en `src/components/manufactura/ProductoDetalle.jsx`
+- [x] T041 [US2] Validar datos obligatorios de etapa y ruta con mensajes claros en `src/components/manufactura/EtapasPage.jsx`
 - [x] T042 [P] [US2] Estilos del formulario de etapas y del editor de rutas en `src/styles.css`
 
 **Punto de control**: La Historia de Usuario 2 debe estar completamente funcional y ser comprobable de forma independiente.
@@ -113,15 +113,15 @@
 
 ### Implementación de la Historia de Usuario 3
 
-- [x] T052 [P] [US3] Crear los validadores de `ORDEN_PRODUCCION` (producto, cantidad planificada > 0, estado y fechas obligatorios; fin no anterior a inicio) en `src/modules/manufactura/ordenes.js`
-- [x] T053 [P] [US3] Crear los validadores de `EJECUCION_ETAPA` (orden, etapa, máquina, trabajador, inicio y fin reales obligatorios) en `src/modules/manufactura/ordenes.js`
+- [x] T052 [P] [US3] Crear los validadores de `ORDEN_PRODUCCION` (producto, lote nuevo entero >= 64, estado y fechas obligatorios; fin no anterior a inicio) en `src/modules/manufactura/ordenes.js`
+- [x] T053 [P] [US3] Crear los validadores de `EJECUCION_ETAPA` (orden, etapa e inicio real obligatorios; máquina y trabajador opcionales; fin real opcional hasta finalizar) en `src/modules/manufactura/ordenes.js`
 - [x] T054 [P] [US3] Agregar las claves `manufactura:ordenes` y `manufactura:ejecuciones` a `src/modules/manufactura/almacenamiento.js`
 - [x] T055 [US3] Implementar el repositorio CRUD de órdenes en `src/modules/manufactura/ordenes.js` (depende de T052, T054)
 - [x] T056 [US3] Implementar el repositorio de ejecuciones con cálculo de `tiempo_uso_min` a partir de inicio/fin real en `src/modules/manufactura/ordenes.js` (depende de T053, T054)
-- [x] T057 [P] [US3] Crear el formulario de orden (producto, cantidad planificada, estado, fechas) en `src/components/manufactura/OrdenesPage.jsx`
+- [x] T057 [P] [US3] Crear el formulario de orden y pedidos con fechas comunes en `src/components/manufactura/OrdenForm.jsx`, integrado desde `src/components/manufactura/OrdenesPage.jsx`
 - [x] T058 [P] [US3] Crear el formulario de ejecución de etapa (etapa, máquina, trabajador, inicio/fin real) en `src/components/manufactura/OrdenesPage.jsx`
 - [x] T059 [P] [US3] Crear la vista de detalle de la orden con sus ejecuciones y avance por etapa en `src/components/manufactura/OrdenesPage.jsx`
-- [x] T060 [US3] Conectar creación/edición de órdenes y registro de ejecuciones en `src/App.jsx` (depende de T055, T056, T057, T058)
+- [x] T060 [US3] Conectar creación/edición de órdenes y registro de ejecuciones en `src/components/manufactura/OrdenesPage.jsx` (depende de T055, T056, T057, T058)
 - [x] T061 [US3] Rechazar fechas inválidas (fin anterior a inicio) y mostrar la explicación en `src/components/manufactura/OrdenesPage.jsx`
 - [x] T062 [US3] Listar las etapas ejecutadas con máquina, trabajador y tiempos en `src/components/manufactura/OrdenesPage.jsx`
 - [x] T063 [P] [US3] Estilos del formulario de orden, ejecuciones y vista de avance en `src/styles.css`
@@ -155,10 +155,10 @@
 
 - [x] T072 [P] [US4] Crear los validadores de `RECEPCION_MATERIAL` (orden, material, proveedor, cantidad recibida > 0 y fecha obligatorios) en `src/modules/manufactura/recepciones.js`
 - [x] T073 [P] [US4] Agregar la clave `manufactura:recepciones` a `src/modules/manufactura/almacenamiento.js`
-- [x] T074 [US4] Implementar el repositorio CRUD de recepciones asociadas a una orden en `src/modules/manufactura/recepciones.js` (depende de T072, T073)
+- [x] T074 [US4] Implementar alta y consulta de recepciones asociadas a una orden, rechazando edición y eliminación de registros confirmados, en `src/modules/manufactura/recepciones.js` (depende de T072, T073; revisión T131)
 - [x] T075 [P] [US4] Crear el formulario de recepción (material, proveedor, cantidad, fecha) en `src/components/manufactura/RecepcionesPage.jsx`
 - [x] T076 [P] [US4] Crear la lista de recepciones con material, proveedor, cantidad y fecha en `src/components/manufactura/RecepcionesPage.jsx`
-- [x] T077 [US4] Conectar el alta/edición de recepciones a una orden existente en `src/App.jsx` (depende de T074, T075)
+- [x] T077 [US4] Conectar el alta y consulta histórica de recepciones a una orden existente en `src/components/manufactura/RecepcionesPage.jsx` y `src/components/manufactura/OrdenesPage.jsx` (depende de T074, T075)
 - [x] T078 [US4] Mostrar todas las recepciones asociadas a la orden en la vista de detalle de la orden en `src/components/manufactura/OrdenesPage.jsx`
 - [x] T079 [US4] Impedir el guardado cuando falta material, proveedor, cantidad o fecha y señalar el campo faltante en `src/components/manufactura/RecepcionesPage.jsx`
 - [x] T080 [P] [US4] Estilos del formulario y la lista de recepciones en `src/styles.css`
@@ -202,8 +202,8 @@
 - [x] T102 [P] [US5] Crear el formulario de mantenimiento con selección de técnico y carga de repuestos y cantidades en `src/components/manufactura/RecursosPage.jsx`
 - [x] T103 [P] [US5] Crear el formulario de asignación de equipamiento (trabajador, equipamiento, fecha de entrega) en `src/components/manufactura/RecursosPage.jsx`
 - [x] T104 [P] [US5] Crear la vista de máquinas con su historial de mantenimientos asociados en `src/components/manufactura/RecursosPage.jsx`
-- [x] T105 [US5] Conectar alta/edición de máquinas, mantenimientos, repuestos y asignaciones en `src/App.jsx` (depende de T098, T099, T100)
-- [x] T106 [US5] Validar datos obligatorios de mantenimiento y asignación con mensajes claros en `src/components/manufactura/RecursosPage.jsx` y `src/components/manufactura/RecursosPage.jsx`
+- [x] T105 [US5] Conectar alta/edición de máquinas, mantenimientos, repuestos y asignaciones en `src/components/manufactura/RecursosPage.jsx` (depende de T098, T099, T100)
+- [x] T106 [US5] Validar datos obligatorios de mantenimiento y asignación con mensajes claros en `src/components/manufactura/RecursosPage.jsx`
 - [x] T107 [P] [US5] Estilos de máquinas, mantenimientos y equipamiento en `src/styles.css`
 
 **Punto de control**: Las Historias de Usuario 1-5 deben estar completamente funcionales y ser comprobables de forma independiente.
@@ -227,9 +227,9 @@
 
 - [x] T110 [P] Añadir prueba de integración del flujo completo producto → ruta → orden → recepción en `tests/integration/manufactura/historias-flujo.test.jsx`
 - [x] T111 [P] Revisar accesibilidad (etiquetas, orden de foco, mensajes de error) en `src/components/manufactura/`
-- [x] T112 Verificar integridad referencial y borrado en cascada: producto→ruta, orden→ejecuciones/recepciones, máquina→mantenimientos, mantenimiento→repuestos en `src/modules/manufactura/`
+- [x] T112 Verificar integridad y cascadas permitidas: producto sin órdenes/pedidos→composición/ruta, orden sin recepciones→ejecuciones, máquina sin ejecuciones→mantenimientos/repuestos; conservar recepciones históricas en `src/modules/manufactura/`
 - [x] T113 Actualizar `README.md` con el módulo de manufactura y las claves de almacenamiento
-- [x] T114 Ejecutar la suite completa de pruebas (`npm test`), verificar el rendimiento con al menos 500 registros por entidad (< 200 ms) y la compilación de producción para confirmar que no hay regresiones
+- [x] T114 Ejecutar la suite completa (`npm test -- --run`) y la compilación de producción para comprobar regresiones. Las mediciones de rendimiento y usabilidad se registran por separado en T212/T213; esta casilla no acredita esos criterios.
 
 ---
 
@@ -319,7 +319,7 @@ Con varios desarrolladores:
 
 ## Trazabilidad Requisitos → Tareas
 
-**Cobertura**: 42/42 requisitos funcionales (FR), 4/4 requisitos de extensibilidad (XR) y 10/10 criterios de éxito (SC) tienen al menos una tarea asociada. Las 84 tareas están cubiertas por al menos un requisito.
+**Cobertura de planificación**: 68/68 requisitos funcionales (FR), 4/4 requisitos de extensibilidad (XR) y 10/10 criterios de éxito (SC) tienen tareas asociadas. Tener una tarea asociada no equivale a haber medido el criterio: los estudios de usabilidad y rendimiento en navegador conservan su estado pendiente hasta contar con evidencia.
 
 ### Requisitos Funcionales
 
@@ -367,6 +367,32 @@ Con varios desarrolladores:
 | FR-040 | Filtros reutilizables por texto, estado, fecha y categoría | T122, T123 |
 | FR-041 | Alta local de materiales y asociación a productos | T124, T125 |
 | FR-042 | Dataset de demostración cargado al iniciar y verificable | T004, T126, T127 |
+| FR-043 | Estado inicial y fechas reproducibles | T128, T151, T204, T211 |
+| FR-044 | Entorno, instalación limpia, documentación y trazabilidad | T129, T133, T209, T210, T211 |
+| FR-045 | Cinco perfiles con navegación y operaciones propias | T130, T134 |
+| FR-046 | Operario limitado a ensamblaje y sin información de entregas | T130, T132, T134 |
+| FR-047 | Permisos antes de persistir y cierre de formularios por rol | T132 |
+| FR-048 | Cierre de orden con ruta completa y recepciones solo en órdenes abiertas | T135 |
+| FR-049 | Deshacer borradores e historial persistente con relaciones | T136, T137, T152, T153, T154, T155 |
+| FR-050 | Foco y desplazamiento hacia acciones, con movimiento reducido | T138, T193 |
+| FR-051 | Lote mínimo entero de 64 y compatibilidad histórica | T139, T200 |
+| FR-052 | Pedidos por peluche, locales y cantidades | T140, T193 |
+| FR-053 | Creación de órdenes y vínculos atómica, sin pedidos duplicados | T140, T194 |
+| FR-054 | Métricas de volumen y tiempos sin duplicar unidades | T142, T144, T208 |
+| FR-055 | Gráficos, filtros por producto y actualización automática | T143, T144 |
+| FR-056 | Catálogos e instrucciones textiles de peluches | T145, T146, T147 |
+| FR-057 | Oso con cascabel y relaciones completas, sin duplicados | T148, T149, T150, T151 |
+| FR-058 | Eliminación y recuperación conjunta de equipamiento y asignaciones | T156, T157, T158, T159 |
+| FR-059 | Deshacer junto a avisos, sin duplicar encabezados | T160, T161, T162, T163 |
+| FR-060 | Lista persistente con Deshacer/Rehacer individual y conflictos | T170, T171, T172, T173 |
+| FR-061 | Bloqueos de eliminación explicados y confirmaciones coherentes | T180, T181, T182, T183, T184 |
+| FR-062 | Fechas y pedidos en un único formulario de nueva orden | T190, T194, T200 |
+| FR-063 | Pedidos positivos por local; mínimo de 64 agregado por lote | T200 |
+| FR-064 | Asignar o ampliar pedidos solo en planificación | T192, T201, T202 |
+| FR-065 | Descartar avisos mediante equis sin cambiar los registros | T195 |
+| FR-066 | Contador de cupos de órdenes planificadas con unidades libres | T201 |
+| FR-067 | Lote completo antes de producir y asignaciones congeladas | T202 |
+| FR-068 | Reconstrucción autorizada una sola vez, con respaldo y recuperación | T203, T204, T207 |
 
 ### Requisitos de Extensibilidad
 
@@ -381,14 +407,14 @@ Con varios desarrolladores:
 
 | Criterio | Descripción breve | Tareas |
 |---|---|---|
-| SC-001 | Crear producto con material y verlo en < 2 min | T011, T016, T114 |
-| SC-002 | Configurar ruta ordenada en < 5 min | T031, T040, T114 |
-| SC-003 | Crear orden y ejecución en < 5 min | T051, T062, T114 |
-| SC-004 | Registrar recepción y verla en la orden en < 2 min | T071, T078, T114 |
-| SC-005 | Máquina + mantenimiento + asignación en < 5 min | T092, T104, T114 |
-| SC-006 | 90% de usuarios completan tareas sin ayuda | T114 |
+| SC-001 | Crear producto con material y verlo en < 2 min | T011, T016, T213 |
+| SC-002 | Configurar ruta ordenada en < 5 min | T031, T040, T213 |
+| SC-003 | Crear orden y ejecución en < 5 min | T051, T062, T213 |
+| SC-004 | Registrar recepción y verla en la orden en < 2 min | T071, T078, T213 |
+| SC-005 | Máquina + mantenimiento + asignación en < 5 min | T092, T104, T213 |
+| SC-006 | 90% de usuarios completan tareas sin ayuda | T213 |
 | SC-007 | Validaciones impiden guardar datos faltantes | T010, T030, T050, T070, T090, T114 |
-| SC-008 | 500 registros por entidad con respuesta < 200 ms | T114 |
+| SC-008 | 500 registros por entidad con respuesta < 200 ms | T212 |
 | SC-009 | Flujo completo sin regresiones | T110, T114 |
 | SC-010 | Pruebas y compilación exitosas | T114 |
 
@@ -409,7 +435,7 @@ Se conserva íntegro el plan anterior. La implementación actual y las decisione
 - [x] HU1: extender los componentes existentes con edición, composición consultable, selector externo, validación y borrado protegido.
 - [x] HU2: implementar etapas y editor ordenado de rutas con validación de secuencias.
 - [x] HU3: implementar órdenes, inicio/finalización de ejecuciones, cálculo de tiempo y avance.
-- [x] HU4: implementar recepciones, edición, consulta y filtro por orden, integradas en su detalle.
+- [x] HU4: implementar alta y consulta histórica de recepciones con filtro por orden, integradas en su detalle; edición y eliminación bloqueadas según T131.
 - [x] HU5: implementar máquinas, historial de mantenimiento/repuestos, equipamiento y asignaciones.
 - [x] Crear navegación, panel, estados vacíos y formularios con mensajes accesibles.
 - [x] Añadir pruebas unitarias y de interfaz conectadas para las cinco historias; retirar las pruebas heredadas incompatibles de la plantilla antigua.
@@ -679,3 +705,33 @@ Los cambios siguen locales en main, sin crear ramas, commit ni push.
   cuentan órdenes y que el volumen cuenta peluches. Mantener los cálculos
   existentes, actualizar la documentación y verificar seis pruebas de métricas,
   compilación y etiquetas en navegador. Captura local del panel actualizado.
+
+## Fase 21: Revisión del feedback docente del Avance 03
+
+El usuario solicitó contrastar el feedback del 16 de noviembre con el estado
+actual y conservar la página tal como está. Esta fase modifica documentación;
+no cambia código, interfaz, datos del navegador ni dependencias.
+
+- [x] T209 Contrastar cada observación de `feedback.md` con los archivos y
+  pruebas actuales; registrar evidencias en `revision-feedback-2026-11-27.md`.
+- [x] T210 Completar la matriz FR-001 a FR-068 y corregir las rutas y
+  descripciones de tareas, investigación, modelo y contrato a la implementación
+  real: React, recepciones inmutables, campos opcionales y pedidos por local.
+- [x] T211 Verificar Node/npm y una copia limpia sin ramas ni repositorio Git
+  adicional: instalación con `npm ci --offline --no-audit --no-fund`, 133 pruebas
+  en veinte archivos y compilación; comprobar también la copia de desarrollo.
+- [ ] T212 Medir en navegador las operaciones y listados con al menos 500
+  registros por entidad y registrar dispositivo, casos y tiempos para SC-008.
+- [ ] T213 Evaluar con usuarios los tiempos de SC-001 a SC-005 y el porcentaje
+  de tareas completadas sin ayuda de SC-006. Las pruebas automatizadas no
+  sustituyen ese estudio ni acreditan por sí solas el 90 %.
+
+T212 y T213 explicitan criterios de evaluación que antes estaban incluidos
+en una casilla T114 sin resultados de medición. No son bloqueos funcionales
+encontrados en la página ni se dan por realizados por pasar la suite.
+
+- [x] T214 Precisar en spec y quickstart la reproducción desde otra computadora:
+  misma revisión publicada, versiones del entorno, perfil nuevo y Supervisor;
+  registrar cantidades iniciales y separar ejemplos reproducibles de ediciones
+  locales y alertas dependientes del día. Corregir la fecha antigua de la guía
+  sin cambiar la página ni volver a cargar datos en el navegador del usuario.
