@@ -129,7 +129,7 @@ Los materiales, repuestos, trabajadores y proveedores provienen de otros módulo
    que requiere su composición por 64 unidades, recibidos antes del inicio.
    El Ajolote planificado conserva tres insumos pendientes. La edición y baja
    de recepciones confirmadas continúan bloqueadas.
-6. En el panel, distinga 128 unidades finalizadas de 384 planificadas y consulte
+6. En el panel, distinga 128 unidades terminadas de 384 previstas y consulte
    el avance parcial de los tres lotes iniciados. Recargue y compruebe que las
    acciones realizadas después de la reconstrucción se conservan.
 

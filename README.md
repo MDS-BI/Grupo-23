@@ -80,8 +80,8 @@ cerradas. Las recepciones anteriores se conservan después del cierre.
 ## Métricas del panel de producción
 
 En el perfil **Supervisor**, el **Panel de producción** incluye un filtro por
-peluche y cuatro métricas: unidades planificadas, unidades de órdenes
-finalizadas, cumplimiento del volumen y horas registradas en ejecuciones
+peluche y cuatro métricas: unidades previstas, unidades terminadas,
+volumen terminado y horas registradas en ejecuciones
 terminadas. Los gráficos comparan estados de órdenes, volumen por peluche y
 tiempos promedio por etapa frente al estándar. Se actualizan al guardar o
 deshacer; no requieren servicios ni dependencias adicionales.
@@ -90,6 +90,10 @@ El volumen y los tiempos excluyen órdenes canceladas. El gráfico de estados s�
 las incluye. El cierre de una orden aporta su cantidad planificada a las
 unidades finalizadas; terminar varias etapas no suma peluches adicionales.
 Las alertas de planta y los indicadores generales conservan su alcance global.
+«Unidades previstas» incluye el volumen de órdenes planificadas, en producción
+y finalizadas. El gráfico de estados cuenta órdenes y calcula porcentajes
+sobre ellas; el gráfico de volumen cuenta peluches. El avance por etapas de
+una orden se consulta por separado y no se convierte en unidades terminadas.
 Los faltantes se calculan por orden abierta y luego se agrupan por material.
 Las entregas de lotes cerrados y los excedentes de otra orden no cubren esos
 faltantes: cada recepción está destinada a su propia orden.

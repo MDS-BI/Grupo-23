@@ -673,3 +673,9 @@ Los cambios siguen locales en main, sin crear ramas, commit ni push.
 - [x] T207 Retirar de la página el botón Descargar respaldo anterior, por
   solicitud posterior del usuario; conservar el respaldo previo y actualizar
   la documentación para reproducir la interfaz vigente.
+
+- [x] T208 Aclarar las etiquetas del panel: Unidades previstas, Unidades
+  terminadas y Volumen terminado. Explicar que los porcentajes de estados
+  cuentan órdenes y que el volumen cuenta peluches. Mantener los cálculos
+  existentes, actualizar la documentación y verificar seis pruebas de métricas,
+  compilación y etiquetas en navegador. Captura local del panel actualizado.

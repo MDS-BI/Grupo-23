@@ -54,9 +54,9 @@ export default function MetricasProduccion({ ordenes, productos, etapas, ejecuci
   const maximoVolumen = Math.max(1, ...metricas.porProducto.map((producto) => producto.planificadas));
   const maximoTiempo = Math.max(1, ...metricas.porEtapa.flatMap((etapa) => [etapa.promedio, etapa.estandar || 0]));
   const indicadores = [
-    ['Unidades planificadas', numero(metricas.unidadesPlanificadas), 'Total de órdenes no canceladas', '01'],
-    ['Unidades finalizadas', numero(metricas.unidadesFinalizadas), 'Unidades en órdenes finalizadas', '02'],
-    ['Cumplimiento del volumen', `${numero(metricas.cumplimiento)} %`, 'Finalizadas / planificadas', '03'],
+    ['Unidades previstas', numero(metricas.unidadesPlanificadas), 'Total previsto de órdenes no canceladas', '01'],
+    ['Unidades terminadas', numero(metricas.unidadesFinalizadas), 'Peluches de órdenes finalizadas', '02'],
+    ['Volumen terminado', `${numero(metricas.cumplimiento)} %`, 'Unidades terminadas / previstas', '03'],
     ['Horas registradas', numero(metricas.minutosRegistrados / 60), 'Suma de ejecuciones terminadas', '04'],
   ];
   return <section className="production-analytics" aria-labelledby={tituloId}>
@@ -80,29 +80,29 @@ export default function MetricasProduccion({ ordenes, productos, etapas, ejecuci
         <h3>{nombre}</h3><strong>{valor}</strong><small>{descripcion}</small>
       </article>)}
     </div>
-    <p className="analytics-note">Las unidades finalizadas se calculan según el cierre de la orden; no representan conteos individuales por etapa. Las órdenes canceladas solo se incluyen en el gráfico de estados.</p>
+    <p className="analytics-note">El avance por etapas se consulta en cada orden; no representa un conteo de peluches terminados. Las unidades se cuentan como terminadas al finalizar la orden completa. Las órdenes canceladas solo se incluyen en el gráfico de estados.</p>
     <div className="production-charts">
       <article className="card chart-card" aria-label="Órdenes por estado">
         <header><h3>Órdenes por estado</h3><span className="chart-unit">órdenes</span></header>
-        <p className="muted">Distribución del trabajo en la selección actual.</p>
+        <p className="muted">Cuenta órdenes por estado. El porcentaje se calcula sobre el total de órdenes de esta selección.</p>
         <GraficoEstados estados={metricas.estados} total={metricas.totalOrdenes} />
         {!metricas.totalOrdenes && <p className="chart-empty">Todavía no hay órdenes para esta selección.</p>}
       </article>
       <article className="card chart-card" aria-label="Volumen por peluche">
-        <header><h3>Volumen por peluche</h3><span className="chart-unit">unidades</span></header>
-        <p className="muted">Compara el volumen total con las unidades de órdenes finalizadas.</p>
-        <Leyenda elementos={[[colores[0], 'Planificadas'], [colores[1], 'Finalizadas']]} />
+        <header><h3>Volumen por peluche</h3><span className="chart-unit">peluches</span></header>
+        <p className="muted">Las unidades previstas incluyen órdenes planificadas, en producción y finalizadas. Las terminadas pertenecen a órdenes finalizadas.</p>
+        <Leyenda elementos={[[colores[0], 'Unidades previstas'], [colores[1], 'Unidades terminadas']]} />
         <ul className="bar-chart-list">
           {metricas.porProducto.map((producto) => <li key={producto.producto_id}>
             <b>{producto.nombre}</b>
-            <span className="chart-values">{numero(producto.planificadas)} planificadas · {numero(producto.finalizadas)} finalizadas</span>
+            <span className="chart-values">{numero(producto.planificadas)} previstas · {numero(producto.finalizadas)} terminadas</span>
             <div className="paired-bars" aria-hidden="true">
               <span style={{ width: `${producto.planificadas / maximoVolumen * 100}%`, backgroundColor: colores[0] }} />
               <span style={{ width: `${producto.finalizadas / maximoVolumen * 100}%`, backgroundColor: colores[1] }} />
             </div>
           </li>)}
         </ul>
-        {!metricas.porProducto.length && <p className="chart-empty">No hay volumen planificado para esta selección.</p>}
+        {!metricas.porProducto.length && <p className="chart-empty">No hay unidades previstas para esta selección.</p>}
       </article>
       <article className="card chart-card chart-card--wide" aria-label="Tiempos por etapa">
         <header><h3>Tiempos por etapa</h3><span className="chart-unit">minutos por ejecución</span></header>
